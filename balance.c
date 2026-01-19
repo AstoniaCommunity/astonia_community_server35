@@ -48,11 +48,11 @@ double get_spell_average(int cn) {
 }
 
 int tactics2skill(int val) {
-    return val * 0.15;
+    return val * 15 / 100;
 }
 
 int tactics2spell(int val) {
-    return val * 0.15;
+    return val * 15 / 100;
 }
 
 int tactics2melee(int val) {
@@ -60,13 +60,13 @@ int tactics2melee(int val) {
 }
 
 int spellpower(int cn, int v) {
-    return ch[cn].value[0][v] + tactics2spell(ch[cn].value[0][V_TACTICS]);
+    return ch[cn].value[0][v];
 }
 
 int get_parry_skill(int cn) {
     int val;
 
-    if (ch[cn].value[1][V_PARRY]) val = get_fight_skill(cn) + ch[cn].value[0][V_PARRY] * 2 + tactics2melee(ch[cn].value[0][V_TACTICS]);
+    if (ch[cn].value[1][V_PARRY]) val = get_fight_skill(cn) + ch[cn].value[0][V_PARRY] * 2;
     else if (ch[cn].flags & CF_EDEMON) val = get_fight_skill(cn) * 3.5;
     else if (ch[cn].value[1][V_MAGICSHIELD]) val = get_fight_skill(cn) + ch[cn].value[0][V_MAGICSHIELD] * 2 - min(10, ch[cn].level / 2);
     else val = get_fight_skill(cn) + get_spell_average(cn) * 2;
@@ -77,7 +77,7 @@ int get_parry_skill(int cn) {
 int get_attack_skill(int cn) {
     int val;
 
-    if (ch[cn].value[1][V_ATTACK]) val = get_fight_skill(cn) + ch[cn].value[0][V_ATTACK] * 2 + tactics2melee(ch[cn].value[0][V_TACTICS]);
+    if (ch[cn].value[1][V_ATTACK]) val = get_fight_skill(cn) + ch[cn].value[0][V_ATTACK] * 2;
     else if (ch[cn].flags & CF_EDEMON) val = get_fight_skill(cn) * 3.5;
     else {
         val = get_fight_skill(cn) + get_spell_average(cn) * 2 - ch[cn].level * 3 - 20;
@@ -91,8 +91,7 @@ int get_surround_attack_skill(int cn) {
     int val;
 
     if (ch[cn].value[1][V_SURROUND]) val = get_fight_skill(cn) +
-        ch[cn].value[0][V_SURROUND] * 2 +
-        tactics2melee(ch[cn].value[0][V_TACTICS]) - 20;
+        ch[cn].value[0][V_SURROUND] * 2 - 20;
     else return 0;
 
     return val;
@@ -248,7 +247,6 @@ int immunity_reduction(int caster, int subject, int skill_strength) {
     extern int showspell;
 
     immun = ch[subject].value[0][V_IMMUNITY];
-    if (ch[subject].value[1][V_TACTICS]) immun += tactics2skill(ch[subject].value[0][V_TACTICS] + 14);
     if (ch[subject].value[1][V_RAGE]) immun += ch[subject].rage / POWERSCALE / RAGEMOD;
 
     diff = skill_strength - immun;
@@ -268,7 +266,6 @@ int freeze_value(int cn, int co) {
     int str, dam, diff, immun;
 
     immun = ch[co].value[0][V_IMMUNITY];
-    if (ch[co].value[1][V_TACTICS]) immun += tactics2skill(ch[co].value[0][V_TACTICS] + 14);
     if (ch[co].value[1][V_RAGE]) immun += ch[co].rage / POWERSCALE / RAGEMOD;
 
     str = spellpower(cn, V_FREEZE);
@@ -293,7 +290,6 @@ int warcry_value(int cn, int co, int pwr) {
     int str, immun, diff, dam;
 
     immun = ch[co].value[0][V_IMMUNITY];
-    if (ch[co].value[1][V_TACTICS]) immun += tactics2skill(ch[co].value[0][V_TACTICS] + 14);
     if (ch[co].value[1][V_RAGE]) immun += ch[co].rage / POWERSCALE / RAGEMOD;
 
     diff = pwr - immun;
