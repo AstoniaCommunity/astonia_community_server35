@@ -1607,8 +1607,8 @@ void update_char(int cn) {
 	// add tactics bonuses
 	if (ch[cn].value[1][V_TACTICS]) {
 		
-		int skillBonus = tactics2skill(ch[cn].value[0][V_TACTICS]);
-		int spellBonus = tactics2spell(ch[cn].value[0][V_TACTICS]);
+		int skill_bonus = tactics2skill(ch[cn].value[0][V_TACTICS]);
+		int spell_bonus = tactics2spell(ch[cn].value[0][V_TACTICS]);
 
 		if (ch[cn].value[1][V_DAGGER]) ch[cn].value[0][V_DAGGER] += skillBonus;
 		if (ch[cn].value[1][V_HAND]) ch[cn].value[0][V_HAND] += skillBonus;

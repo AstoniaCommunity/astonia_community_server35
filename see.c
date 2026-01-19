@@ -51,14 +51,14 @@ int char_see_char_nolos(int cn, int co) {
 
     light = max(32 - light, 0) * 2;
 
-    if (ch[co].speed_mode == SM_STEALTH) stealth = ch[co].value[0][V_STEALTH] + tactics2skill(ch[co].value[0][V_TACTICS]);
+    if (ch[co].speed_mode == SM_STEALTH) stealth = ch[co].value[0][V_STEALTH];
     else stealth = 0;
 
     // 0...64        4..400
     if (stealth) vco = light + stealth + dist;
     else vco = 0;
 
-    vcn = ch[cn].value[0][V_PERCEPT] + tactics2skill(ch[cn].value[0][V_TACTICS]) + 16 + 49;
+    vcn = ch[cn].value[0][V_PERCEPT] + 16 + 49;
 
     if (vcn >= vco) return 1;
 
