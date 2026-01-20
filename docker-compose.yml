@@ -1,0 +1,53 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: astonia-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-astonia}
+      MYSQL_DATABASE: merc35
+    volumes:
+      - astonia-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - astonia-net
+
+  server:
+    image: ${DOCKER_IMAGE:-astoniacommunity/astonia_server_35:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: astonia-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AS35_DBHOST: db
+      AS35_DBUSER: root
+      AS35_DBPASS: ${MYSQL_ROOT_PASSWORD:-astonia}
+      AS35_DBNAME: merc35
+      AS35_CHATHOST: localhost
+    ports:
+      # Chat server (internal communication, usually not exposed publicly)
+      # - "5554:5554"
+      # Game server ports - area servers
+      - "8080-8090:8080-8090"
+      - "27584-27620:27584-27620"
+    volumes:
+      # Persist server logs (optional)
+      - ./logs:/server/logs
+    networks:
+      - astonia-net
+
+volumes:
+  astonia-db-data:
+
+networks:
+  astonia-net:
+    driver: bridge
