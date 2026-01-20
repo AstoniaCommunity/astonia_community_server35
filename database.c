@@ -1974,8 +1974,8 @@ static void load_char(char *name, char *password) {
     }
 
     // read the data we need
-    //                     0   1    2    3            4            5  6   7      8              9          10
-    sprintf(buf, "select sID,chr,item,name,current_area,allowed_area,ID,ppd,mirror,current_mirror,logout_time from chars where name='%s'", login.name);
+    //                     0   1    2    3            4            5  6   7      8              9          10    11
+    sprintf(buf, "select sID,chr,item,name,current_area,allowed_area,ID,ppd,mirror,current_mirror,logout_time,class from chars where name='%s'", login.name);
     if (mysql_query_con(&mysql, buf)) {
         elog("Failed to select account name=%s: Error: %s (%d)", login.name, mysql_error(&mysql), mysql_errno(&mysql));
         mysql_query_con(&mysql, "unlock tables");
@@ -2044,7 +2044,7 @@ static void load_char(char *name, char *password) {
         return;
     }
 
-    if (nologin && atoi(row[0]) != 1) {
+    if (nologin && !(atoi(row[11]) & CF_GOD)) {
         mysql_free_result_cnt(result);
         mysql_query_con(&mysql, "unlock tables");
         login_shutdown();
