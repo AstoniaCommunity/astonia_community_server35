@@ -68,7 +68,7 @@ int salesprice(int cn, int co, int nr) {
     if (store[s]->ware[nr].cnt) {
         price = store[s]->ware[nr].item.value;
 
-        skill = ch[co].value[0][V_BARTER] + tactics2skill(ch[co].value[0][V_TACTICS]) + get_support_prof(co, P_TRADER) * 5 + clan_trade_bonus(co);
+        skill = ch[co].value[0][V_BARTER] + get_support_prof(co, P_TRADER) * 5 + clan_trade_bonus(co);
 
         mult = 1.55 - (skill / 1000.0);
         if (mult < 1.05) mult = 1.05;
@@ -92,7 +92,7 @@ int buyprice(int cn, int in) {
     price = it[in].value;
 
     if (!(it[in].flags & IF_MONEY)) {
-        skill = ch[cn].value[0][V_BARTER] + tactics2skill(ch[cn].value[0][V_TACTICS]) + get_support_prof(cn, P_TRADER) * 5 + clan_trade_bonus(cn);
+        skill = ch[cn].value[0][V_BARTER] + get_support_prof(cn, P_TRADER) * 5 + clan_trade_bonus(cn);
 
         mult = 0.75 + (skill / 2500.0);
         if (mult > 0.95) mult = 0.95;

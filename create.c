@@ -1606,31 +1606,10 @@ void update_char(int cn) {
 
 	// add tactics bonuses
 	if (ch[cn].value[1][V_TACTICS]) {
-		
 		int skill_bonus = tactics2skill(ch[cn].value[0][V_TACTICS]);
-		int spell_bonus = tactics2spell(ch[cn].value[0][V_TACTICS]);
-
-		if (ch[cn].value[1][V_DAGGER]) ch[cn].value[0][V_DAGGER] += skillBonus;
-		if (ch[cn].value[1][V_HAND]) ch[cn].value[0][V_HAND] += skillBonus;
-		if (ch[cn].value[1][V_STAFF]) ch[cn].value[0][V_STAFF] += skillBonus;
-		if (ch[cn].value[1][V_SWORD]) ch[cn].value[0][V_SWORD] += skillBonus;
-		if (ch[cn].value[1][V_TWOHAND]) ch[cn].value[0][V_TWOHAND] += skillBonus;
-
-		if (ch[cn].value[1][V_ATTACK]) ch[cn].value[0][V_ATTACK] += skillBonus;
-		if (ch[cn].value[1][V_PARRY]) ch[cn].value[0][V_PARRY] += skillBonus;
-		if (ch[cn].value[1][V_SURROUND]) ch[cn].value[0][V_SURROUND] += skillBonus;
-		if (ch[cn].value[1][V_SPEEDSKILL]) ch[cn].value[0][V_SPEEDSKILL] += skillBonus;
-		if (ch[cn].value[1][V_BARTER]) ch[cn].value[0][V_BARTER] += skillBonus;
-		if (ch[cn].value[1][V_PERCEPT]) ch[cn].value[0][V_PERCEPT] += skillBonus;
-		if (ch[cn].value[1][V_STEALTH]) ch[cn].value[0][V_STEALTH] += skillBonus;
-		if (ch[cn].value[1][V_RAGE]) ch[cn].value[0][V_RAGE] += skillBonus;
-		
-		if (ch[cn].value[1][V_WARCRY]) ch[cn].value[0][V_WARCRY] += spellBonus;
-		if (ch[cn].value[1][V_HEAL]) ch[cn].value[0][V_HEAL] += spellBonus;
-		if (ch[cn].value[1][V_FREEZE]) ch[cn].value[0][V_FREEZE] += spellBonus;
-		if (ch[cn].value[1][V_FLASH]) ch[cn].value[0][V_FLASH] += spellBonus;
-		if (ch[cn].value[1][V_FIRE]) ch[cn].value[0][V_FIRE] += spellBonus;
-		if (ch[cn].value[1][V_IMMUNITY]) ch[cn].value[0][V_IMMUNITY] += spellBonus;
+		for (n = V_DAGGER; n < V_DEMON; n++) {
+			if (n != V_TACTICS && n != V_BLESS && n != V_MAGICSHIELD && ch[cn].value[1][n]) ch[cn].value[0][n] += skill_bonus;
+		}
 	}
 		
 

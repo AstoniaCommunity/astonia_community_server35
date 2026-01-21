@@ -53,7 +53,7 @@ static void increase_rage(int cn) {
     int rage_diff;
 
     if (ch[cn].value[1][V_RAGE]) {
-        rage_diff = ((ch[cn].value[0][V_RAGE] + tactics2skill(ch[cn].value[0][V_TACTICS] + 14)) * POWERSCALE - ch[cn].rage);
+        rage_diff = (ch[cn].value[0][V_RAGE] * POWERSCALE - ch[cn].rage);
         ch[cn].rage += rage_diff / 20;
     }
 }

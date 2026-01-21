@@ -53,10 +53,10 @@ int char_can_flee(int cn) {
     if (ch[cn].escape_timer >= ticker) return 0;
 
     for (m = 0; m < 4; m++)
-        if ((co = ch[cn].enemy[m]) != 0) per += ch[co].value[0][V_PERCEPT] + tactics2skill(ch[co].value[0][V_TACTICS] + 14);
+        if ((co = ch[cn].enemy[m]) != 0) per += ch[co].value[0][V_PERCEPT];
 
-    if (has_spell(cn, IDR_WARCRY) || has_spell(cn, IDR_FREEZE)) ste = (ch[cn].value[0][V_STEALTH] + tactics2skill(ch[co].value[0][V_TACTICS] + 14)) / 2;
-    else ste = ch[cn].value[0][V_STEALTH] + tactics2skill(ch[co].value[0][V_TACTICS] + 14);
+    if (has_spell(cn, IDR_WARCRY) || has_spell(cn, IDR_FREEZE)) ste = (ch[cn].value[0][V_STEALTH]) / 2;
+    else ste = ch[cn].value[0][V_STEALTH];
     ;
 
     chance = ste * 10 / per;

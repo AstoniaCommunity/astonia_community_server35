@@ -51,14 +51,6 @@ int tactics2skill(int val) {
     return val * 15 / 100;
 }
 
-int tactics2spell(int val) {
-    return val * 15 / 100;
-}
-
-int tactics2melee(int val) {
-    return tactics2skill(val) * 3;
-}
-
 int spellpower(int cn, int v) {
     return ch[cn].value[0][v];
 }

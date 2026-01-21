@@ -10,5 +10,4 @@
 #define RAGEMOD 4 // rage skill is divided by this before being used
 
 int skilldiff2percent(int diff);
-int tactics2spell(int val);
 int tactics2skill(int val);
