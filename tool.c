@@ -1559,10 +1559,11 @@ void look_values_bg(int cnID, int coID) {
     tell_chat(0, cnID, 1, "%s", buf);
 
     ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
-    if (ppd) {
-        sprintf(buf, "Gold in hand: %.2fG, gold in bank: %.2fG", ch[co].gold / 100.0, ppd->gold / 100.0);
-        tell_chat(0, cnID, 1, "%s", buf);
-    }
+    if (ppd && !ppd->loaded) ppd = NULL;
+    if (ppd) sprintf(buf, "Gold in hand: %.2fG, gold in bank: %.2fG", ch[co].gold / 100.0, ppd->gold / 100.0);
+    else sprintf(buf, "Gold in hand: %.2fG", ch[co].gold / 100.0);
+    tell_chat(0, cnID, 1, "%s", buf);
+
     sprintf(buf, "Mirror: %d, actual mirror: %d. Area %d, %s", ch[co].mirror, areaM, areaID, get_section_name(ch[co].x, ch[co].y));
     tell_chat(0, cnID, 1, "%s", buf);
 

@@ -1368,12 +1368,14 @@ static void login_nopay(void) {
     pthread_mutex_unlock(&data_mutex);
 }
 
+#if 0
 static void login_dup(void) {
     pthread_mutex_lock(&data_mutex);
     login.status = LS_DUP;
     login.age = ticker;
     pthread_mutex_unlock(&data_mutex);
 }
+#endif
 
 static void login_shutdown(void) {
     pthread_mutex_lock(&data_mutex);
@@ -1812,6 +1814,7 @@ static int load_char_pwd(char *pass, int sID, int logout_time, int *ptimeleft) {
     return 0;
 }
 
+#if 0
 static int load_char_dup(int ID, int sID) {
     MYSQL_RES *result;
     char buf[256];
@@ -1837,7 +1840,7 @@ static int load_char_dup(int ID, int sID) {
 
     return 1;
 }
-
+#endif
 int load_depot(int sID, int cID) {
     char query[80];
     MYSQL_RES *result;
@@ -2036,6 +2039,7 @@ static void load_char(char *name, char *password) {
         return;
     }
 
+#if 0 // disabled for testing!
     if (!load_char_dup(ID, atoi(row[0]))) {
         xlog("duplicate login for ID=%d (%s)", ID, row[3]);
         mysql_free_result_cnt(result);
@@ -2043,6 +2047,7 @@ static void load_char(char *name, char *password) {
         login_dup();
         return;
     }
+#endif
 
     if (nologin && !(atoi(row[11]) & CF_GOD)) {
         mysql_free_result_cnt(result);

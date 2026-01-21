@@ -24,6 +24,11 @@ int swap_depot(int cn, int nr) {
     ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
     if (!ppd) return 0;
 
+    if (!ppd->loaded) {
+        error = ERR_ACCESS_DENIED;
+        return 0;
+    }
+
     if (cn < 1 || cn >= MAXCHARS) {
         error = ERR_ILLEGAL_CHARNO;
         return 0;

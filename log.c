@@ -220,8 +220,10 @@ void log_items(int cn) {
         if (ch[cn].item[n]) log_item(cn, it + ch[cn].item[n]);
     }
 
-    ilog("ID=%d: %s eqlog depot:", ch[cn].ID, ch[cn].name);
-    if ((ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd)))) {
+    ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+    if (ppd && !ppd->loaded) ppd = NULL;
+    if (ppd) {
+        ilog("ID=%d: %s eqlog depot:", ch[cn].ID, ch[cn].name);
         for (n = 0; n < MAXDEPOT; n++) {
             if (ppd->itm[n].flags) log_item(cn, ppd->itm + n);
         }

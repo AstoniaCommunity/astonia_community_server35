@@ -428,6 +428,7 @@ void guard_driver(int cn, int ret, int lastact) {
                         ppd->legal_fine = 0;
                     } else {
                         bank = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+                        if (bank && !bank->loaded) bank = NULL;
                         if (bank) {
                             int need;
 

@@ -672,7 +672,10 @@ void turn_seyan(int cn) {
     }
 
     // remove quest items from depot
+    // TODO: this is pointless as it is, since the account wide depot cannot store quest items anyway.
+    // it will have to go through the planned per-char, though
     ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+    if (!ppd->loaded) ppd = NULL;
     if (!ppd) return;
     for (n = 0; n < MAXDEPOT; n++) {
         if (ppd->itm[n].flags & IF_QUEST) {

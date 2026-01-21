@@ -2417,6 +2417,7 @@ static void player_stats(int nr) {
                 strcpy(player[nr]->con_name, "Error Loading Depot");
                 psend(nr, buf, len + 2);
                 if (!player[nr]) return;
+                // TODO: trigger reload of depot, send note to other chars to unload the depot
             }
         } else {
             if (strcmp(player[nr]->con_name, "Your Depot")) {

@@ -707,7 +707,9 @@ void destroy_item_byID(int cn, int ID) {
         }
     }
 
-    if (ppd) {
+    if (ppd && ppd->loaded) {
+        // TODO: make sure all relevant items are QUESTITEMS? otherwise players can avoid having their stuff destroyed
+        // by storing it in the depot and loading it with a different char.
         for (n = 0; n < MAXDEPOT; n++) {
             if (ppd->itm[n].flags) {
                 if (ppd->itm[n].ID == ID) {
