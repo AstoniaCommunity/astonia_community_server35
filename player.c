@@ -2426,7 +2426,8 @@ static void player_stats(int nr) {
                         if (!player[nr]) return;
                     }
                 }
-                // TODO: trigger reload of depot, send note to other chars to unload the depot
+                load_depot_for_char(ch[cn].ID, ch[cn].sID);
+                // TODO: We should re-try one or two times, maybe with a second delay each?
             }
         } else {
             if (strcmp(player[nr]->con_name, "Your Depot")) {
@@ -2457,6 +2458,7 @@ static void player_stats(int nr) {
             psend(nr, buf, 2);
             if (!player[nr]) return;
         }
+        strcpy(player[nr]->con_name, "none");
     }
 
     if (ch[cn].flags & CF_PROF) {

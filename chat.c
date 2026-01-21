@@ -253,6 +253,12 @@ static void rec_chat(unsigned short channel, char *text) {
 
         cnID = atoi(text);
         do_whotutor(cnID);
+    } else if (channel == 1039) { // release depot request
+        int sID, cID;
+
+        sID = atoi(text);
+        cID = atoi(text + 11);
+        release_depot(sID, cID);
     }
 }
 

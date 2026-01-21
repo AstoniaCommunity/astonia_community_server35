@@ -117,7 +117,7 @@ void add_iplog(int ID, unsigned int ip);
 void db_read_clan_membercount(int cnr);
 void db_summary(char *key, int sID);
 void db_update_global(void);
-void db_load_depot_for_char(int ID, int sID);
+void db_load_depot_for_char(int cID, int sID);
 
 static pthread_t db_tid;
 static pthread_mutex_t data_mutex;
@@ -758,11 +758,15 @@ int rescue_char(int ID) {
     return add_query(DT_RESCUE, buf, "rescue char", 0);
 }
 
-int load_depot_for_char(int ID, int sID) {
-    char buf[80], buf2[80];
+int load_depot_for_char(int cID, int sID) {
+    char buf[80], buf2[80], buf3[80];
 
-    sprintf(buf, "%d", ID);
+    sprintf(buf, "%d", cID);
     sprintf(buf2, "%d", sID);
+
+    sprintf(buf3, "%10d:%10d", sID, cID);
+    xlog("requesting depot release (%s)", buf3);
+    server_chat(1039, buf3);
 
     return add_query(DT_LOADDEPOT, buf, buf2, 0);
 }
@@ -3642,31 +3646,51 @@ void db_update_global(void) {
     update_global_online();
 }
 
-void db_load_depot_for_char(int ID, int sID) {
+void db_load_depot_for_char(int cID, int sID) {
     struct depot_ppd *ppd;
-    int n;
+    int co;
 
     lock_server();
-    for (n = 1; n < MAXCHARS; n++) {
-        if (!ch[n].flags) continue;
-        if (ch[n].ID == ID) break;
+
+    for (co = getfirst_char(); co; co = getnext_char(co)) {
+        if (ch[co].sID == sID && ch[co].ID == cID) break;
     }
-    if (n == MAXCHARS || ch[n].sID != sID) {
+    if (!co) {
         unlock_server();
         return;
     }
-    ppd = set_data(n, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+
+    ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
     if (ppd->loaded) {
         unlock_server();
         return;
     }
 
-    if (load_depot(sID, ID, ppd)) {
-        xlog("loaded depot");
+    if (load_depot(sID, cID, ppd)) {
+        xlog("loaded depot for %s", ch[co].name);
         ppd->loaded = 1;
     } else {
-        xlog("could not load depot");
+        xlog("could not load depot for %s", ch[co].name);
     }
 
     unlock_server();
+}
+
+void release_depot(int sID, int cID) {
+    struct depot_ppd *depot_ppd;
+    int co;
+
+    xlog("release depot for %d", sID);
+
+    for (co = getfirst_char(); co; co = getnext_char(co)) {
+        if (ch[co].sID != sID) continue;
+        if (ch[co].ID == cID) continue;
+        depot_ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+        if (depot_ppd->loaded) {
+            save_depot(ch[co].sID, depot_ppd, ch[co].ID, 1);
+            save_char(co, 0);
+            bzero(depot_ppd, sizeof(struct depot_ppd));
+            xlog("release depot for %s", ch[co].name);
+        }
+    }
 }

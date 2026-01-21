@@ -2597,24 +2597,6 @@ int command(int cn, char *ptr) // 1=ok, 0=repeat
         return 1;
     }
 
-    if ((len = cmdcmp(ptr, "nodepot", 4))) {
-        struct depot_ppd *depot_ppd;
-
-        depot_ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
-        if (depot_ppd->loaded) {
-            save_depot(ch[cn].sID, depot_ppd, ch[cn].ID, 1);
-            bzero(depot_ppd, sizeof(struct depot_ppd));
-            log_char(cn, LOG_SYSTEM, 0, "Done.");
-        }
-
-        return 1;
-    }
-
-    if ((len = cmdcmp(ptr, "loaddepot", 6))) {
-        load_depot_for_char(ch[cn].ID, ch[cn].sID);
-        return 1;
-    }
-
     if (cmd_chat(cn, ptr)) return 1;
 
     log_char(cn, LOG_SYSTEM, 0, "Unknown command.");
