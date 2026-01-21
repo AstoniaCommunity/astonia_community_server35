@@ -261,12 +261,12 @@ union ceffect {
 #define SV_GOLD 30
 #define SV_LOOKINV 31
 #define SV_ITEMPRICE 32
-#define SV_CYCLES 33
+#define SV__FREE_FOR_USE4__ 33
 #define SV_CEFFECT 34
 #define SV_UEFFECT 35
 #define SV_REALTIME 36
 #define SV_SPEEDMODE 37
-#define SV_FIGHTMODE 38
+#define SV__FREE_FOR_USE5__ 38
 #define SV_CONTYPE 39
 #define SV_CONNAME 40
 #define SV__FREE_FOR_USE1__ 41
