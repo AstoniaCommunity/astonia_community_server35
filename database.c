@@ -81,6 +81,7 @@
 #define DT_SHOWALTS 23
 #define DT_SUMMARY 24
 #define DT_UPDATEGLOBAL 25
+#define DT_LOADDEPOT 26
 
 #define MAXAREA 60
 #define MAXMIRROR 27
@@ -116,6 +117,7 @@ void add_iplog(int ID, unsigned int ip);
 void db_read_clan_membercount(int cnr);
 void db_summary(char *key, int sID);
 void db_update_global(void);
+void db_load_depot_for_char(int ID, int sID);
 
 static pthread_t db_tid;
 static pthread_mutex_t data_mutex;
@@ -756,6 +758,15 @@ int rescue_char(int ID) {
     return add_query(DT_RESCUE, buf, "rescue char", 0);
 }
 
+int load_depot_for_char(int ID, int sID) {
+    char buf[80], buf2[80];
+
+    sprintf(buf, "%d", ID);
+    sprintf(buf2, "%d", sID);
+
+    return add_query(DT_LOADDEPOT, buf, buf2, 0);
+}
+
 int do_rename(int masterID, char *from, char *to) {
     char buf[256];
 
@@ -1060,6 +1071,9 @@ static void db_thread_sub(void) {
             break;
         case DT_UPDATEGLOBAL:
             db_update_global();
+            break;
+        case DT_LOADDEPOT:
+            db_load_depot_for_char(atoi(opt1), atoi(opt2));
             break;
         }
 
@@ -1841,7 +1855,8 @@ static int load_char_dup(int ID, int sID) {
     return 1;
 }
 #endif
-int load_depot(int sID, int cID) {
+
+int load_depot(int sID, int cID, struct depot_ppd *dest) {
     char query[80];
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -1863,7 +1878,7 @@ int load_depot(int sID, int cID) {
         if (mysql_query_con(&mysql, query)) {
             elog("Failed to create depot sID=%d: Error: %s (%d)", sID, mysql_error(&mysql), mysql_errno(&mysql));
         }
-        bzero(&login.depot, sizeof(login.depot));
+        bzero(dest, sizeof(login.depot));
         return 1;
     }
     if (!(row = mysql_fetch_row(result))) {
@@ -1876,8 +1891,8 @@ int load_depot(int sID, int cID) {
         return 0;
     }
 
-    bzero(&login.depot, sizeof(login.depot));
-    if (row[0]) uncompress_string((unsigned char *)&login.depot, row[0], sizeof(struct depot_ppd));
+    bzero(dest, sizeof(login.depot));
+    if (row[0]) uncompress_string((unsigned char *)dest, row[0], sizeof(struct depot_ppd));
 
     mysql_free_result_cnt(result);
     sprintf(query, "update depot set area=%d, mirror=%d, cID=%d where ID=%d", areaID, areaM, cID, sID);
@@ -2158,7 +2173,7 @@ static void load_char(char *name, char *password) {
 
     mysql_free_result_cnt(result);
 
-    if (!load_depot(login.sID, ID)) bzero(&login.depot, sizeof(login.depot));
+    if (!load_depot(login.sID, ID, &login.depot)) bzero(&login.depot, sizeof(login.depot));
     else login.depot.loaded = 1;
 
     // mark character as online in database
@@ -3625,4 +3640,33 @@ void db_summary(char *key, int sID) {
 
 void db_update_global(void) {
     update_global_online();
+}
+
+void db_load_depot_for_char(int ID, int sID) {
+    struct depot_ppd *ppd;
+    int n;
+
+    lock_server();
+    for (n = 1; n < MAXCHARS; n++) {
+        if (!ch[n].flags) continue;
+        if (ch[n].ID == ID) break;
+    }
+    if (n == MAXCHARS || ch[n].sID != sID) {
+        unlock_server();
+        return;
+    }
+    ppd = set_data(n, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+    if (ppd->loaded) {
+        unlock_server();
+        return;
+    }
+
+    if (load_depot(sID, ID, ppd)) {
+        xlog("loaded depot");
+        ppd->loaded = 1;
+    } else {
+        xlog("could not load depot");
+    }
+
+    unlock_server();
 }

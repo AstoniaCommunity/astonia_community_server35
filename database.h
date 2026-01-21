@@ -51,3 +51,6 @@ int plrnotes(int victimID, int sID);
 int showalts(int masterID, int victimID);
 int summary(char *key, int sID);
 void log_dc(int cn);
+struct depot_ppd;
+void save_depot(int sID, struct depot_ppd *dat, int cID, int leaving);
+int load_depot_for_char(int ID, int sID);
