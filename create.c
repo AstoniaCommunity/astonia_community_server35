@@ -1604,14 +1604,13 @@ void update_char(int cn) {
         else if (n <= V_STR && ch[cn].value[0][n] < 0) ch[cn].value[0][n] = 0;
     }
 
-	// add tactics bonuses
-	if (ch[cn].value[1][V_TACTICS]) {
-		int skill_bonus = tactics2skill(ch[cn].value[0][V_TACTICS]);
-		for (n = V_DAGGER; n < V_DEMON; n++) {
-			if (n != V_TACTICS && n != V_BLESS && n != V_MAGICSHIELD && ch[cn].value[1][n]) ch[cn].value[0][n] += skill_bonus;
-		}
-	}
-		
+    // add tactics bonuses
+    if (ch[cn].value[1][V_TACTICS]) {
+        int skill_bonus = tactics2skill(ch[cn].value[0][V_TACTICS]);
+        for (n = V_DAGGER; n < V_DEMON; n++) {
+            if (n != V_TACTICS && n != V_BLESS && n != V_MAGICSHIELD && ch[cn].value[1][n]) ch[cn].value[0][n] += skill_bonus;
+        }
+    }
 
     if (ch[cn].value[1][V_SPEEDSKILL]) ch[cn].value[0][V_SPEED] += ch[cn].value[0][V_SPEEDSKILL] / 2;
 
