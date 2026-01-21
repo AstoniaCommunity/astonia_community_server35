@@ -3688,7 +3688,6 @@ void release_depot(int sID, int cID) {
         depot_ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
         if (depot_ppd->loaded) {
             save_depot(ch[co].sID, depot_ppd, ch[co].ID, 1);
-            save_char(co, 0);
             bzero(depot_ppd, sizeof(struct depot_ppd));
             xlog("release depot for %s", ch[co].name);
         }
