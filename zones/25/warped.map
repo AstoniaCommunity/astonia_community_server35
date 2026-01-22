@@ -296981,11 +296981,11 @@ flag=MF_INDOORS
 
 field="251,237"
 gsprite=59667
+it=depot4
 flag=MF_INDOORS
 
 field="252,237"
 gsprite=59668
-it=green_walltorch_on_ls
 flag=MF_INDOORS
 
 field="253,237"
@@ -298169,6 +298169,7 @@ flag=MF_INDOORS
 
 field="253,238"
 gsprite=59668
+it=green_walltorch_on_lh
 flag=MF_INDOORS
 
 field="254,238"

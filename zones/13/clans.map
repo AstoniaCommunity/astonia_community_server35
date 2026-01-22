@@ -4502,6 +4502,7 @@ flag=MF_PEACE
 
 field="9,2"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -4799,6 +4800,7 @@ flag=MF_PEACE
 
 field="58,2"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -5096,6 +5098,7 @@ flag=MF_PEACE
 
 field="107,2"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -5393,6 +5396,7 @@ flag=MF_PEACE
 
 field="156,2"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -5690,6 +5694,7 @@ flag=MF_PEACE
 
 field="205,2"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -35072,6 +35077,7 @@ flag=MF_PEACE
 
 field="9,22"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -35369,6 +35375,7 @@ flag=MF_PEACE
 
 field="58,22"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -35666,6 +35673,7 @@ flag=MF_PEACE
 
 field="107,22"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -35963,6 +35971,7 @@ flag=MF_PEACE
 
 field="156,22"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -36260,6 +36269,7 @@ flag=MF_PEACE
 
 field="205,22"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -65642,6 +65652,7 @@ flag=MF_PEACE
 
 field="9,42"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -65939,6 +65950,7 @@ flag=MF_PEACE
 
 field="58,42"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -66236,6 +66248,7 @@ flag=MF_PEACE
 
 field="107,42"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -66533,6 +66546,7 @@ flag=MF_PEACE
 
 field="156,42"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -66854,6 +66868,7 @@ flag=MF_PEACE
 
 field="205,42"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -96240,6 +96255,7 @@ flag=MF_PEACE
 
 field="9,62"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -96537,6 +96553,7 @@ flag=MF_PEACE
 
 field="58,62"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -96834,6 +96851,7 @@ flag=MF_PEACE
 
 field="107,62"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -97131,6 +97149,7 @@ flag=MF_PEACE
 
 field="156,62"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -97428,6 +97447,7 @@ flag=MF_PEACE
 
 field="205,62"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -126810,6 +126830,7 @@ flag=MF_PEACE
 
 field="9,82"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -127107,6 +127128,7 @@ flag=MF_PEACE
 
 field="58,82"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -127404,6 +127426,7 @@ flag=MF_PEACE
 
 field="107,82"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -127701,6 +127724,7 @@ flag=MF_PEACE
 
 field="156,82"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -127998,6 +128022,7 @@ flag=MF_PEACE
 
 field="205,82"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -157380,6 +157405,7 @@ flag=MF_PEACE
 
 field="9,102"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -157677,6 +157703,7 @@ flag=MF_PEACE
 
 field="58,102"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -157974,6 +158001,7 @@ flag=MF_PEACE
 
 field="107,102"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -158271,6 +158299,7 @@ flag=MF_PEACE
 
 field="156,102"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -158568,6 +158597,7 @@ flag=MF_PEACE
 
 field="205,102"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -187950,6 +187980,7 @@ flag=MF_PEACE
 
 field="9,122"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -188247,6 +188278,7 @@ flag=MF_PEACE
 
 field="58,122"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -188544,6 +188576,7 @@ flag=MF_PEACE
 
 field="107,122"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -188841,6 +188874,7 @@ flag=MF_PEACE
 
 field="156,122"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -189138,6 +189172,7 @@ flag=MF_PEACE
 
 field="205,122"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -218520,6 +218555,7 @@ flag=MF_PEACE
 
 field="9,142"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -218817,6 +218853,7 @@ flag=MF_PEACE
 
 field="58,142"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -219114,6 +219151,7 @@ flag=MF_PEACE
 
 field="107,142"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -219411,6 +219449,7 @@ flag=MF_PEACE
 
 field="156,142"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -219708,6 +219747,7 @@ flag=MF_PEACE
 
 field="205,142"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -249090,6 +249130,7 @@ flag=MF_PEACE
 
 field="9,162"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -249387,6 +249428,7 @@ flag=MF_PEACE
 
 field="58,162"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -249684,6 +249726,7 @@ flag=MF_PEACE
 
 field="107,162"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -249981,6 +250024,7 @@ flag=MF_PEACE
 
 field="156,162"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -250278,6 +250322,7 @@ flag=MF_PEACE
 
 field="205,162"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -279660,6 +279705,7 @@ flag=MF_PEACE
 
 field="9,182"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -279957,6 +280003,7 @@ flag=MF_PEACE
 
 field="58,182"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -280254,6 +280301,7 @@ flag=MF_PEACE
 
 field="107,182"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -280551,6 +280599,7 @@ flag=MF_PEACE
 
 field="156,182"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -280848,6 +280897,7 @@ flag=MF_PEACE
 
 field="205,182"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -310230,6 +310280,7 @@ flag=MF_PEACE
 
 field="9,202"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -310527,6 +310578,7 @@ flag=MF_PEACE
 
 field="58,202"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -310824,6 +310876,7 @@ flag=MF_PEACE
 
 field="107,202"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -311121,6 +311174,7 @@ flag=MF_PEACE
 
 field="156,202"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -311418,6 +311472,7 @@ flag=MF_PEACE
 
 field="205,202"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -340800,6 +340855,7 @@ flag=MF_PEACE
 
 field="9,222"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -341097,6 +341153,7 @@ flag=MF_PEACE
 
 field="58,222"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -341394,6 +341451,7 @@ flag=MF_PEACE
 
 field="107,222"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -341691,6 +341749,7 @@ flag=MF_PEACE
 
 field="156,222"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -341988,6 +342047,7 @@ flag=MF_PEACE
 
 field="205,222"
 gsprite=12126
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 

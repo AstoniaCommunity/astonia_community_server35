@@ -28753,7 +28753,7 @@ flag=MF_PEACE
 
 field="3,21"
 gsprite=12120
-it=depot1
+it=depot3
 flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 flag=MF_PEACE
@@ -51692,6 +51692,7 @@ flag=MF_PEACE
 
 field="18,39"
 gsprite=20459
+it=depot1
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -52800,7 +52801,6 @@ flag=MF_PEACE
 
 field="18,40"
 gsprite=20457
-it=depot1
 flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 flag=MF_PEACE
@@ -53891,7 +53891,7 @@ flag=MF_PEACE
 
 field="18,41"
 gsprite=20459
-fsprite=21066
+it=depot3
 flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 flag=MF_PEACE
@@ -80985,6 +80985,7 @@ flag=MF_SHOUTBLOCK
 
 field="93,64"
 gsprite=20294
+it=depot1
 flag=MF_INDOORS
 
 field="94,64"
@@ -81988,7 +81989,6 @@ flag=MF_SHOUTBLOCK
 
 field="93,65"
 gsprite=20297
-it=depot1
 flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
@@ -83059,6 +83059,7 @@ flag=MF_SHOUTBLOCK
 
 field="93,66"
 gsprite=20291
+it=depot3
 flag=MF_INDOORS
 
 field="94,66"

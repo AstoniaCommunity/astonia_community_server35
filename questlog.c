@@ -685,8 +685,6 @@ void destroy_item_byID(int cn, int ID) {
     struct depot_ppd *ppd;
     int n, in;
 
-    ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
-
     for (n = 0; n < INVENTORYSIZE; n++) {
         if (n >= 12 && n < 30) continue;
 
@@ -707,7 +705,8 @@ void destroy_item_byID(int cn, int ID) {
         }
     }
 
-    if (ppd && ppd->loaded) {
+    ppd = set_data(cn, DRD_CHARDEPOT_PPD, sizeof(struct depot_ppd));
+    if (ppd) {
         // TODO: make sure all relevant items are QUESTITEMS? otherwise players can avoid having their stuff destroyed
         // by storing it in the depot and loading it with a different char.
         for (n = 0; n < MAXDEPOT; n++) {

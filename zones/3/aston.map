@@ -183565,6 +183565,7 @@ flag=MF_NEUTRAL
 
 field="134,181"
 gsprite=20314
+it=depot3
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -184880,7 +184881,6 @@ flag=MF_NEUTRAL
 
 field="134,182"
 gsprite=20317
-it=depot1
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -186222,6 +186222,7 @@ flag=MF_NEUTRAL
 
 field="134,183"
 gsprite=20311
+it=depot1
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -192778,19 +192779,20 @@ flag=MF_NEUTRAL
 
 field="122,188"
 gsprite=20317
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
 
 field="123,188"
 gsprite=20315
-it=depot2
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
 
 field="124,188"
 gsprite=20316
+it=depot2
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -200533,19 +200535,20 @@ flag=MF_NEUTRAL
 
 field="122,194"
 gsprite=20317
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
 
 field="123,194"
 gsprite=20315
-it=depot2
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
 
 field="124,194"
 gsprite=20316
+it=depot2
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -204816,6 +204819,7 @@ flag=MF_PEACE
 
 field="182,197"
 gsprite=17068
+it=depot4
 flag=MF_INDOORS
 flag=MF_PEACE
 
@@ -208469,6 +208473,7 @@ flag=MF_NEUTRAL
 
 field="138,200"
 gsprite=20333
+it=depot1
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -209759,7 +209764,6 @@ flag=MF_NEUTRAL
 
 field="138,201"
 gsprite=20327
-it=depot1
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL
@@ -211005,6 +211009,7 @@ flag=MF_NEUTRAL
 
 field="138,202"
 gsprite=20330
+it=depot3
 flag=MF_INDOORS
 flag=MF_PEACE
 flag=MF_NEUTRAL

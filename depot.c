@@ -17,16 +17,21 @@
 #include "database.h"
 #include "item_id.h"
 
-int swap_depot(int cn, int nr) {
+static int swap_depot(int cn, int nr, int is_account_depot) {
     int in, in2;
     struct depot_ppd *ppd;
 
-    ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
-    if (!ppd) return 0;
+    if (is_account_depot) {
+        ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+        if (!ppd) return 0;
 
-    if (!ppd->loaded) {
-        error = ERR_ACCESS_DENIED;
-        return 0;
+        if (!ppd->loaded) {
+            error = ERR_ACCESS_DENIED;
+            return 0;
+        }
+    } else {
+        ppd = set_data(cn, DRD_CHARDEPOT_PPD, sizeof(struct depot_ppd));
+        if (!ppd) return 0;
     }
 
     if (cn < 1 || cn >= MAXCHARS) {
@@ -43,9 +48,16 @@ int swap_depot(int cn, int nr) {
     // remember citem
     in2 = ch[cn].citem;
 
-    if (it[in2].flags & (IF_NODEPOT | IF_QUEST | IF_BONDTAKE)) {
-        error = ERR_ACCESS_DENIED;
-        return 0;
+    if (is_account_depot) {
+        if (it[in2].flags & (IF_NODEPOT | IF_QUEST | IF_BONDTAKE)) {
+            error = ERR_ACCESS_DENIED;
+            return 0;
+        }
+    } else {
+        if (it[in2].flags & IF_NODEPOT) {
+            error = ERR_ACCESS_DENIED;
+            return 0;
+        }
     }
 
     // remember item from depot
@@ -56,7 +68,7 @@ int swap_depot(int cn, int nr) {
             return 0;
         }
         it[in] = ppd->itm[nr];
-        dlog(cn, in, "Took %s from depot slot %d", it[in].name, nr);
+        dlog(cn, in, "Took %s from %s depot slot %d", it[in].name, is_account_depot ? "account" : "char", nr);
     } else in = 0;
 
     // set new citem
@@ -66,7 +78,7 @@ int swap_depot(int cn, int nr) {
 
     if (in2) {
         ppd->itm[nr] = it[in2];
-        dlog(cn, in2, "Put %s into depot slot %d", it[in2].name, nr);
+        dlog(cn, in2, "Put %s into %s depot slot %d", it[in2].name, is_account_depot ? "account" : "char", nr);
         free_item(in2);
     } else ppd->itm[nr].flags = 0;
 
@@ -75,13 +87,18 @@ int swap_depot(int cn, int nr) {
 
 // character (usually a player) cn is using store NR
 // flag=1 take/drop, flag=0 look
-void player_depot(int cn, int nr, int flag, int fast) {
+void player_depot(int cn, int nr, int flag, int fast, int is_account_depot) {
     struct depot_ppd *ppd;
 
-    ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
-    if (!ppd) return;
+    if (is_account_depot) {
+        ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
+        if (!ppd) return;
 
-    if (!ppd->loaded) return;
+        if (!ppd->loaded) return;
+    } else {
+        ppd = set_data(cn, DRD_CHARDEPOT_PPD, sizeof(struct depot_ppd));
+        if (!ppd) return;
+    }
 
     if (flag) {
         if (fast && ch[cn].citem) {
@@ -89,9 +106,9 @@ void player_depot(int cn, int nr, int flag, int fast) {
                 if (!(ppd->itm[nr].flags)) break;
             }
             if (nr == MAXDEPOT) return;
-            swap_depot(cn, nr);
+            swap_depot(cn, nr, is_account_depot);
         } else {
-            swap_depot(cn, nr);
+            swap_depot(cn, nr, is_account_depot);
             if (fast) store_citem(cn);
         }
     } else {

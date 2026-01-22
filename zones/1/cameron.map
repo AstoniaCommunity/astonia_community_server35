@@ -90367,13 +90367,12 @@ flag=MF_NEUTRAL
 
 field="141,101"
 gsprite=20297
+it=depot4
 flag=MF_INDOORS
 flag=MF_NEUTRAL
 
 field="142,101"
 gsprite=20298
-fsprite=21061
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 flag=MF_NEUTRAL
 
@@ -102997,15 +102996,16 @@ flag=MF_NEUTRAL
 
 field="140,113"
 gsprite=12028
+it=depot2
 flag=MF_NEUTRAL
 
 field="141,113"
 gsprite=12026
-it=depot2
 flag=MF_NEUTRAL
 
 field="142,113"
 gsprite=12027
+it=depot4
 flag=MF_NEUTRAL
 
 field="143,113"

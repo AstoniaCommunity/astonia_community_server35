@@ -131607,6 +131607,7 @@ flag=MF_SOUNDBLOCK
 
 field="186,139"
 gsprite=20459
+it=depot3
 
 field="187,139"
 gsprite=20460

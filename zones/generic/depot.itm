@@ -1,17 +1,39 @@
 depot1:
 name="Depot"
-description="Your Depot"
+description="Account Wide Depot"
 sprite=21065
 flag=IF_USE
 flag=IF_MOVEBLOCK
 flag=IF_DEPOT
+arg="00"
 ;
 
 depot2:
 name="Depot"
-description="Your Depot"
+description="Account Wide Depot"
 sprite=21063
 flag=IF_USE
 flag=IF_MOVEBLOCK
 flag=IF_DEPOT
+arg="00"
+;
+
+depot3:
+name="Depot"
+description="Your Depot"
+sprite=21067
+flag=IF_USE
+flag=IF_MOVEBLOCK
+flag=IF_DEPOT
+arg="01"
+;
+
+depot4:
+name="Depot"
+description="Your Depot"
+sprite=21068
+flag=IF_USE
+flag=IF_MOVEBLOCK
+flag=IF_DEPOT
+arg="01"
 ;

@@ -24742,7 +24742,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,17"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,17"
@@ -68826,7 +68826,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,49"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,49"
@@ -112850,7 +112850,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,81"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,81"
@@ -156671,7 +156671,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,113"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,113"
@@ -200769,7 +200769,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,145"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,145"
@@ -244811,7 +244811,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,177"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,177"
@@ -288709,7 +288709,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,209"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,209"
@@ -329391,7 +329391,7 @@ flag=MF_SHOUTBLOCK
 
 field="47,238"
 gsprite=15025
-it=mr_walltorch_on_ds
+it=depot3
 flag=MF_INDOORS
 
 field="48,238"

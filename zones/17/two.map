@@ -105167,8 +105167,7 @@ flag=MF_INDOORS
 
 field="63,86"
 gsprite=1353076553
-fsprite=1382830671
-flag=MF_MOVEBLOCK
+it=depot4
 flag=MF_INDOORS
 
 field="64,86"
@@ -106198,8 +106197,6 @@ flag=MF_INDOORS
 
 field="63,87"
 gsprite=20649
-fsprite=21070
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="64,87"
@@ -107296,12 +107293,11 @@ flag=MF_SHOUTBLOCK
 
 field="62,88"
 gsprite=1353207624
-ch=banker_didimus
 flag=MF_INDOORS
 
 field="63,88"
 gsprite=20649
-fsprite=1382765134
+fsprite=1382765135
 flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
@@ -108526,6 +108522,7 @@ flag=MF_SHOUTBLOCK
 
 field="62,89"
 gsprite=1353207627
+ch=banker_didimus
 flag=MF_INDOORS
 
 field="63,89"

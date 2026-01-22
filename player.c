@@ -548,8 +548,10 @@ static void cl_fastsell(int nr, char *buf) {
         }
         player_store(cn, 0, 1, 0);
     } else if ((in = ch[cn].con_in)) {
-        if (it[in].flags & IF_DEPOT) player_depot(cn, 0, 1, 1);
-        else container(cn, 0, 1, 0);
+        if (it[in].flags & IF_DEPOT) {
+            if (it[in].drdata[0]) player_depot(cn, 0, 1, 1, 0);
+            else player_depot(cn, 0, 1, 1, 1);
+        } else container(cn, 0, 1, 0);
     }
 }
 
@@ -653,8 +655,10 @@ static void cl_container(int nr, char *buf) {
 
     if (ch[cn].merchant) player_store(cn, n, 1, 0);
     else if ((in = ch[cn].con_in)) {
-        if (it[in].flags & IF_DEPOT) player_depot(cn, n, 1, 0);
-        else container(cn, n, 1, 0);
+        if (it[in].flags & IF_DEPOT) {
+            if (it[in].drdata[0]) player_depot(cn, n, 1, 0, 0);
+            else player_depot(cn, n, 1, 0, 1);
+        } else container(cn, n, 1, 0);
     }
 }
 
@@ -672,8 +676,10 @@ static void cl_container_fast(int nr, char *buf) {
 
     if (ch[cn].merchant) player_store(cn, n, 1, 1);
     else if ((in = ch[cn].con_in)) {
-        if (it[in].flags & IF_DEPOT) player_depot(cn, n, 1, 1);
-        else container(cn, n, 1, 1);
+        if (it[in].flags & IF_DEPOT) {
+            if (it[in].drdata[0]) player_depot(cn, n, 1, 1, 0);
+            else player_depot(cn, n, 1, 1, 1);
+        } else container(cn, n, 1, 1);
     }
 }
 
@@ -691,8 +697,10 @@ static void cl_look_container(int nr, char *buf) {
 
     if (ch[cn].merchant) player_store(cn, n, 0, 0);
     else if ((in = ch[cn].con_in)) {
-        if (it[in].flags & IF_DEPOT) player_depot(cn, n, 0, 0);
-        else container(cn, n, 0, 0);
+        if (it[in].flags & IF_DEPOT) {
+            if (it[in].drdata[0]) player_depot(cn, n, 0, 0, 0);
+            else player_depot(cn, n, 0, 0, 1);
+        } else container(cn, n, 0, 0);
     }
 }
 
@@ -2498,24 +2506,31 @@ static void player_stats(int nr) {
 
         if (!player_stats_store(cn, nr, co, s)) return;
 
-    } else if ((in = ch[cn].con_in) && (it[in].flags & IF_DEPOT) && (ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd)))) {
+    } else if ((in = ch[cn].con_in) && (it[in].flags & IF_DEPOT)) {
+        if (!it[in].drdata[0]) { // account wide depot
+            if ((ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd)))) {
+                if (!ppd->loaded) {
+                    if (!player_stats_depot(cn, nr, NULL, "Loading Depot...", 1)) return;
+                    if (ticker - player[nr]->depot_reload_timer > TICKS / 4) {
 
-        if (!ppd->loaded) {
-            if (!player_stats_depot(cn, nr, NULL, "Loading Depot...", 1)) return;
-            if (ticker - player[nr]->depot_reload_timer > TICKS / 4) {
+                        if (player[nr]->depot_reload_tries < 4) {
+                            xlog("trigger load depot");
+                            load_depot_for_char(ch[cn].ID, ch[cn].sID);
+                            player[nr]->depot_reload_timer = ticker;
+                            player[nr]->depot_reload_tries++;
+                        }
+                    }
+                } else {
+                    player[nr]->depot_reload_tries = 0;
+                    player[nr]->depot_reload_timer = 0;
 
-                if (player[nr]->depot_reload_tries < 4) {
-                    xlog("trigger load depot");
-                    load_depot_for_char(ch[cn].ID, ch[cn].sID);
-                    player[nr]->depot_reload_timer = ticker;
-                    player[nr]->depot_reload_tries++;
+                    if (!player_stats_depot(cn, nr, ppd, "Account Wide Depot", 1)) return;
                 }
             }
-        } else {
-            player[nr]->depot_reload_tries = 0;
-            player[nr]->depot_reload_timer = 0;
-
-            if (!player_stats_depot(cn, nr, ppd, "Account Wide Depot", 1)) return;
+        } else { // per character depot
+            if ((ppd = set_data(cn, DRD_CHARDEPOT_PPD, sizeof(struct depot_ppd)))) {
+                if (!player_stats_depot(cn, nr, ppd, "Your Depot", 1)) return;
+            }
         }
     } else {
         player[nr]->depot_reload_tries = 0;

@@ -13,6 +13,5 @@ struct depot_ppd {
     int dummy[11]; // free for future extensions
     struct item itm[MAXDEPOT]; // items in depot
 };
-int swap_depot(int cn, int nr);
-void player_depot(int cn, int nr, int flag, int fast);
+void player_depot(int cn, int nr, int flag, int fast, int is_account_depot);
 void depot_sort(int cn);
