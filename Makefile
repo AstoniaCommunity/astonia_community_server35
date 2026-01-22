@@ -364,8 +364,8 @@ clean:
 	@rm -f server35 .obj/*.o .obj/*.d .dllobj/*.o .dllobj/*.d runtime/*/*
 	
 pretty:
-	@ls *.c *.h | xargs -r clang-format -i
+	@ls src/*.c src/*.h | xargs -r clang-format -i
 
 pretty-check:
-	@ls *.c *.h | xargs -r clang-format --dry-run -Werror
+	@ls src/*.c src/*.h | xargs -r clang-format --dry-run -Werror
 

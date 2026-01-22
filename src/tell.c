@@ -2,7 +2,6 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-
 #include "server.h"
 #include "drdata.h"
 #include "lookup.h"
