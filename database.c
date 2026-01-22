@@ -3679,13 +3679,16 @@ void db_load_depot_for_char(int cID, int sID) {
 
 void release_depot(int sID, int cID) {
     struct depot_ppd *depot_ppd;
-    int co;
+    int co, in;
 
     for (co = getfirst_char(); co; co = getnext_char(co)) {
         if (ch[co].sID != sID) continue;
         if (ch[co].ID == cID) continue;
         depot_ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
         if (depot_ppd->loaded) {
+
+            if ((in = ch[co].con_in) && (it[in].flags & IF_DEPOT)) ch[co].con_in = 0;
+
             save_depot(ch[co].sID, depot_ppd, ch[co].ID, 1);
             bzero(depot_ppd, sizeof(struct depot_ppd));
             xlog("Released depot from %s (sID=%d)", ch[co].name, sID);
