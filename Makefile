@@ -51,11 +51,11 @@ runtime/37/arkhata.dll
 
 CC=gcc
 DEBUG=-g
-CFLAGS=-Wall -Wshadow -Werror -Wno-pointer-sign -O3 $(DEBUG) -fno-strict-aliasing -m32 # for normal object files
+CFLAGS=-Wall -Wshadow -Werror -Wno-pointer-sign -O3 $(DEBUG) -fno-strict-aliasing -m32 -Isrc # for normal object files
 LDFLAGS=-O $(DEBUG) -L/usr/lib/mysql -m32 # building tools
 LDRFLAGS=-O $(DEBUG) -rdynamic -L/usr/lib/mysql -m32 # building server
 DDFLAGS=-O $(DEBUG) -fPIC -shared -m32 # building DLLs
-DFLAGS=$(CFLAGS) -fPIC -m32 # for DLL object files
+DFLAGS=$(CFLAGS) -fPIC -m32 -Isrc # for DLL object files
 DEPFLAGS = -MMD -MP
 
 OBJS=.obj/server.o .obj/io.o .obj/libload.o .obj/tool.o .obj/sleep.o \
@@ -78,21 +78,21 @@ OBJS=.obj/server.o .obj/io.o .obj/libload.o .obj/tool.o .obj/sleep.o \
 
 # ------- Server -----
 
-server35:	$(OBJS) version.c
-	$(CC) $(LDRFLAGS) -o server35 $(OBJS) version.c -lmysqlclient -lm -lz -ldl -lpthread -largon2
+server35:	$(OBJS) src/version.c
+	$(CC) $(LDRFLAGS) -o server35 $(OBJS) src/version.c -lmysqlclient -lm -lz -ldl -lpthread -largon2
 	
 .obj/rdtsc.o:
-	$(CC) $(CFLAGS) $(DEPFLAGS) -o .obj/rdtsc.o -c rdtsc.S
+	$(CC) $(CFLAGS) $(DEPFLAGS) -o .obj/rdtsc.o -c src/rdtsc.S
 
 .obj/mem.o:
-	$(CC) $(CFLAGS) $(DEPFLAGS) -DDEBUG -o .obj/mem.o -c mem.c
+	$(CC) $(CFLAGS) $(DEPFLAGS) -DDEBUG -o $@ -c src/mem.c
 
-.obj/%.o: %.c
+.obj/%.o: src/%.c
 	$(CC) $(CFLAGS) $(DEPFLAGS) -o $@ -c $<
 
 # ------- DLLs -------
 
-.dllobj/%.o: %.c
+.dllobj/%.o: src/%.c
 	$(CC) $(DFLAGS) $(DEPFLAGS) -o $@ -c $<
 
 
@@ -349,14 +349,14 @@ runtime/31/warrmines.dll: .dllobj/warrmines.o
 chatserver:		.obj/chatserver.o
 	$(CC) $(LDFLAGS) -o chatserver .obj/chatserver.o
 
-.obj/chatserver.o:	chatserver.c
-	$(CC) $(CFLAGS) $(DEPFLAGS) -o .obj/chatserver.o -c chatserver.c
+.obj/chatserver.o:	src/chatserver.c
+	$(CC) $(CFLAGS) -o .obj/chatserver.o -c src/chatserver.c
 
-create_character:	create_character.c config.h .obj/config.o
-	$(CC) $(CFLAGS) $(DEPFLAGS) -o create_character create_character.c .obj/config.o -L/usr/lib/mysql -m32 -lmysqlclient
+create_character:	src/create_character.c src/config.h src/server.h src/drdata.h .obj/config.o
+	$(CC) $(CFLAGS) -o create_character src/create_character.c .obj/config.o -L/usr/lib/mysql -m32 -lmysqlclient
 
-create_account:		create_account.c .obj/argon.o argon.h config.h .obj/config.o
-	$(CC) $(CFLAGS) $(DEPFLAGS) -o create_account create_account.c .obj/argon.o .obj/config.o -L/usr/lib/mysql -m32 -lmysqlclient -largon2
+create_account:		src/create_account.c .obj/argon.o src/argon.h src/config.h .obj/config.o
+	$(CC) $(CFLAGS) -o create_account src/create_account.c .obj/argon.o .obj/config.o -L/usr/lib/mysql -m32 -lmysqlclient -largon2
 
 # ------- Helper -----
 
