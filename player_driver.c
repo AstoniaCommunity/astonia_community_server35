@@ -613,7 +613,7 @@ void tutorial(int cn, int nr, struct tutorial_ppd *ppd) {
         }
         if (ppd->left_cnt < 3 && realtime - ppd->left_last > TF_TIMEOUT) {
             if (!ver) log_char(cn, LOG_SYSTEM, 0, "#Todays Hint:$$Clicking the left mouse button always initiates an action, while right-clicking merely looks at the item or character.");
-            else log_char(cn, LOG_SYSTEM, 0, "#Todays Hint:$$Clicking the left mouse button on an item in your inventory takes it. Right-clicking uses it. Hold an item on your mouse cursor and click on a second item in your inventory to use one with the other.");
+            else log_char(cn, LOG_SYSTEM, 0, "#Todays Hint:$$Clicking the left mouse button on an item in your inventory takes it. Right-clicking uses it. Hold an item on your mouse cursor and right-click on a second item in your inventory to use one with the other.");
             ppd->left_cnt++;
             ppd->left_last = realtime;
             ppd->timer = realtime;

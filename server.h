@@ -346,8 +346,8 @@ struct character {
 
     char name[40];
     char description[LENDESC];
-    unsigned int ID;
-    unsigned int sID;
+    unsigned int ID; // database table chars.ID (often called cID)
+    unsigned int sID; // database table account.ID (was: subscriber.ID, hence sID)
 
     unsigned int player; // corresponding player[] entry
 
