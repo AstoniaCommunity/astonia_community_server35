@@ -1136,7 +1136,7 @@ void *db_thread(void *dummy) {
 #define LS_FAILED 5 // error, send player away
 #define LS_LOCKED 6 // error, send player away
 #define LS_PASSWD 7 // error, send player away
-#define LS_DUP 8 // error, send player away
+
 #define LS_NOPAY 9 // error, send player away
 #define LS_SHUTDOWN 10 // error, send player away
 #define LS_IPLOCKED 11 // error, send player away
@@ -1235,11 +1235,6 @@ int find_login(char *name, char *password, int *area_ptr, int *cn_ptr, int *mirr
         return -3;
     }
 
-    if (login.status == LS_DUP) { // login failed. send him away and mark login as free
-        login.status = LS_EMPTY;
-        pthread_mutex_unlock(&data_mutex);
-        return -4;
-    }
     if (login.status == LS_NOPAY) { // login failed. send him away and mark login as free
         login.status = LS_EMPTY;
         pthread_mutex_unlock(&data_mutex);
@@ -1381,15 +1376,6 @@ static void login_nopay(void) {
     login.age = ticker;
     pthread_mutex_unlock(&data_mutex);
 }
-
-#if 0
-static void login_dup(void) {
-    pthread_mutex_lock(&data_mutex);
-    login.status = LS_DUP;
-    login.age = ticker;
-    pthread_mutex_unlock(&data_mutex);
-}
-#endif
 
 static void login_shutdown(void) {
     pthread_mutex_lock(&data_mutex);
@@ -1828,34 +1814,6 @@ static int load_char_pwd(char *pass, int sID, int logout_time, int *ptimeleft) {
     return 0;
 }
 
-#if 0
-static int load_char_dup(int ID, int sID) {
-    MYSQL_RES *result;
-    char buf[256];
-
-    sprintf(buf, "select sID from chars where sID=%d and ID!=%d and current_area!=0 limit 1", sID, ID);
-    if (mysql_query_con(&mysql, buf)) {
-        elog("Failed to select sID.chars ID=%d: Error: %s (%d)", sID, mysql_error(&mysql), mysql_errno(&mysql));
-        return 0;
-    }
-    if (!(result = mysql_store_result_cnt(&mysql))) {
-        elog("Failed to store result: Error: %s (%d)", mysql_error(&mysql), mysql_errno(&mysql));
-        return 0;
-    }
-
-    // found another character online?
-    if (mysql_num_rows(result) > 0) {
-        mysql_free_result_cnt(result);
-        return 0;
-    }
-
-    // all fine
-    mysql_free_result_cnt(result);
-
-    return 1;
-}
-#endif
-
 int load_depot(int sID, int cID, struct depot_ppd *dest) {
     char query[80];
     MYSQL_RES *result;
@@ -2058,16 +2016,6 @@ static void load_char(char *name, char *password) {
         else login_nopay();
         return;
     }
-
-#if 0 // disabled for testing!
-    if (!load_char_dup(ID, atoi(row[0]))) {
-        xlog("duplicate login for ID=%d (%s)", ID, row[3]);
-        mysql_free_result_cnt(result);
-        mysql_query_con(&mysql, "unlock tables");
-        login_dup();
-        return;
-    }
-#endif
 
     if (nologin && !(atoi(row[11]) & CF_GOD)) {
         mysql_free_result_cnt(result);
