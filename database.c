@@ -372,10 +372,7 @@ void save_depot(int sID, struct depot_ppd *dat, int cID, int leaving) {
     char query[sizeof(struct depot_ppd) * 2 + 12 + 1024 + 160];
     int xlen = 0;
 
-    if (!dat->loaded) {
-        xlog("not saving depot, was not loaded");
-        return;
-    }
+    if (!dat->loaded) return;
 
     if (dat->lastsave == dat->changes) {
         if (leaving) {
@@ -1863,6 +1860,11 @@ int load_depot(int sID, int cID, struct depot_ppd *dest) {
     char query[80];
     MYSQL_RES *result;
     MYSQL_ROW row;
+
+    if (!sID || !cID || !dest) {
+        elog("load_depot got illegal input: %d %d %p.", sID, cID, dest);
+        return 0;
+    }
 
     sprintf(query, "select data,area,mirror,cID from depot where ID=%d", sID);
 
@@ -3654,7 +3656,7 @@ void db_load_depot_for_char(int cID, int sID) {
     for (co = getfirst_char(); co; co = getnext_char(co)) {
         if (ch[co].sID == sID && ch[co].ID == cID) break;
     }
-    if (!co) {
+    if (!co || !(ch[co].flags & CF_PLAYER)) {
         unlock_server();
         return;
     }

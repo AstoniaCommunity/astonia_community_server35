@@ -2892,6 +2892,7 @@ void return_items(struct trader_data *dat, int switched) {
 
     if (dat->c1token) {
         if (c2 && (ppd = set_data(c2, DRD_DEPOT_PPD, sizeof(struct depot_ppd))) && ppd->loaded) {
+            // TODO: figure out what happens to tokens. Not going to auto-load depot here since I expect them to be removed anyway.
             ppd->payment_tokens += dat->c1token;
 
             if (switched) {

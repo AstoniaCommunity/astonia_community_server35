@@ -2368,7 +2368,7 @@ int command(int cn, char *ptr) // 1=ok, 0=repeat
             if (depot_ppd->loaded) {
                 log_char(cn, LOG_SYSTEM, 0, "Your bank account contains %d gold.", depot_ppd->gold / 100);
                 log_char(cn, LOG_SYSTEM, 0, "You own %d payment tokens.", depot_ppd->payment_tokens);
-            } else log_char(cn, LOG_SYSTEM, 0, "Your depot could not be loaded.");
+            } else log_char(cn, LOG_SYSTEM, 0, "Your depot isn't loaded; try relogging with only a single character online.");
         }
 
         return 1;

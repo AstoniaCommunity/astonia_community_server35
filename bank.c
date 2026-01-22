@@ -177,6 +177,8 @@ struct bank_driver_data {
     int close;
 
     int memcleartimer;
+
+    int depot_load_retries;
 };
 
 void bank_driver_parse(int cn, struct bank_driver_data *dat) {
@@ -263,7 +265,8 @@ void bank_driver(int cn, int ret, int lastact) {
                 continue;
             }
 
-            if (!ppd->loaded) quiet_say(cn, "Hello %s! The server could not load thy depot. Please come back later.", ch[co].name);
+            if (!ppd->loaded)
+                ; // we don't talk about accounts if we the depot isn't loaded
             else if (!ppd->gold) quiet_say(cn, "Hello %s! Wouldst thou like to open an \260c4account\260c0 with the Imperial Bank?", ch[co].name);
             else quiet_say(cn, "Ah, welcome %s! Thy \260c4account\260c0 is in good hands with the Imperial Bank.", ch[co].name);
             mem_add_driver(cn, co, 7);
@@ -271,12 +274,25 @@ void bank_driver(int cn, int ret, int lastact) {
 
         // talk back
         if (msg->type == NT_TEXT) {
-            analyse_text_driver(cn, msg->dat1, (char *)msg->dat2, msg->dat3);
+            //analyse_text_driver(cn, msg->dat1, (char *)msg->dat2, msg->dat3);  why do we even call this??
 
-            if ((msg->dat1 == 1 || msg->dat1 == 2) && (co = msg->dat3) != cn) { // talk, and not our talk
+            if ((msg->dat1 == LOG_TALK || msg->dat1 == LOG_SHOUT) && (co = msg->dat3) != cn) { // talk, and not our talk
                 ppd = set_data(co, DRD_DEPOT_PPD, sizeof(struct depot_ppd));
 
-                if (ppd && ppd->loaded && (ptr = strcasestr((char *)msg->dat2, "deposit"))) {
+                if (ppd && !ppd->loaded && (strcasestr((char *)msg->dat2, "deposit") || strcasestr((char *)msg->dat2, "withdraw") || strcasestr((char *)msg->dat2, "balance"))) {
+                    load_depot_for_char(ch[co].ID, ch[co].sID);
+                    if (dat->depot_load_retries < 4) {
+                        dat->depot_load_retries++;
+                        do_idle(cn, TICKS / 4);
+                        return; // we exit here so the message remains in the queue and gets processed again, hopefully with a loaded depot
+                    } else {
+                        quiet_say(cn, "Thy depot could not be loaded. Please try again later.");
+                    }
+                    ppd = NULL;
+                }
+                if (ppd) dat->depot_load_retries = 0;
+
+                if (ppd && (ptr = strcasestr((char *)msg->dat2, "deposit"))) {
                     val = atoi(ptr + 7) * 100;
                     if (val) {
                         if (val > ch[co].gold || val < 0) {
@@ -290,7 +306,7 @@ void bank_driver(int cn, int ret, int lastact) {
                             dlog(co, 0, "deposited %.2fG, new balance %.2fG (sID=%d).", val / 100.0, ppd->gold / 100.0, ch[co].sID);
                         }
                     } else quiet_say(cn, "Thou must name an amount.");
-                } else if (ppd && ppd->loaded && (ptr = strcasestr((char *)msg->dat2, "withdraw"))) {
+                } else if (ppd && (ptr = strcasestr((char *)msg->dat2, "withdraw"))) {
                     val = atoi(ptr + 8) * 100;
                     if (val) {
                         if (val > ppd->gold || val < 0) {
@@ -304,7 +320,7 @@ void bank_driver(int cn, int ret, int lastact) {
                             dlog(co, 0, "withdrew %.2fG, balance left %.2fG (sID=%d).", val / 100.0, ppd->gold / 100.0, ch[co].sID);
                         }
                     } else quiet_say(cn, "Thou must name an amount.");
-                } else if (ppd && ppd->loaded && strcasestr((char *)msg->dat2, "balance")) {
+                } else if (ppd && strcasestr((char *)msg->dat2, "balance")) {
                     if (ppd->gold >= 100) quiet_say(cn, "Thou hast %s gold in thine account.", bignumber(ppd->gold / 100));
                     else quiet_say(cn, "Thou dost not have any money in thine account.");
                 }
