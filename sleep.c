@@ -2,10 +2,8 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 #include "server.h"
 #include "log.h"

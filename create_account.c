@@ -6,7 +6,6 @@
 #include <time.h>
 #include <getopt.h>
 #include <mysql/mysql.h>
-#include <mysql/mysqld_error.h>
 #include "argon.h"
 #include "config.h"
 

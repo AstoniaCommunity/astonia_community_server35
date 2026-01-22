@@ -3,8 +3,6 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 
 #include "server.h"
 #include "log.h"
@@ -27,16 +25,12 @@
 #include "sector.h"
 #include "area.h"
 #include "death.h"
-#include "lookup.h"
-#include "chat.h"
 #include "drvlib.h"
 #include "military.h"
 #include "item_id.h"
 #include "respawn.h"
 #include "poison.h"
-#include "misc_ppd.h"
 #include "date.h"
-#include "consistency.h"
 #include "lostcon.h"
 #include "clan.h"
 

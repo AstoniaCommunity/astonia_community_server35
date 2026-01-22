@@ -2,7 +2,6 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <time.h>
 
 #include "server.h"
 #include "talk.h"

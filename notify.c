@@ -6,7 +6,6 @@
 
 #include "server.h"
 #include "log.h"
-#include "see.h"
 #include "mem.h"
 #include "sector.h"
 #include "create.h"

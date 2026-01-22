@@ -5,16 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <stdarg.h>
-#include <ctype.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/time.h>
 #include <netinet/in.h>
 #include <sys/wait.h>
 #include "mail.h"

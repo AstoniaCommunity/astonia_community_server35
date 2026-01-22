@@ -2,7 +2,6 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -10,19 +9,11 @@
 #include "server.h"
 #include "log.h"
 #include "notify.h"
-#include "direction.h"
 #include "do.h"
-#include "path.h"
-#include "error.h"
 #include "drdata.h"
 #include "see.h"
-#include "death.h"
 #include "talk.h"
-#include "effect.h"
 #include "tool.h"
-#include "date.h"
-#include "sector.h"
-#include "item_id.h"
 #include "libload.h"
 #include "drvlib.h"
 #include "create.h"
@@ -30,12 +21,6 @@
 #include "lookup.h"
 #include "task.h"
 #include "database.h"
-#include "chat.h"
-#include "player.h"
-#include "mem.h"
-#include "consistency.h"
-#include "map.h"
-#include "player_driver.h"
 #include "club.h"
 
 // library helper functions needed for init

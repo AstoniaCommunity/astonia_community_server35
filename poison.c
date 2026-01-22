@@ -5,12 +5,10 @@
 #include "server.h"
 #include "tool.h"
 #include "talk.h"
-#include "log.h"
 #include "death.h"
 #include "timer.h"
 #include "create.h"
 #include "drvlib.h"
-#include "consistency.h"
 #include "poison.h"
 
 #define POISONDURATION (TICKS * 60 * 60 * 2)

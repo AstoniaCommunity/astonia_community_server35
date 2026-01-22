@@ -3,10 +3,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <mysql/mysql.h>
-#include <mysql/mysqld_error.h>
 
 int mysql_query_con(MYSQL *my, const char *query);
 void mysql_free_result_cnt(MYSQL_RES *result);
@@ -17,7 +15,6 @@ MYSQL_RES *mysql_store_result_cnt(MYSQL *my);
 #include "database.h"
 #include "create.h"
 #include "chat.h"
-#include "player.h"
 #include "clan.h"
 #include "task.h"
 #include "club.h"

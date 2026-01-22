@@ -7,7 +7,6 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/mman.h>
-#include <malloc.h>
 #include <pthread.h>
 
 #include "log.h"

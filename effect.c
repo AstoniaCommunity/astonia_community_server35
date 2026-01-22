@@ -3,25 +3,19 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "server.h"
 #include "log.h"
-#include "notify.h"
 #include "death.h"
 #include "light.h"
 #include "tool.h"
-#include "spell.h"
 #include "los.h"
 #include "mem.h"
 #include "sector.h"
 #include "create.h"
 #include "item_id.h"
 #include "talk.h"
-#include "balance.h"
 #include "drvlib.h"
-#include "map.h"
-#include "consistency.h"
 #include "database.h"
 #include "effect.h"
 #include "clan.h"

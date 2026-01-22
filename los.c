@@ -9,7 +9,6 @@
 #include "log.h"
 #include "light.h"
 #include "mem.h"
-#include "sector.h"
 #include "los.h"
 
 struct los *los;

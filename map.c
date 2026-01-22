@@ -8,17 +8,13 @@
 #include "create.h"
 #include "expire.h"
 #include "effect.h"
-#include "drdata.h"
-#include "notify.h"
 #include "libload.h"
-#include "container.h"
 #include "sector.h"
 #include "area.h"
 #include "tool.h"
 #include "map.h"
 #include "path.h"
 #include "drvlib.h"
-#include "consistency.h"
 #include "btrace.h"
 
 // set item to map tile x,y. checks for errors, free space and does light.

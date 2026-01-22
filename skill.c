@@ -5,7 +5,6 @@
 #include "server.h"
 #include "create.h"
 #include "database.h"
-#include "log.h"
 #include "tool.h"
 #include "skill.h"
 

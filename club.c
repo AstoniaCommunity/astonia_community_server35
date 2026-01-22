@@ -3,28 +3,15 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <ctype.h>
 
 #include "server.h"
 #include "log.h"
-#include "mem.h"
 #include "tool.h"
-#include "direction.h"
 #include "talk.h"
 #include "date.h"
-#include "clan.h"
 #include "database.h"
-#include "map.h"
-#include "effect.h"
-#include "create.h"
-#include "drdata.h"
-#include "notify.h"
-#include "sector.h"
-#include "player.h"
-#include "drvlib.h"
 #include "club.h"
 
 int club_update_done = 0;

@@ -7,7 +7,6 @@
 #include "server.h"
 #include "mem.h"
 #include "log.h"
-#include "tool.h"
 #include "sector.h"
 
 #define MAXDOOR 1024

@@ -6,17 +6,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
-#include <arpa/inet.h>
-#include <errno.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <errno.h>
 
 #include "server.h"
 #include "mem.h"
@@ -24,7 +17,6 @@
 #include "talk.h"
 #include "database.h"
 #include "chat.h"
-#include "death.h"
 #include "tool.h"
 #include "clan.h"
 #include "ignore.h"
@@ -32,7 +24,6 @@
 #include "swear.h"
 #include "chat.h"
 #include "club.h"
-#include "date.h"
 #include "config.h"
 
 int remove_item_from_body_bg(int cnID, int IID);

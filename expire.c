@@ -8,7 +8,6 @@
 #include "map.h"
 #include "create.h"
 #include "container.h"
-#include "consistency.h"
 #include "expire.h"
 
 static void expire_timer(int in, int serial, int x, int y, int expire_sn) {

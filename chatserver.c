@@ -6,18 +6,11 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <ctype.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
-#include <errno.h>
 
 volatile int quit = 0;
 

@@ -6,41 +6,31 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 #include "server.h"
 #include "log.h"
 #include "notify.h"
 #include "direction.h"
 #include "do.h"
-#include "path.h"
-#include "error.h"
 #include "drdata.h"
 #include "see.h"
 #include "death.h"
 #include "talk.h"
 #include "effect.h"
 #include "tool.h"
-#include "date.h"
 #include "map.h"
 #include "create.h"
-#include "light.h"
 #include "drvlib.h"
 #include "libload.h"
-#include "quest_exp.h"
 #include "item_id.h"
 #include "database.h"
 #include "mem.h"
 #include "player.h"
 #include "skill.h"
 #include "expire.h"
-#include "clan.h"
-#include "chat.h"
-#include "los.h"
 #include "shrine.h"
 #include "player_driver.h"
 #include "sector.h"
-#include "consistency.h"
 #include "statistics.h"
 
 int warrior_tab[] = {

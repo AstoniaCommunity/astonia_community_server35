@@ -14,13 +14,10 @@
 #include "mem.h"
 #include "statistics.h"
 #include "drvlib.h"
-#include "consistency.h"
 #include "map.h"
-#include "depot.h"
 #include "store.h"
 #include "database.h"
 #include "clan.h"
-#include "balance.h"
 #include "prof.h"
 
 struct store **store;

@@ -8,7 +8,6 @@
 #include "talk.h"
 #include "drdata.h"
 #include "lookup.h"
-#include "tool.h"
 #include "ignore.h"
 
 #define MAXIGNORE 100

@@ -7,7 +7,6 @@
 #include "talk.h"
 #include "escape.h"
 #include "act.h"
-#include "balance.h"
 #include "drvlib.h"
 #include "tool.h"
 

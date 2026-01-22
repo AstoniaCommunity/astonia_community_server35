@@ -2,17 +2,10 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
 
-#include "server.h"
 #include "mem.h"
 #include "log.h"
 #include "talk.h"

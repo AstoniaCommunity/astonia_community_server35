@@ -7,7 +7,6 @@
 #include <pthread.h>
 
 #include "server.h"
-#include "tool.h"
 #include "mem.h"
 #include "database.h"
 #include "lookup.h"

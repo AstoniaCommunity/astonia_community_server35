@@ -6,13 +6,10 @@
 #include <string.h>
 
 #include "server.h"
-#include "log.h"
 #include "error.h"
 #include "create.h"
 #include "tool.h"
-#include "talk.h"
 #include "drdata.h"
-#include "consistency.h"
 #include "depot.h"
 #include "database.h"
 #include "item_id.h"

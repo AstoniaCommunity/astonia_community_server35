@@ -4,27 +4,14 @@
 
 #define __USE_BSD_SIGNAL
 
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <ctype.h>
-#include <sys/ioctl.h>
-#include <netinet/in.h>
-#include <dlfcn.h>
 #include <zlib.h>
-#include <getopt.h>
 #include <malloc.h>
 #include <time.h>
 
 #include "server.h"
-#include "client.h"
 #include "player.h"
 #include "io.h"
 #include "notify.h"
@@ -33,8 +20,6 @@
 #include "sleep.h"
 #include "log.h"
 #include "create.h"
-#include "direction.h"
-#include "act.h"
 #include "los.h"
 #include "path.h"
 #include "timer.h"
@@ -43,7 +28,6 @@
 #include "map.h"
 #include "date.h"
 #include "container.h"
-#include "depot.h"
 #include "store.h"
 #include "mem.h"
 #include "sector.h"

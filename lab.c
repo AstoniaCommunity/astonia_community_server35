@@ -10,7 +10,6 @@
 #include "map.h"
 #include "drvlib.h"
 #include "talk.h"
-#include "consistency.h"
 #include "log.h"
 #include "lab.h"
 

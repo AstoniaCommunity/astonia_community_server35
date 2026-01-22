@@ -12,7 +12,6 @@
 #include "log.h"
 #include "player.h"
 #include "see.h"
-#include "path.h"
 #include "mem.h"
 #include "sector.h"
 #include "btrace.h"

@@ -3,8 +3,6 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 #include "server.h"
 #include "direction.h"

@@ -3,17 +3,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "server.h"
 #include "tool.h"
-#include "talk.h"
-#include "map.h"
-#include "drvlib.h"
-#include "log.h"
-#include "act.h"
-#include "notify.h"
-#include "consistency.h"
-#include "database.h"
 #include "prof.h"
 
 struct prof prof[P_MAX] = {

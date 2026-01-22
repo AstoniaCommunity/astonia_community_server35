@@ -5,21 +5,14 @@
 #define __USE_BSD_SIGNAL
 
 #include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <signal.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <dirent.h>
 #include <dlfcn.h>
 
 #include "server.h"
 #include "tool.h"
 #include "log.h"
-#include "notify.h"
 #include "player.h"
 #include "mem.h"
 #include "libload.h"

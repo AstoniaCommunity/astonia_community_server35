@@ -2,14 +2,12 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <stdlib.h>
 #include <string.h>
 
 #include "server.h"
 #include "log.h"
 #include "create.h"
 #include "mem.h"
-#include "consistency.h"
 #include "container.h"
 
 struct container *con;

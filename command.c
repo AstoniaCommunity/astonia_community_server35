@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
 
 #include "server.h"
 #include "talk.h"
@@ -16,12 +15,10 @@
 #include "database.h"
 #include "date.h"
 #include "do.h"
-#include "map.h"
 #include "chat.h"
 #include "create.h"
 #include "drvlib.h"
 #include "player.h"
-#include "death.h"
 #include "clan.h"
 #include "lookup.h"
 #include "command.h"
@@ -35,15 +32,12 @@
 #include "tell.h"
 #include "respawn.h"
 #include "swear.h"
-#include "prof.h"
 #include "misc_ppd.h"
 #include "libload.h"
 #include "effect.h"
-#include "consistency.h"
 #include "depot.h"
 #include "lab.h"
 #include "club.h"
-#include "questlog.h"
 #include "version.h"
 #include "item_id.h"
 #include "player_driver.h"

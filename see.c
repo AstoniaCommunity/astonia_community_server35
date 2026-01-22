@@ -8,7 +8,6 @@
 #include "log.h"
 #include "date.h"
 #include "btrace.h"
-#include "balance.h"
 #include "see.h"
 
 static inline int check_lightm(int m) {

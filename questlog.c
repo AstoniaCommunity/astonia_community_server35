@@ -3,43 +3,22 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include "server.h"
 #include "log.h"
-#include "notify.h"
-#include "direction.h"
-#include "do.h"
-#include "path.h"
-#include "error.h"
 #include "drdata.h"
-#include "see.h"
-#include "death.h"
 #include "talk.h"
-#include "effect.h"
 #include "tool.h"
 #include "depot.h"
-#include "store.h"
-#include "date.h"
-#include "map.h"
-#include "create.h"
 #include "drvlib.h"
-#include "libload.h"
-#include "quest_exp.h"
-#include "item_id.h"
-#include "skill.h"
 #include "area1.h"
 #include "area3.h"
-#include "consistency.h"
 #include "database.h"
 #include "questlog.h"
 #include "btrace.h"
 #include "player.h"
 #include "staffer_ppd.h"
 #include "two_ppd.h"
-#include "nomad_ppd.h"
 #include "container.h"
 #include "chat.h"
 

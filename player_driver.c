@@ -28,7 +28,6 @@
 #include "create.h"
 #include "skill.h"
 #include "area1.h"
-#include "consistency.h"
 #include "database.h"
 #include "lostcon.h"
 #include "path.h"

@@ -3,7 +3,6 @@
  */
 
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -11,7 +10,6 @@
 #include <netinet/in.h>
 
 #include "server.h"
-#include "do.h"
 #include "log.h"
 #include "io.h"
 #include "client.h"
@@ -19,7 +17,6 @@
 #include "database.h"
 #include "create.h"
 #include "see.h"
-#include "notify.h"
 #define NEED_PLAYER_STRUCT
 #define NEED_PLAYER_DRIVER
 #include "player.h"
@@ -33,9 +30,7 @@
 #include "effect.h"
 #include "talk.h"
 #include "drvlib.h"
-#include "direction.h"
 #include "do.h"
-#include "drdata.h"
 #include "act.h"
 #include "command.h"
 #include "container.h"
@@ -44,7 +39,6 @@
 #include "depot.h"
 #include "store.h"
 #include "libload.h"
-#include "death.h"
 #include "tool.h"
 #include "statistics.h"
 #include "sector.h"
@@ -53,7 +47,6 @@
 #include "mail.h"
 #include "motd.h"
 #include "tell.h"
-#include "consistency.h"
 #include "drdata.h"
 #include "lostcon.h"
 #include "military.h"

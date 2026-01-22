@@ -2,16 +2,11 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <string.h>
-#include <ctype.h>
 
 #include "server.h"
 #include "drdata.h"
 #include "talk.h"
 #include "date.h"
-#include "tool.h"
-#include "create.h"
-#include "chat.h"
 #include "swear.h"
 
 struct swear_ppd {

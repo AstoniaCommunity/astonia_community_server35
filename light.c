@@ -17,13 +17,10 @@ area it gets.
 #include <math.h>
 
 #include "server.h"
-#include "log.h"
 #define NEED_FAST_LOS_LIGHT
 #include "los.h"
 #undef NEED_FAST_LOS_LIGHT
 #include "sector.h"
-#include "consistency.h"
-#include "btrace.h"
 #include "light.h"
 
 static inline void map_add_light(int x, int y, int v) {

@@ -9,7 +9,6 @@
 #include "talk.h"
 #include "lookup.h"
 #include "database.h"
-#include "tool.h"
 #include "clan.h"
 #include "clanlog.h"
 

@@ -15,7 +15,6 @@ Possible optimization: Hash table for inserts.
 #include <stdlib.h>
 
 #include "server.h"
-#include "log.h"
 #include "mem.h"
 #include "timer.h"
 

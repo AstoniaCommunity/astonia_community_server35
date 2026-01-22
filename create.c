@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <math.h>
 #include <sys/mman.h>
 #include <errno.h>
 
@@ -21,19 +20,15 @@
 #include "light.h"
 #include "player.h"
 #include "direction.h"
-#include "timer.h"
 #include "mem.h"
 #include "notify.h"
-#include "libload.h"
 #include "sector.h"
 #include "drvlib.h"
 #include "area.h"
-#include "date.h"
 #include "create.h"
 #include "respawn.h"
 #include "balance.h"
 #include "map.h"
-#include "consistency.h"
 #include "btrace.h"
 #include "item_id.h"
 #include "spell.h"

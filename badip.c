@@ -3,23 +3,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <string.h>
-#include <ctype.h>
 #include <time.h>
-#include <errno.h>
-#include <math.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <mysql/mysql.h>
-#include <mysql/mysqld_error.h>
 #include "badip.h"
 
 static int get_count(MYSQL *mysql, unsigned int ip, int timeout) {

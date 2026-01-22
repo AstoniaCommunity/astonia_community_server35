@@ -3,7 +3,6 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 #include "server.h"
@@ -14,7 +13,6 @@
 #include "path.h"
 #include "do.h"
 #include "see.h"
-#include "talk.h"
 #include "map.h"
 #include "container.h"
 #include "timer.h"
@@ -28,10 +26,8 @@
 #include "date.h"
 #include "player_driver.h"
 #include "lostcon.h"
-#include "balance.h"
 #include "drvlib.h"
 #include "fight.h"
-#include "consistency.h"
 #include "log.h"
 
 int walk_or_use_driver(int cn, int dir) {

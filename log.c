@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
 #include <pthread.h>
 
 #include "server.h"
@@ -12,7 +11,6 @@
 #include "depot.h"
 #include "date.h"
 #include "drdata.h"
-#include "database.h"
 #include "log.h"
 
 static FILE *logfp;
