@@ -102,6 +102,8 @@ struct player {
     int container[PLR_INVENTORYSIZE]; // sprites of items in container/store
     int price[PLR_INVENTORYSIZE]; // prices in store
     int cprice;
+    int depot_reload_timer;
+    int depot_reload_tries;
 
     union ceffect ceffect[MAXEF];
     unsigned int seffect[MAXEF];

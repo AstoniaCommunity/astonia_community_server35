@@ -765,7 +765,6 @@ int load_depot_for_char(int cID, int sID) {
     sprintf(buf2, "%d", sID);
 
     sprintf(buf3, "%10d:%10d", sID, cID);
-    xlog("requesting depot release (%s)", buf3);
     server_chat(1039, buf3);
 
     return add_query(DT_LOADDEPOT, buf, buf2, 0);
@@ -3667,10 +3666,10 @@ void db_load_depot_for_char(int cID, int sID) {
     }
 
     if (load_depot(sID, cID, ppd)) {
-        xlog("loaded depot for %s", ch[co].name);
+        xlog("Loaded depot for %s (sID=%d)", ch[co].name, sID);
         ppd->loaded = 1;
     } else {
-        xlog("could not load depot for %s", ch[co].name);
+        xlog("Could not load depot for %s (sID=%d, this is not an error)", ch[co].name, sID);
     }
 
     unlock_server();
@@ -3680,8 +3679,6 @@ void release_depot(int sID, int cID) {
     struct depot_ppd *depot_ppd;
     int co;
 
-    xlog("release depot for %d", sID);
-
     for (co = getfirst_char(); co; co = getnext_char(co)) {
         if (ch[co].sID != sID) continue;
         if (ch[co].ID == cID) continue;
@@ -3689,7 +3686,7 @@ void release_depot(int sID, int cID) {
         if (depot_ppd->loaded) {
             save_depot(ch[co].sID, depot_ppd, ch[co].ID, 1);
             bzero(depot_ppd, sizeof(struct depot_ppd));
-            xlog("release depot for %s", ch[co].name);
+            xlog("Released depot from %s (sID=%d)", ch[co].name, sID);
         }
     }
 }

@@ -2150,6 +2150,7 @@ static void player_stats(int nr) {
     unsigned char buf[256];
     struct depot_ppd *ppd;
     struct military_ppd *mppd;
+    static char loading_depot_str[] = "Loading Depot...";
 
     cn = player[nr]->cn;
 
@@ -2410,11 +2411,11 @@ static void player_stats(int nr) {
             if (!player[nr]) return;
         }
         if (!ppd->loaded) {
-            if (strcmp(player[nr]->con_name, "Error Loading Depot")) {
+            if (strcmp(player[nr]->con_name, loading_depot_str) || (player[nr]->depot_reload_timer && ticker - player[nr]->depot_reload_timer > TICKS / 4)) {
                 buf[0] = SV_CONNAME;
-                buf[1] = len = strlen("Error Loading Depot");
-                strcpy(buf + 2, "Error Loading Depot");
-                strcpy(player[nr]->con_name, "Error Loading Depot");
+                buf[1] = len = strlen(loading_depot_str);
+                strcpy(buf + 2, loading_depot_str);
+                strcpy(player[nr]->con_name, loading_depot_str);
                 psend(nr, buf, len + 2);
                 if (!player[nr]) return;
                 for (n = 0; n < MAXDEPOT; n++) {
@@ -2426,10 +2427,14 @@ static void player_stats(int nr) {
                         if (!player[nr]) return;
                     }
                 }
+
                 load_depot_for_char(ch[cn].ID, ch[cn].sID);
-                // TODO: We should re-try one or two times, maybe with a second delay each?
+                if (player[nr]->depot_reload_tries < 4) player[nr]->depot_reload_timer = ticker;
+                player[nr]->depot_reload_tries++;
             }
         } else {
+            player[nr]->depot_reload_tries = 0;
+            player[nr]->depot_reload_timer = 0;
             if (strcmp(player[nr]->con_name, "Your Depot")) {
                 buf[0] = SV_CONNAME;
                 buf[1] = len = strlen("Your Depot");
