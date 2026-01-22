@@ -126,15 +126,15 @@ int init_log(void) {
         tm = localtime((time_t *)&time_now);
         logday = tm->tm_mday;
 
-        sprintf(buf, "%02d_%02d_%02d.log", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
+        sprintf(buf, "logs/%02d_%02d_%02d.log", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
         logfp = fopen(buf, "a");
         if (!logfp) return 0;
 
-        sprintf(buf, "%02d_%02d_%02d.ilog", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
+        sprintf(buf, "logs/%02d_%02d_%02d.ilog", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
         infofp = fopen(buf, "a");
         if (!infofp) return 0;
 
-        sprintf(buf, "%02d_%02d_%02d.elog", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
+        sprintf(buf, "logs/%02d_%02d_%02d.elog", tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday);
         errorfp = fopen(buf, "a");
         if (!errorfp) return 0;
     } else {
