@@ -266,7 +266,7 @@ void bank_driver(int cn, int ret, int lastact) {
             }
 
             if (!ppd->loaded)
-                ; // we don't talk about accounts if we the depot isn't loaded
+                ; // we don't talk about accounts if the depot isn't loaded
             else if (!ppd->gold) quiet_say(cn, "Hello %s! Wouldst thou like to open an \260c4account\260c0 with the Imperial Bank?", ch[co].name);
             else quiet_say(cn, "Ah, welcome %s! Thy \260c4account\260c0 is in good hands with the Imperial Bank.", ch[co].name);
             mem_add_driver(cn, co, 7);

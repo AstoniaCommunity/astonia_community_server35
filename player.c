@@ -2145,16 +2145,10 @@ static void player_map(int nr) {
 #endif
 }
 
-static void player_stats(int nr) {
-    int n, cn, in, sprite, flags, ct, co, s, price, len;
+static int player_stats_setval(int cn, int nr) {
     unsigned char buf[256];
-    struct depot_ppd *ppd;
-    struct military_ppd *mppd;
-    static char loading_depot_str[] = "Loading Depot...";
+    int n;
 
-    cn = player[nr]->cn;
-
-    // values
     if (ch[cn].flags & CF_UPDATE) { // only check for value updates if update_char() was called (speed optim.)
         for (n = 0; n < V_MAX; n++) {
             if (ch[cn].value[0][n] != player[nr]->value[0][n]) {
@@ -2162,76 +2156,87 @@ static void player_stats(int nr) {
                 buf[1] = n;
                 *(short *)(buf + 2) = player[nr]->value[0][n] = ch[cn].value[0][n];
                 psend(nr, buf, 4);
-                if (!player[nr]) return;
+                if (!player[nr]) return 0;
             }
             if (ch[cn].value[1][n] != player[nr]->value[1][n]) {
                 buf[0] = SV_SETVAL1;
                 buf[1] = n;
                 *(short *)(buf + 2) = player[nr]->value[1][n] = ch[cn].value[1][n];
                 psend(nr, buf, 4);
-                if (!player[nr]) return;
+                if (!player[nr]) return 0;
             }
         }
         ch[cn].flags &= ~CF_UPDATE;
     }
+    return 1;
+}
+
+static int player_stats_singles(int cn, int nr) {
+    struct military_ppd *mppd;
+    unsigned char buf[256];
 
     // hp, endurance, mana, lifeshield, exp
     if (ch[cn].hp / POWERSCALE != player[nr]->hp) {
         buf[0] = SV_SETHP;
         *(short *)(buf + 1) = player[nr]->hp = ch[cn].hp / POWERSCALE;
         psend(nr, buf, 3);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].endurance / POWERSCALE != player[nr]->endurance) {
         buf[0] = SV_ENDURANCE;
         *(short *)(buf + 1) = player[nr]->endurance = ch[cn].endurance / POWERSCALE;
         psend(nr, buf, 3);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].mana / POWERSCALE != player[nr]->mana) {
         buf[0] = SV_SETMANA;
         *(short *)(buf + 1) = player[nr]->mana = ch[cn].mana / POWERSCALE;
         psend(nr, buf, 3);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].lifeshield / POWERSCALE != player[nr]->lifeshield) {
         buf[0] = SV_LIFESHIELD;
         *(short *)(buf + 1) = player[nr]->lifeshield = ch[cn].lifeshield / POWERSCALE;
         psend(nr, buf, 3);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].exp != player[nr]->exp) {
         buf[0] = SV_EXP;
         *(unsigned int *)(buf + 1) = player[nr]->exp = ch[cn].exp;
         psend(nr, buf, 5);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].exp_used != player[nr]->exp_used) {
         buf[0] = SV_EXP_USED;
         *(unsigned int *)(buf + 1) = player[nr]->exp_used = ch[cn].exp_used;
         psend(nr, buf, 5);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if ((ticker & 15) == 15 && (mppd = set_data(cn, DRD_MILITARY_PPD, sizeof(struct military_ppd))) && mppd->military_pts != player[nr]->mil_exp) {
         buf[0] = SV_MIL_EXP;
         *(unsigned int *)(buf + 1) = player[nr]->mil_exp = mppd->military_pts;
         psend(nr, buf, 5);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].speed_mode != player[nr]->speed_mode) {
         buf[0] = SV_SPEEDMODE;
         buf[1] = player[nr]->speed_mode = ch[cn].speed_mode;
         psend(nr, buf, 2);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
     if (ch[cn].rage / POWERSCALE != player[nr]->rage) {
         buf[0] = SV_SETRAGE;
         *(short *)(buf + 1) = player[nr]->rage = ch[cn].rage / POWERSCALE;
         psend(nr, buf, 3);
-        if (!player[nr]) return;
+        if (!player[nr]) return 0;
     }
+    return 1;
+}
 
-    // items
+static int player_stats_items(int cn, int nr) {
+    unsigned char buf[256];
+    int n, in, sprite, flags, price;
+
     if (ch[cn].flags & CF_ITEMS) {
         for (n = 0; n < INVENTORYSIZE; n++) {
             if ((in = ch[cn].item[n])) {
@@ -2248,7 +2253,7 @@ static void player_stats(int nr) {
                 *(unsigned int *)(buf + 2) = player[nr]->item[n] = sprite;
                 *(unsigned int *)(buf + 6) = player[nr]->item_flags[n] = flags;
                 psend(nr, buf, 10);
-                if (!player[nr]) return;
+                if (!player[nr]) return 0;
             }
         }
 
@@ -2262,7 +2267,7 @@ static void player_stats(int nr) {
             *(unsigned int *)(buf + 1) = player[nr]->citem_sprite = sprite;
             *(unsigned int *)(buf + 5) = player[nr]->citem_flags = flags;
             psend(nr, buf, 9);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
         }
 
         if ((in = ch[cn].citem) && (it[in].flags & IF_MONEY)) {
@@ -2270,14 +2275,14 @@ static void player_stats(int nr) {
                 buf[0] = SV_CPRICE;
                 *(unsigned int *)(buf + 1) = player[nr]->cprice = it[in].value;
                 psend(nr, buf, 5);
-                if (!player[nr]) return;
+                if (!player[nr]) return 0;
             }
         } else {
             if (player[nr]->cprice != 0) {
                 buf[0] = SV_CPRICE;
                 *(unsigned int *)(buf + 1) = player[nr]->cprice = 0;
                 psend(nr, buf, 5);
-                if (!player[nr]) return;
+                if (!player[nr]) return 0;
             }
         }
 
@@ -2285,175 +2290,180 @@ static void player_stats(int nr) {
             buf[0] = SV_GOLD;
             *(unsigned int *)(buf + 1) = player[nr]->gold = ch[cn].gold;
             psend(nr, buf, 5);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
         }
 
         ch[cn].flags &= ~CF_ITEMS;
     }
+    return 1;
+}
 
-    // container
-    if ((in = ch[cn].con_in) && (ct = it[in].content)) {
-        if (player[nr]->con_type != 1) {
-            buf[0] = SV_CONTYPE;
-            buf[1] = player[nr]->con_type = 1;
-            psend(nr, buf, 2);
-            if (!player[nr]) return;
-        }
-        if (strcmp(player[nr]->con_name, it[in].description)) {
-            buf[0] = SV_CONNAME;
-            buf[1] = len = strlen(it[in].description);
-            strcpy(buf + 2, it[in].description);
-            strcpy(player[nr]->con_name, it[in].description);
-            psend(nr, buf, len + 2);
-            if (!player[nr]) return;
-        }
-        if (player[nr]->con_cnt != CONTAINERSIZE) {
-            buf[0] = SV_CONCNT;
-            buf[1] = player[nr]->con_cnt = CONTAINERSIZE;
-            psend(nr, buf, 2);
-            if (!player[nr]) return;
-        }
-        for (n = 0; n < CONTAINERSIZE; n++) {
-            if ((in = con[ct].item[n])) sprite = it[in].sprite;
-            else sprite = 0;
+static int player_stats_container(int cn, int nr, int in, int ct) {
+    unsigned char buf[256];
+    int n, len, sprite;
 
-            if (player[nr]->container[n] != sprite) {
-                buf[0] = SV_CONTAINER;
-                buf[1] = n;
-                *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
-                psend(nr, buf, 6);
-                if (!player[nr]) return;
-            }
-        }
-    } else if ((co = ch[cn].merchant) && (s = ch[co].store)) {
+    if (player[nr]->con_type != 1) {
+        buf[0] = SV_CONTYPE;
+        buf[1] = player[nr]->con_type = 1;
+        psend(nr, buf, 2);
+        if (!player[nr]) return 0;
+    }
+    if (strcmp(player[nr]->con_name, it[in].description)) {
+        buf[0] = SV_CONNAME;
+        buf[1] = len = strlen(it[in].description);
+        strcpy(buf + 2, it[in].description);
+        strcpy(player[nr]->con_name, it[in].description);
+        psend(nr, buf, len + 2);
+        if (!player[nr]) return 0;
+    }
+    if (player[nr]->con_cnt != CONTAINERSIZE) {
+        buf[0] = SV_CONCNT;
+        buf[1] = player[nr]->con_cnt = CONTAINERSIZE;
+        psend(nr, buf, 2);
+        if (!player[nr]) return 0;
+    }
+    for (n = 0; n < CONTAINERSIZE; n++) {
+        if ((in = con[ct].item[n])) sprite = it[in].sprite;
+        else sprite = 0;
 
-        if (player[nr]->con_type != 2) {
-            buf[0] = SV_CONTYPE;
-            buf[1] = player[nr]->con_type = 2;
-            psend(nr, buf, 2);
-            if (!player[nr]) return;
+        if (player[nr]->container[n] != sprite) {
+            buf[0] = SV_CONTAINER;
+            buf[1] = n;
+            *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
+            psend(nr, buf, 6);
+            if (!player[nr]) return 0;
         }
-        if (strcmp(player[nr]->con_name, ch[co].name)) {
-            buf[0] = SV_CONNAME;
-            buf[1] = len = strlen(ch[co].name);
-            strcpy(buf + 2, ch[co].name);
-            strcpy(player[nr]->con_name, ch[co].name);
-            psend(nr, buf, len + 2);
-            if (!player[nr]) return;
+    }
+    return 1;
+}
+
+static int player_stats_store(int cn, int nr, int co, int s) {
+    unsigned char buf[256];
+    int n, price, sprite, len, in;
+
+    if (player[nr]->con_type != 2) {
+        buf[0] = SV_CONTYPE;
+        buf[1] = player[nr]->con_type = 2;
+        psend(nr, buf, 2);
+        if (!player[nr]) return 0;
+    }
+    if (strcmp(player[nr]->con_name, ch[co].name)) {
+        buf[0] = SV_CONNAME;
+        buf[1] = len = strlen(ch[co].name);
+        strcpy(buf + 2, ch[co].name);
+        strcpy(player[nr]->con_name, ch[co].name);
+        psend(nr, buf, len + 2);
+        if (!player[nr]) return 0;
+    }
+
+    if (player[nr]->con_cnt != STORESIZE) {
+        buf[0] = SV_CONCNT;
+        buf[1] = player[nr]->con_cnt = STORESIZE;
+        psend(nr, buf, 2);
+        if (!player[nr]) return 0;
+    }
+    for (n = 0; n < STORESIZE; n++) {
+        if ((in = store[s]->ware[n].cnt)) sprite = store[s]->ware[n].item.sprite;
+        else sprite = 0;
+
+        if (player[nr]->container[n] != sprite) {
+            buf[0] = SV_CONTAINER;
+            buf[1] = n;
+            *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
+            psend(nr, buf, 6);
+            if (!player[nr]) return 0;
         }
 
-        if (player[nr]->con_cnt != STORESIZE) {
-            buf[0] = SV_CONCNT;
-            buf[1] = player[nr]->con_cnt = STORESIZE;
-            psend(nr, buf, 2);
-            if (!player[nr]) return;
+        price = salesprice(co, cn, n);
+
+        if (player[nr]->price[n] != price) {
+            buf[0] = SV_PRICE;
+            buf[1] = n;
+            *(unsigned int *)(buf + 2) = player[nr]->price[n] = price;
+            psend(nr, buf, 6);
+            if (!player[nr]) return 0;
         }
-        for (n = 0; n < STORESIZE; n++) {
-            if ((in = store[s]->ware[n].cnt)) sprite = store[s]->ware[n].item.sprite;
-            else sprite = 0;
+    }
+    for (n = 0; n < INVENTORYSIZE; n++) {
+        if ((in = ch[cn].item[n])) price = buyprice(cn, in);
+        else price = 0;
 
-            if (player[nr]->container[n] != sprite) {
-                buf[0] = SV_CONTAINER;
-                buf[1] = n;
-                *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
-                psend(nr, buf, 6);
-                if (!player[nr]) return;
-            }
-
-            price = salesprice(co, cn, n);
-
-            if (player[nr]->price[n] != price) {
-                buf[0] = SV_PRICE;
-                buf[1] = n;
-                *(unsigned int *)(buf + 2) = player[nr]->price[n] = price;
-                psend(nr, buf, 6);
-                if (!player[nr]) return;
-            }
+        if (player[nr]->item_price[n] != price) {
+            buf[0] = SV_ITEMPRICE;
+            buf[1] = n;
+            *(unsigned int *)(buf + 2) = player[nr]->item_price[n] = price;
+            psend(nr, buf, 6);
+            if (!player[nr]) return 0;
         }
-        for (n = 0; n < INVENTORYSIZE; n++) {
-            if ((in = ch[cn].item[n])) price = buyprice(cn, in);
-            else price = 0;
-
-            if (player[nr]->item_price[n] != price) {
-                buf[0] = SV_ITEMPRICE;
-                buf[1] = n;
-                *(unsigned int *)(buf + 2) = player[nr]->item_price[n] = price;
-                psend(nr, buf, 6);
-                if (!player[nr]) return;
-            }
-        }
-        if (ch[cn].citem) {
-            price = buyprice(cn, ch[cn].citem);
-            if (player[nr]->cprice != price) {
-                buf[0] = SV_CPRICE;
-                *(unsigned int *)(buf + 1) = player[nr]->cprice = price;
-                psend(nr, buf, 5);
-                if (!player[nr]) return;
-            }
-        } else if (player[nr]->cprice != 0) {
+    }
+    if (ch[cn].citem) {
+        price = buyprice(cn, ch[cn].citem);
+        if (player[nr]->cprice != price) {
             buf[0] = SV_CPRICE;
-            *(unsigned int *)(buf + 1) = player[nr]->cprice = 0;
+            *(unsigned int *)(buf + 1) = player[nr]->cprice = price;
             psend(nr, buf, 5);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
         }
+    } else if (player[nr]->cprice != 0) {
+        buf[0] = SV_CPRICE;
+        *(unsigned int *)(buf + 1) = player[nr]->cprice = 0;
+        psend(nr, buf, 5);
+        if (!player[nr]) return 0;
+    }
 
-    } else if ((in = ch[cn].con_in) && (it[in].flags & IF_DEPOT) && (ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd)))) {
+    return 1;
+}
+
+static int player_stats_prof(int cn, int nr) {
+    unsigned char buf[256];
+    int n;
+
+    if (ch[cn].flags & CF_PROF) {
+        ch[cn].flags &= ~CF_PROF;
+        buf[0] = SV_PROF;
+        for (n = 0; n < P_MAX; n++) buf[n + 1] = ch[cn].prof[n];
+        psend(nr, buf, P_MAX + 1);
+        if (!player[nr]) return 0;
+    }
+    return 1;
+}
+
+static int player_stats_depot(int cn, int nr, struct depot_ppd *ppd, char *name, int opened) {
+    unsigned char buf[256];
+    int n, len, sprite;
+
+    if (opened) {
         if (player[nr]->con_type != 1) {
             buf[0] = SV_CONTYPE;
             buf[1] = player[nr]->con_type = 1;
             psend(nr, buf, 2);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
         }
         if (player[nr]->con_cnt != MAXDEPOT) {
             buf[0] = SV_CONCNT;
             buf[1] = player[nr]->con_cnt = MAXDEPOT;
             psend(nr, buf, 2);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
         }
-        if (!ppd->loaded) {
-            if (strcmp(player[nr]->con_name, loading_depot_str) || (player[nr]->depot_reload_timer && ticker - player[nr]->depot_reload_timer > TICKS / 4)) {
-                buf[0] = SV_CONNAME;
-                buf[1] = len = strlen(loading_depot_str);
-                strcpy(buf + 2, loading_depot_str);
-                strcpy(player[nr]->con_name, loading_depot_str);
-                psend(nr, buf, len + 2);
-                if (!player[nr]) return;
-                for (n = 0; n < MAXDEPOT; n++) {
-                    if (player[nr]->container[n] != 0) {
-                        buf[0] = SV_CONTAINER;
-                        buf[1] = n;
-                        *(unsigned int *)(buf + 2) = player[nr]->container[n] = 0;
-                        psend(nr, buf, 6);
-                        if (!player[nr]) return;
-                    }
-                }
 
-                load_depot_for_char(ch[cn].ID, ch[cn].sID);
-                if (player[nr]->depot_reload_tries < 4) player[nr]->depot_reload_timer = ticker;
-                player[nr]->depot_reload_tries++;
-            }
-        } else {
-            player[nr]->depot_reload_tries = 0;
-            player[nr]->depot_reload_timer = 0;
-            if (strcmp(player[nr]->con_name, "Your Depot")) {
-                buf[0] = SV_CONNAME;
-                buf[1] = len = strlen("Your Depot");
-                strcpy(buf + 2, "Your Depot");
-                strcpy(player[nr]->con_name, "Your Depot");
-                psend(nr, buf, len + 2);
-                if (!player[nr]) return;
-            }
-            for (n = 0; n < MAXDEPOT; n++) {
-                if (ppd->itm[n].flags) sprite = ppd->itm[n].sprite;
-                else sprite = 0;
+        if (strcmp(player[nr]->con_name, name)) {
+            buf[0] = SV_CONNAME;
+            buf[1] = len = strlen(name);
+            strcpy(buf + 2, name);
+            strcpy(player[nr]->con_name, name);
+            psend(nr, buf, len + 2);
+            if (!player[nr]) return 0;
+        }
+        for (n = 0; n < MAXDEPOT; n++) {
+            if (ppd && ppd->itm[n].flags) sprite = ppd->itm[n].sprite;
+            else sprite = 0;
 
-                if (player[nr]->container[n] != sprite) {
-                    buf[0] = SV_CONTAINER;
-                    buf[1] = n;
-                    *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
-                    psend(nr, buf, 6);
-                    if (!player[nr]) return;
-                }
+            if (player[nr]->container[n] != sprite) {
+                buf[0] = SV_CONTAINER;
+                buf[1] = n;
+                *(unsigned int *)(buf + 2) = player[nr]->container[n] = sprite;
+                psend(nr, buf, 6);
+                if (!player[nr]) return 0;
             }
         }
     } else {
@@ -2461,17 +2471,57 @@ static void player_stats(int nr) {
             buf[0] = SV_CONCNT;
             buf[1] = player[nr]->con_cnt = 0;
             psend(nr, buf, 2);
-            if (!player[nr]) return;
+            if (!player[nr]) return 0;
+            strcpy(player[nr]->con_name, "none");
         }
-        strcpy(player[nr]->con_name, "none");
     }
 
-    if (ch[cn].flags & CF_PROF) {
-        ch[cn].flags &= ~CF_PROF;
-        buf[0] = SV_PROF;
-        for (n = 0; n < P_MAX; n++) buf[n + 1] = ch[cn].prof[n];
-        psend(nr, buf, P_MAX + 1);
-        if (!player[nr]) return;
+    return 1;
+}
+
+static void player_stats(int nr) {
+    int cn, in, ct, co, s;
+    struct depot_ppd *ppd;
+
+    cn = player[nr]->cn;
+
+    if (!player_stats_setval(cn, nr)) return;
+    if (!player_stats_singles(cn, nr)) return;
+    if (!player_stats_items(cn, nr)) return;
+    if (!player_stats_prof(cn, nr)) return;
+
+    if ((in = ch[cn].con_in) && (ct = it[in].content)) {
+
+        if (!player_stats_container(cn, nr, in, ct)) return;
+
+    } else if ((co = ch[cn].merchant) && (s = ch[co].store)) {
+
+        if (!player_stats_store(cn, nr, co, s)) return;
+
+    } else if ((in = ch[cn].con_in) && (it[in].flags & IF_DEPOT) && (ppd = set_data(cn, DRD_DEPOT_PPD, sizeof(struct depot_ppd)))) {
+
+        if (!ppd->loaded) {
+            if (!player_stats_depot(cn, nr, NULL, "Loading Depot...", 1)) return;
+            if (ticker - player[nr]->depot_reload_timer > TICKS / 4) {
+
+                if (player[nr]->depot_reload_tries < 4) {
+                    xlog("trigger load depot");
+                    load_depot_for_char(ch[cn].ID, ch[cn].sID);
+                    player[nr]->depot_reload_timer = ticker;
+                    player[nr]->depot_reload_tries++;
+                }
+            }
+        } else {
+            player[nr]->depot_reload_tries = 0;
+            player[nr]->depot_reload_timer = 0;
+
+            if (!player_stats_depot(cn, nr, ppd, "Account Wide Depot", 1)) return;
+        }
+    } else {
+        player[nr]->depot_reload_tries = 0;
+        player[nr]->depot_reload_timer = 0;
+
+        if (!player_stats_depot(cn, nr, NULL, "none", 0)) return;
     }
 }
 
