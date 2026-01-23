@@ -23,6 +23,8 @@
 #define MAXITEM (maxitem) //6144	//16384
 #define MAXCHARS (maxchars) //768	//2048		// MUST be a multiple of 8
 #define MAXEFFECT (maxeffect) //512	//1024
+#define MAXTCHARS 128
+#define MAXTITEM (128 * 12)
 
 #define MAXAREANAME 80
 #define MAXPASSWORD 16
@@ -476,7 +478,7 @@ struct character {
 extern struct character *ch;
 
 // *********** EFFECT DEFINITION **************
-#define MAXFIELD 256
+#define MAXFIELD 16
 
 struct effect {
     int type; // type of effect

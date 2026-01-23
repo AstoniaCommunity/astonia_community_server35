@@ -24,4 +24,3 @@ void xfree(void *ptr);
 void *xstrdup(char *ptr, int ID);
 void list_mem(void);
 int init_mem(void);
-int init_smalloc(void);

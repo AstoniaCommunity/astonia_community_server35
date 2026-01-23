@@ -106,6 +106,8 @@ void showmem(void) {
     xlog("Used items     : %5d/%5d (%4.1f%%)", used_items, MAXITEM, 100.0 / MAXITEM * used_items);
     xlog("Used effects   : %5d/%5d (%4.1f%%)", used_effects, MAXEFFECT, 100.0 / MAXEFFECT * used_effects);
     xlog("Used containers: %5d/%5d (%4.1f%%)", used_containers, MAXCONTAINER, 100.0 / MAXCONTAINER * used_containers);
+    xlog("Used t-chars   : %5d/%5d (%4.1f%%)", used_tchars, MAXTCHARS, 100.0 / MAXTCHARS * used_tchars);
+    xlog("Used t-items   : %5d/%5d (%4.1f%%)", used_titems, MAXTITEM, 100.0 / MAXTITEM * used_titems);
     xlog("Used timers    : %5d", used_timers);
     xlog("Used notifies  : %5d", used_msgs);
     xlog("Used queries   : %5d", used_queries);
@@ -339,7 +341,6 @@ int main(int argc, char *args[]) {
     // init random number generator
     srand(time_now);
 
-    if (!init_smalloc()) exit(1);
     if (!init_mem()) exit(1);
     if (!init_prof()) exit(1);
     if (!init_log()) exit(1);
@@ -429,7 +430,7 @@ int main(int argc, char *args[]) {
             reinit_log();
         }
 
-        if ((ticker & 255) == 0) {
+        if ((ticker & 255) == 77) {
             call_check_task();
             call_area_load();
             shutdown_warn();

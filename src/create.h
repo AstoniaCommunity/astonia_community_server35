@@ -2,8 +2,8 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-extern int used_chars;
-extern int used_items;
+extern int used_chars, used_tchars;
+extern int used_items, used_titems;
 
 int init_create(void);
 int create_item(char *name);

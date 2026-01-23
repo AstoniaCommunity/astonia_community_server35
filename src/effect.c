@@ -119,7 +119,10 @@ int set_effect_map(int fn, int x, int y) {
 
     m = x + y * MAXMAP;
 
-    if (ef[fn].field_cnt >= MAXFIELD) return 0;
+    if (ef[fn].field_cnt >= MAXFIELD) {
+        elog("MAXFIELD reached for effect %d (type %d)", fn, ef[fn].type);
+        return 0;
+    }
 
     for (n = 0; n < 4; n++) {
         if (!map[m].ef[n]) break;

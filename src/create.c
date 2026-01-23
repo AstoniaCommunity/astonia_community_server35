@@ -43,9 +43,6 @@
 #define PAGESIZE 4096
 #endif
 
-#define MAXTCHARS 256
-#define MAXTITEM 1500
-
 int used_chars, used_tchars;
 int used_items, used_titems;
 static int tmp_a = 1;
@@ -492,7 +489,10 @@ static int add_item(struct it_temp *itt) {
 
     for (n = 1; n < MAXTITEM; n++)
         if (!it_temp[n].name[0]) break;
-    if (n == MAXTITEM) return 0;
+    if (n == MAXTITEM) {
+        elog("MAXTITEM reached!");
+        return 0;
+    }
 
     it_temp[n] = *itt;
     used_titems++;
@@ -633,7 +633,10 @@ static int add_char(struct ch_temp *cht) {
 
     for (n = 1; n < MAXTCHARS; n++)
         if (!ch_temp[n].name[0]) break;
-    if (n == MAXTCHARS) return 0;
+    if (n == MAXTCHARS) {
+        elog("MAXTCHARS reached!");
+        return 0;
+    }
 
     if ((cht->ch.flags & CF_QUESTITEM) &&
         !(cht->ch.flags & (CF_IMMORTAL | CF_NOATTACK)) &&
@@ -1430,7 +1433,7 @@ int init_create(void) {
 
     ch = xcalloc(sizeof(struct character) * MAXCHARS, IM_BASE);
     if (!ch) return 0;
-    xlog("Allocated characters: %.2fM (%d*%d)", sizeof(struct item) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct character), MAXCHARS);
+    xlog("Allocated characters: %.2fM (%d*%d)", sizeof(struct character) * MAXCHARS / 1024.0 / 1024.0, sizeof(struct character), MAXCHARS);
     mem_usage += sizeof(struct item) * MAXCHARS;
 
     it_temp = xcalloc(sizeof(struct it_temp) * MAXTITEM, IM_BASE);
