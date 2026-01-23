@@ -29,7 +29,7 @@
 #include "depot.h"
 #include "player_driver.h"
 #include "questlog.h"
-#include "two_ppd.h"
+#include "exkordon.h"
 
 // library helper functions needed for init
 int ch_driver(int nr, int cn, int ret, int lastact); // character driver (decides next action)

@@ -35,7 +35,7 @@
 #include "area.h"
 #include "misc_ppd.h"
 #include "act.h"
-#include "staffer_ppd.h"
+#include "misc2_ppd.h"
 #include "transport.h"
 #include "clan.h"
 #include "prof.h"

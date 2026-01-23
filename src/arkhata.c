@@ -22,7 +22,7 @@
 #include "drvlib.h"
 #include "libload.h"
 #include "item_id.h"
-#include "staffer_ppd.h"
+#include "misc2_ppd.h"
 #include "skill.h"
 #include "database.h"
 #include "questlog.h"

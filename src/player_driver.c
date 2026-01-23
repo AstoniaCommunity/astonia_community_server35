@@ -27,7 +27,7 @@
 #include "area.h"
 #include "create.h"
 #include "skill.h"
-#include "area1.h"
+#include "cameron.h"
 #include "database.h"
 #include "lostcon.h"
 #include "path.h"

@@ -10,12 +10,10 @@
 #include "notify.h"
 #include "direction.h"
 #include "do.h"
-#include "path.h"
 #include "drdata.h"
 #include "see.h"
 #include "death.h"
 #include "talk.h"
-#include "database.h"
 #include "map.h"
 #include "create.h"
 #include "drvlib.h"
@@ -23,7 +21,6 @@
 #include "effect.h"
 #include "item_id.h"
 #include "libload.h"
-#include "player_driver.h"
 #include "sector.h"
 #include "lab.h"
 
@@ -49,45 +46,226 @@ int driver(int type, int nr, int obj, int ret, int lastact) {
     }
 }
 
-struct lab2_herald_driver_data {
-    int last_talk;
-    int next_talk;
+// -- general lab5 stuff --------------------------------------------------------------------------------------------
+
+struct lab5_player_data {
+    unsigned char seyanstate; // the talk state of the seyan
+    unsigned char seyangot; // bit1=head1 bit2=head2 bit3=head3
+
+    unsigned char magegot; // (the door will set this values, so the mage can say something - not implemented, talking is complex and i was tired)
+    unsigned char magestate; // the talk state of the mage
+
+    unsigned char ritualdaemon; // the daemon the ritual is for
+    unsigned char ritualstate; // the ritualstate (0=none at all, 1=touched name, 2=touched realname)
 };
 
-void lab2_herald_driver(int cn, int ret, int lastact) {
-    struct lab_ppd *ppd;
-    struct lab2_herald_driver_data *dat;
+struct lab5_talk_data {
+    int cv_co; // current victim
+    int cv_serial; // current victim
+    int lasttalk;
+};
+
+struct lab5_daemon_data {
+    int attackstart;
+    char aggressive, type, dir, dummy; // 1=master 2=gunned
+};
+
+char *daemonname[4] = {"xxnamexx", "Asfaloth", "Beronath", "Cyradeth"};
+char *daemonreal[4] = {"xxrealxx", "Fao Thals", "Breth Ona", "Ch Dae Tyr"};
+int namecoordx[4] = {85, 90, 85, 80}; // need initialisation for dll reload (it took me a while till i found that "bug")
+int namecoordy[4] = {33, 28, 23, 28}; // need initialisation for dll reload
+
+#define MAXDOOR 4
+int daemondoorx[MAXDOOR] = {119, 119, 119, 119}; // need initialisation for dll reload
+int daemondoory[MAXDOOR] = {108, 95, 82, 69}; // need initialisation for dll reload
+
+// warning: might kill (and thus delete) cn
+void ritual_hurt(int cn, struct lab5_player_data *pd, int x, int y) {
+    int fn;
+
+    fn = create_show_effect(EF_PULSEBACK, cn, ticker, ticker + 17, 20, 42);
+    if (fn) {
+        ef[fn].x = x;
+        ef[fn].y = y;
+    }
+
+    log_char(cn, LOG_SYSTEM, 0, "\260c3The Ritual Of %s ended.\260c0", daemonname[pd->ritualdaemon]);
+    pd->ritualdaemon = 0;
+    pd->ritualstate = 0;
+
+    // always do hurt last as it might kill the character
+    hurt(cn, 5 * POWERSCALE, 0, 1, 0, 0);
+}
+
+void ritual_create_char(char *name, int x, int y, int dir, int attackstart) {
+    int cn;
+    struct lab5_daemon_data *dat;
+
+    // create
+    cn = create_char(name, 0);
+    if (!cn) return;
+
+    ch[cn].dir = dir;
+    ch[cn].flags &= ~CF_RESPAWN;
+    update_char(cn);
+
+    ch[cn].hp = ch[cn].value[0][V_HP] * POWERSCALE;
+    ch[cn].endurance = ch[cn].value[0][V_ENDURANCE] * POWERSCALE;
+    ch[cn].mana = ch[cn].value[0][V_MANA] * POWERSCALE;
+
+    // drop him to map
+    if (!drop_char(cn, x, y, 0)) {
+        destroy_char(cn);
+        xlog("drop_char failed (%s,%d)", __FILE__, __LINE__);
+        return;
+    }
+
+    // set values of the secure move driver
+    ch[cn].tmpx = ch[cn].x;
+    ch[cn].tmpy = ch[cn].y;
+
+    // set direction of deamon driver
+    dat = set_data(cn, DRD_LAB5_DAEMON, sizeof(struct lab5_daemon_data));
+    if (dat) {
+        dat->dir = dir;
+        dat->attackstart = attackstart * TICKS;
+    }
+}
+
+int ritual_start(int cn, int daemon) {
+    int i, x = 0, y, sx, sy, ex, ey, break2, mn, doorx, doory, co; // x=0 to avoid compiler warning!
+    static int statue1[4] = {11165, 11123, 11157, 11161};
+    static int statue2[4] = {11167, 11125, 11159, 11163};
+
+    // check for free room
+    for (i = 0; i < MAXDOOR; i++) {
+
+        sx = daemondoorx[i] + 0;
+        sy = daemondoory[i] - 6;
+        ex = daemondoorx[i] + 14;
+        ey = daemondoory[i] + 6;
+
+        for (break2 = 0, y = sy; !break2 && y <= ey; y++) {
+            for (x = sx; x <= ex; x++) {
+                if ((co = map[x + y * MAXMAP].ch) && (ch[co].flags & CF_PLAYER)) {
+                    break2 = 1;
+                    break;
+                }
+            }
+        }
+
+        if (y == ey + 1 && x == ex + 1) break;
+    }
+
+    if (i == MAXDOOR) return 0;
+
+    // cleanup
+    for (y = sy; y <= ey; y++) {
+        for (x = sx; x <= ex; x++) {
+            mn = x + y * MAXMAP;
+            if ((co = map[mn].ch) && !(ch[co].flags & CF_PLAYER)) remove_destroy_char(co);
+        }
+    }
+
+    // create new room
+    doorx = daemondoorx[i];
+    doory = daemondoory[i];
+
+    map[(doorx + 2) + (doory - 2) * MAXMAP].fsprite = statue1[daemon];
+    set_sector(doorx + 2, doory - 2); // set sector ?
+    map[(doorx + 2) + (doory + 2) * MAXMAP].fsprite = statue1[daemon];
+    set_sector(doorx + 2, doory + 2);
+    map[(doorx + 12) + (doory - 2) * MAXMAP].fsprite = statue2[daemon];
+    set_sector(doorx + 12, doory - 2);
+    map[(doorx + 12) + (doory + 2) * MAXMAP].fsprite = statue2[daemon];
+    set_sector(doorx + 12, doory + 2);
+
+    if (daemon == 1) {
+        ritual_create_char("lab5_one_servant", doorx + 10, doory - 2, DX_LEFT, 7);
+        ritual_create_char("lab5_one_servant", doorx + 10, doory + 2, DX_LEFT, 7);
+        ritual_create_char("lab5_one_master", doorx + 12, doory + 0, DX_LEFT, 8);
+    } else if (daemon == 2) {
+        ritual_create_char("lab5_two_servant", doorx + 10, doory - 2, DX_LEFT, 7);
+        ritual_create_char("lab5_two_servant", doorx + 10, doory + 2, DX_LEFT, 7);
+        ritual_create_char("lab5_two_master", doorx + 12, doory + 0, DX_LEFT, 8);
+    } else if (daemon == 3) {
+        ritual_create_char("lab5_three_servant_mage", doorx + 6, doory - 4, DX_DOWN, 7);
+        ritual_create_char("lab5_three_servant_mage", doorx + 6, doory + 4, DX_UP, 7);
+        ritual_create_char("lab5_three_servant", doorx + 12, doory + 1, DX_LEFT, 8);
+        ritual_create_char("lab5_three_master", doorx + 12, doory - 1, DX_LEFT, 8);
+    }
+
+    // insert character
+    if (teleport_char_driver(cn, doorx + 1, doory)) return 1;
+    return 0;
+}
+
+int has_potion(int cn) {
+    int i, in;
+
+    for (i = 30; i < INVENTORYSIZE; i++) {
+        if ((in = ch[cn].item[i]) && it[in].driver == IDR_POTION) return 1;
+    }
+
+    if ((in = ch[cn].citem) && it[in].driver == IDR_POTION) return 1;
+
+    return 0;
+}
+
+// -- seyan driver --------------------------------------------------------------------------------------------------
+
+void set_seyan_state(struct lab5_player_data *pd) {
+    if ((pd->seyangot & (1 << 0)) && (pd->seyangot & (1 << 1)) && (pd->seyangot & (1 << 2))) pd->seyanstate = 20; // done
+    else if (pd->seyangot) pd->seyanstate = 10; // some
+    else pd->seyanstate = 0; // start
+}
+
+void lab5_seyan_driver(int cn, int ret, int lastact) {
+    struct lab5_player_data *pd;
+    static struct lab5_talk_data datbuf; // we only have one, so there is no need to use the memory system (?)
+    struct lab5_talk_data *dat = &datbuf;
     struct msg *msg, *next;
     int co;
     int talkdir = 0, didsay = 0;
     char *str;
 
-    // get data
-    dat = set_data(cn, DRD_LAB2_HERALD, sizeof(*dat));
-    if (!dat) return; // oops...
-
     // loop through our messages
     for (msg = ch[cn].msg; msg; msg = next) {
         next = msg->next;
-
-        if (msg->type == NT_CREATE) {
-        }
-
-        if (msg->type == NT_TEXT) {
-            co = msg->dat3;
-            tabunga(cn, co, (char *)msg->dat2);
-        }
 
         if (msg->type == NT_GIVE) {
             if (!ch[cn].citem) {
                 remove_message(cn, msg);
                 continue;
             } // ??? i saw something like this at DBs source
-
             co = msg->dat1;
-            // DB: besser: sizeof(struct lab_ppd)
-            if ((ch[co].flags & CF_PLAYER) && (ppd = set_data(co, DRD_LAB_PPD, sizeof(*ppd)))) {
-                if (it[ch[cn].citem].ID == IID_LAB2_ARATHASRING) ppd->herald_talkstep = 60;
+
+            // players only
+            if (ch[co].flags & CF_PLAYER) {
+
+                // get lab ppd
+                pd = set_data(co, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+                if (!pd) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+
+                // check item
+                if (it[ch[cn].citem].ID == IID_LAB5_HEAD1) {
+                    pd->seyangot |= (1 << 0);
+                    set_seyan_state(pd);
+                    if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while I'm talking to others.", ch[co].name); }
+                }
+                if (it[ch[cn].citem].ID == IID_LAB5_HEAD2) {
+                    pd->seyangot |= (1 << 1);
+                    set_seyan_state(pd);
+                    if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while I'm talking to others.", ch[co].name); }
+                }
+                if (it[ch[cn].citem].ID == IID_LAB5_HEAD3) {
+                    pd->seyangot |= (1 << 2);
+                    set_seyan_state(pd);
+                    if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while I'm talking to others.", ch[co].name); }
+                }
             }
 
             // destroy everything we get
@@ -99,132 +277,124 @@ void lab2_herald_driver(int cn, int ret, int lastact) {
 
             co = msg->dat1;
 
-            // dont talk to other NPCs
+            // dont talk
             if (!(ch[co].flags & CF_PLAYER)) {
                 remove_message(cn, msg);
                 continue;
-            }
-
-            // dont talk to players without connection
+            } // dont talk to other NPCs
             if (ch[co].driver == CDR_LOSTCON) {
                 remove_message(cn, msg);
                 continue;
-            }
-
-            // only talk when the old sentence is read
-            if (ticker < dat->next_talk) {
+            } // dont talk to players without connection
+            if (ticker < dat->lasttalk + 5 * TICKS) {
                 remove_message(cn, msg);
                 continue;
-            }
-
-            // dont talk to someone we cant see, and dont talk to ourself
+            } // only talk when the old sentence is read
             if (!char_see_char(cn, co) || cn == co) {
                 remove_message(cn, msg);
                 continue;
-            }
-
-            // dont talk to someone far away
+            } // dont talk to someone we cant see, and dont talk to ourself
             if (char_dist(cn, co) > 10) {
                 remove_message(cn, msg);
                 continue;
+            } // dont talk to someone far away
+
+            // remove cv
+            if (dat->cv_co) {
+                if (!ch[dat->cv_co].flags || ch[dat->cv_co].serial != dat->cv_serial || char_dist(cn, dat->cv_co) > 10 || !char_see_char(cn, dat->cv_co)) {
+                    dat->cv_co = 0;
+                }
             }
 
-            // get lab ppd
-            ppd = set_data(co, DRD_LAB_PPD, sizeof(*ppd));
-            if (!ppd) {
+            // only talk to cv
+            if (dat->cv_co && dat->cv_co != co) {
                 remove_message(cn, msg);
                 continue;
             }
 
-            switch (ppd->herald_talkstep) {
-            case 0: // INTRO
-                say(cn, "Hello %s. I am Herald, the Keeper of this graveyard. I can't say how glad I am to see thee here. I assume thou wantst to pass this test. I need thine help urgently. Horrible things happen here, as thou hast probably noticed. I don't dare to leave the chapel since the dead are rising from their graves. \260c4Arathas\260c0 has caused this abomination, may his soul rest in peace.", ch[co].name);
-                didsay = 1;
-                ppd->herald_talkstep++;
-                dat->next_talk = ticker + 10 * TICKS;
-                break;
+            // set new cv
+            if (!dat->cv_co) {
+                dat->cv_co = co;
+                dat->cv_serial = ch[co].serial;
+            }
 
+            // get lab ppd
+            pd = set_data(co, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            switch (pd->seyanstate) {
+            // INTRO
+            case 0:
+                say(cn, "Hello %s. I am here to introduce thee to the quest that has to be done here.", ch[co].name);
+                didsay = 1;
+                pd->seyanstate++;
+                break;
             case 1:
-                say(cn, "If thou wishest to help me, kill \260c4Arathas\260c0. Bring me his ring as proof, and I will open thee a gate leading out of this part of the Labyrinth.");
+                say(cn, "There are three Demons controlling this Labyrinth. Your mission is extremely simple: Destroy them. To prove their death, bring me their heads. Then thou art worthy to enter the next Gate.");
                 didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 10 * TICKS;
+                pd->seyanstate++;
+                break;
+            case 2:
+                say(cn, "But I have to tell thee, that thou shouldst not carry any healing or mana potions, nor a combo potion with thee when entering here. If thou hast some, please deposit them in thine depot at the Gatekeeper's.");
+                didsay = 1;
+                pd->seyanstate++;
+                break;
+            case 3:
+                if (has_potion(co)) {
+                    dat->cv_co = 0;
+                    break;
+                }
+                say(cn, "Go ahead now, %s, and fulfil thine destiny.", ch[co].name);
+                didsay = 1;
+                pd->seyanstate++;
+                break;
+            case 4:
+                say(cn, "Ah, and %s, thou mightst find a friend of mine here. Listen carefully to his advice.", ch[co].name);
+                didsay = 1;
+                pd->seyanstate++;
+                break;
+            case 5:
+                dat->cv_co = 0;
                 break;
 
-            case 10: // ARATHAS
-                say(cn, "I don't know much about him. I just started to read what \260c4Elias\260c0, his brother, wrote in his \260c4diary\260c0 when the skeletons attacked me in my study. I'm lucky I got out alive. Now I'm hiding here in the chapel. The undeads dare not enter it.");
+            // received something
+            case 10:
+                if (pd->seyangot == 1 || pd->seyangot == 2 || pd->seyangot == 4) say(cn, "Very well done, %s.", ch[co].name);
+                if (pd->seyangot == 3 || pd->seyangot == 5 || pd->seyangot == 6) say(cn, "I'm impressed, %s.", ch[co].name);
                 didsay = 1;
-                ppd->herald_talkstep++;
-                dat->next_talk = ticker + 10 * TICKS;
+                pd->seyanstate++;
                 break;
-
             case 11:
-                say(cn, "But thou wished to hear about Arathas. He and his brother stem from a family of well renowed mages. They have their own \260c4family vault\260c0 on this graveyard. Arathas died during some kind of magical experiment, and he was buried in the family vault a long time ago.");
-                didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 10 * TICKS;
+                dat->cv_co = 0;
                 break;
 
-            case 20: // ELIAS
-                say(cn, "Elias is Arathas' brother. The last times I saw him, he seemed very frightened. He spoke about strange happenings in the crypt. Now we know what he was talking about.");
+            // received all, open gate
+            case 20:
+                say(cn, "%s, thou broughtst me the three Demon's heads and proved thine worth.", ch[co].name);
                 didsay = 1;
-                ppd->herald_talkstep++;
-                dat->next_talk = ticker + 10 * TICKS;
+                pd->seyanstate++;
                 break;
-
             case 21:
-                say(cn, "One day he entered the family vault. But he did not return, and after a while, his relatives divided his belongings among them. By now, they are all dead, too, and rest in this graveyard. If things were different, I'd show thee their graves, but with the undeads about I do not dare. Thou couldst check the books yourself, for the locations of their tombs. They are in the \260c4administrative building\260c0. But beware, lots of skeletons and undeads are there, too.");
+                say(cn, "Now I will open a magic gate for thee. Use it, and thou wilt be able to travel to the next part of the Labyrinth.");
                 didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 10 * TICKS;
+                pd->seyanstate++;
                 break;
-
-            case 30: // FAMILY VAULT
-                say(cn, "The family vault is located northeast of the chapel.");
-                didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 5 * TICKS;
-                break;
-
-            case 40: // ADMINISTRATIVE BUILDING
-                say(cn, "The administrative building is located northwest of the chapel. All administrative records about the graveyard are stored there.");
-                didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 5 * TICKS;
-                break;
-
-            case 50: // DIARY
-                say(cn, "I left the diary in my rooms, in the north-eastern part of the \260c4administrative building\260c0. I left it there, in my study, when I fled from the undeads.");
-                didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 5 * TICKS;
-                break;
-
-            case 60: // AFTER RING
-                say(cn, "I thank thee, %s. This ring proves that thou hast killed Arathas. I hope peace will return now.", ch[co].name);
-                didsay = 1;
-                ppd->herald_talkstep++;
-                dat->next_talk = ticker + 5 * TICKS;
-                break;
-
-            case 61: // AFTER RING
-                say(cn, "And here, my friend, is the Gate, as I have promised thee. Thou hast been most resourceful, %s.", ch[co].name);
-                didsay = 1;
-                ppd->herald_talkstep++;
-                dat->next_talk = ticker + 5 * TICKS;
-                break;
-
-            case 62: // AFTER RING
+            case 22:
+                create_lab_exit(co, 15);
                 say(cn, "Mayest thou pass the last gate, %s", ch[co].name);
                 didsay = 1;
-                ppd->herald_talkstep = 255;
-                dat->next_talk = ticker + 5 * TICKS;
-                create_lab_exit(co, 30);
+                pd->seyanstate++;
+                break;
+            case 23:
+                dat->cv_co = 0;
                 break;
             }
 
             if (didsay) {
-                dat->last_talk = ticker;
+                dat->lasttalk = ticker;
                 talkdir = offset2dx(ch[cn].x, ch[cn].y, ch[co].x, ch[co].y);
             }
         }
@@ -233,6 +403,8 @@ void lab2_herald_driver(int cn, int ret, int lastact) {
 
             co = msg->dat3;
             str = (char *)msg->dat2;
+
+            tabunga(cn, co, (char *)msg->dat2);
 
             if (co == cn) {
                 remove_message(cn, msg);
@@ -248,31 +420,15 @@ void lab2_herald_driver(int cn, int ret, int lastact) {
             }
 
             // get lab ppd
-            ppd = set_data(co, DRD_LAB_PPD, sizeof(*ppd));
-            if (!ppd) {
+            pd = set_data(co, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) {
                 remove_message(cn, msg);
                 continue;
             }
 
-            if (strcasestr(str, "ARATHAS")) {
-                ppd->herald_talkstep = 10;
-                dat->next_talk = ticker + TICKS / 2;
-            } else if (strcasestr(str, "ELIAS")) {
-                ppd->herald_talkstep = 20;
-                dat->next_talk = ticker + TICKS / 2;
-            } else if (strcasestr(str, "FAMILY") && strcasestr(str, "VAULT")) {
-                ppd->herald_talkstep = 30;
-                dat->next_talk = ticker + TICKS / 2;
-            } else if (strcasestr(str, "ADMINISTRATIVE") && strcasestr(str, "BUILDING")) {
-                ppd->herald_talkstep = 40;
-                dat->next_talk = ticker + TICKS / 2;
-            } else if (strcasestr(str, "DIARY")) {
-                ppd->herald_talkstep = 50;
-                dat->next_talk = ticker + TICKS / 2;
-            } else if (strcasestr(str, "REPEAT")) {
+            if (strcasestr(str, "REPEAT")) {
                 say(cn, "I will repeat, %s", ch[co].name);
-                ppd->herald_talkstep = 0;
-                dat->next_talk = ticker + TICKS;
+                set_seyan_state(pd);
             }
         }
 
@@ -282,130 +438,32 @@ void lab2_herald_driver(int cn, int ret, int lastact) {
 
     if (talkdir) turn(cn, talkdir);
 
-    if (dat->last_talk + TICKS * 30 < ticker) {
+    if (dat->lasttalk + TICKS * 30 < ticker) {
         if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_RIGHTDOWN, ret, lastact)) return;
     }
 
     do_idle(cn, TICKS);
 }
 
-// ------------------------------
+// -- mage driver ---------------------------------------------------------------------------------------------------
 
-struct lab2_deamon_driver_data {
-    int co; // enemy
-    int serial; // serial number of enemy
-    int talkstep;
-    int talkticker;
-    char attacking; // set if the demon is in seek and destory mode
-    char observing; // set if the demon was created an the player had elias stuff
-};
-
-struct lab2_player_data {
-    int deamonchecked;
-    int numyard;
-    int numcrypt;
-    unsigned char bitarray[0];
-};
-
-void lab2_deamon_create(int x, int y, int co) {
-    struct lab2_deamon_driver_data *dat;
-    int cn;
-
-    if (!co) return;
-
-    // check if we already have one
-    if ((cn = getfirst_char())) do {
-            if (ch[cn].flags && ch[cn].driver == CDR_LAB2DEAMON) {
-                if (!(dat = set_data(cn, DRD_LAB2_DEAMON, sizeof(*dat)))) return; // oops
-                if (dat->co == co && dat->serial == ch[dat->co].serial) return; // we already have him
-            }
-        } while ((cn = getnext_char(cn)));
-
-    // create the deamon
-    cn = create_char("lab2_daemon", 0);
-    if (!cn) return;
-
-    ch[cn].dir = DX_DOWN;
-    ch[cn].flags &= ~CF_RESPAWN;
-    update_char(cn);
-
-    ch[cn].hp = ch[cn].value[0][V_HP] * POWERSCALE;
-    ch[cn].endurance = ch[cn].value[0][V_ENDURANCE] * POWERSCALE;
-    ch[cn].mana = ch[cn].value[0][V_MANA] * POWERSCALE;
-
-    // drop him to map
-    if (!drop_char(cn, x, y, 0) && !drop_char(cn, x, y + 3, 0)) {
-        destroy_char(cn);
-        xlog("drop_char failed (%s,%d)", __FILE__, __LINE__);
-        return;
-    }
-
-    // set values of the secure move driver
-    ch[cn].tmpx = ch[cn].x;
-    ch[cn].tmpy = ch[cn].y;
-
-    // get data
-    dat = set_data(cn, DRD_LAB2_DEAMON, sizeof(*dat));
-    if (!dat) return; // oops...
-
-    dat->co = co;
-    dat->serial = ch[co].serial;
-
-    // create an effect
-    create_mist(ch[cn].x, ch[cn].y);
-}
-
-int lab2_deamon_is_elias(int co) // 0=no 1=yes -1=partially
-{
-    int part = 0;
-
-    if (it[ch[co].item[WN_HEAD]].ID == IID_LAB2_ELIASHAT) part++;
-    if (it[ch[co].item[WN_CLOAK]].ID == IID_LAB2_ELIASCAPE) part++;
-    if (it[ch[co].item[WN_BELT]].ID == IID_LAB2_ELIASBELT) part++;
-    if (it[ch[co].item[WN_FEET]].ID == IID_LAB2_ELIASBOOTS) part++;
-
-    if (part == 4) return 1;
-    if (part == 0) return 0;
-    return -1;
-}
-
-void lab2_deamon_driver(int cn, int ret, int lastact) {
-    struct lab2_deamon_driver_data *dat;
+void lab5_mage_driver(int cn, int ret, int lastact) {
+    struct lab5_player_data *pd;
+    static struct lab5_talk_data datbuf; // we only have one, so there is no need to use the memory system (?)
+    struct lab5_talk_data *dat = &datbuf;
     struct msg *msg, *next;
     int co;
-    struct lab2_player_data *player_dat;
-
-    // get data
-    dat = set_data(cn, DRD_LAB2_DEAMON, sizeof(*dat));
-    if (!dat) return; // oops...
+    int talkdir = 0, didsay = 0;
+    char *str;
+    int called;
 
     // loop through our messages
     for (msg = ch[cn].msg; msg; msg = next) {
         next = msg->next;
 
         if (msg->type == NT_CREATE) {
-            fight_driver_set_dist(cn, 2 * MAXMAP, 2 * MAXMAP, 2 * MAXMAP);
-
-            switch (lab2_deamon_is_elias(dat->co)) {
-            case -1:
-                dat->talkstep = 50;
-                break;
-
-            case 1:
-                dat->observing = 1;
-                dat->talkstep = 10;
-                if (dat->co) player_dat = set_data(dat->co, DRD_LAB2_PLAYER, sizeof(*player_dat));
-                else player_dat = NULL;
-                if (!player_dat) break;
-                if (player_dat->deamonchecked) dat->talkstep = 20;
-                else player_dat->deamonchecked = 1;
-                break;
-            }
-        }
-
-        if (msg->type == NT_TEXT) {
-            co = msg->dat3;
-            tabunga(cn, co, (char *)msg->dat2);
+            namecoordx[0] = ch[cn].x;
+            namecoordy[0] = ch[cn].y;
         }
 
         if (msg->type == NT_GIVE) {
@@ -413,23 +471,247 @@ void lab2_deamon_driver(int cn, int ret, int lastact) {
                 remove_message(cn, msg);
                 continue;
             } // ??? i saw something like this at DBs source
+            co = msg->dat1;
 
             // destroy everything we get
             destroy_item(ch[cn].citem);
             ch[cn].citem = 0;
         }
 
-        if (msg->type == NT_NPC && msg->dat1 == NTID_LAB2_DEAMONCHECK) {
-            co = msg->dat2;
+        if (msg->type == NT_CHAR) {
 
-            if (co == dat->co && ch[co].serial == dat->serial && lab2_deamon_is_elias(co) != 1) {
+            co = msg->dat1;
 
-                if (fight_driver_add_enemy(cn, co, 1, 1)) {
-                    dat->attacking = 1;
-                    dat->talkstep = 255;
-                    if (dat->observing) shout(cn, "Hey! Thou are not Elias. Now thou shalt die, %s!", ch[co].name);
-                    else shout(cn, "I warned thee. Now thou shalt die, %s!", ch[co].name);
+            // dont talk
+            if (!(ch[co].flags & CF_PLAYER)) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to other NPCs
+            if (ch[co].driver == CDR_LOSTCON) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to players without connection
+            if (ticker < dat->lasttalk + 5 * TICKS) {
+                remove_message(cn, msg);
+                continue;
+            } // only talk when the old sentence is read
+            if (!char_see_char(cn, co) || cn == co) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to someone we cant see, and dont talk to ourself
+            if (char_dist(cn, co) > 7) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to someone far away
+
+            // remove cv
+            if (dat->cv_co) {
+                if (!ch[dat->cv_co].flags || ch[dat->cv_co].serial != dat->cv_serial || char_dist(cn, dat->cv_co) > 7 || !char_see_char(cn, dat->cv_co)) {
+                    dat->cv_co = 0;
                 }
+            }
+
+            // only talk to cv
+            if (dat->cv_co && dat->cv_co != co) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // set new cv
+            if (!dat->cv_co) {
+                dat->cv_co = co;
+                dat->cv_serial = ch[co].serial;
+            }
+
+            // get lab ppd
+            pd = set_data(co, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            switch (pd->magestate) {
+            // INTRO
+            case 0:
+                say(cn, "Hello %s. My name is Mathor, and I am the friend Laros surely mentioned.", ch[co].name);
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 1:
+                say(cn, "It is the entrance room to the Master \260c4Demons\260c0 what thou see here. Those stone plates show their names. But thou have to find their real names written on similar plates somewhere behind those doors here.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 2:
+                say(cn, "Once thou foundst the real name of a Master Demon, Thou can \260c4force\260c0 him to summon thee into his place, and fight him there. Thou might ask me for more details, if thou art interested.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 3:
+                say(cn, "And thou shouldst be!");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 4:
+                dat->cv_co = 0;
+                break;
+            // FORCE
+            case 10:
+                say(cn, "Well %s. To force a Master \260c4Demon\260c0 to summon thee into his place thou have to perform a certain \260c4ritual\260c0 first. But be very careful, %s. If thou makest only one mistake it might kill thee. The powers that are working here are strong.", ch[co].name, ch[co].name);
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 11:
+                say(cn, "Very strong indeed!");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 12:
+                dat->cv_co = 0;
+                break;
+            // DAEMONs
+            case 20:
+                say(cn, "Well %s, unfortunetaly those Master Demons can't be hurt by normal weapons. So make sure thou art properly equipped with a sacred stone weapon when fighting the Masters.", ch[co].name);
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 21:
+                say(cn, "I have heard that those weapon might be found somewhere in the section behind the south western door of this room.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 22:
+                dat->cv_co = 0;
+                break;
+            // RITUAL
+            case 30:
+                say(cn, "Oh %s, it's a ritual of mighty powers thou art asking for. So listen carefully.", ch[co].name);
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 31:
+                say(cn, "First, thou hast to touch the stone plate of the Demons name.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 32:
+                say(cn, "Second, thou hast to touch the correct stone plate of the Demons real name. Those thou hast to find.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 33:
+                say(cn, "Third, thou hast to enter the inner square from the opposite entrance.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 34:
+                say(cn, "Then place thineself in the center, and shout the real name of the Master.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 35:
+                say(cn, "Well, thats it. Prepare to fight him then.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 36:
+                say(cn, "Ah, and thou couldst do it in any order, but may I suggest doing them from the east to the west.");
+                didsay = 1;
+                pd->magestate++;
+                break;
+            case 37:
+                dat->cv_co = 0;
+                break;
+            }
+
+            if (didsay) {
+                dat->lasttalk = ticker;
+                talkdir = offset2dx(ch[cn].x, ch[cn].y, ch[co].x, ch[co].y);
+            }
+        }
+
+        if (msg->type == NT_TEXT) {
+
+            co = msg->dat3;
+            str = (char *)msg->dat2;
+
+            tabunga(cn, co, (char *)msg->dat2);
+
+            if (co == cn) {
+                remove_message(cn, msg);
+                continue;
+            }
+            if (!(ch[co].flags & CF_PLAYER)) {
+                remove_message(cn, msg);
+                continue;
+            }
+            if (!char_see_char(cn, co)) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // get lab ppd
+            pd = set_data(co, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            if (strcasestr(str, "REPEAT")) {
+                pd->magestate = 0;
+                say(cn, "I will repeat, %s", ch[co].name);
+            } else if (strcasestr(str, "FORCE")) {
+                pd->magestate = 10;
+                if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+            } else if (strcasestr(str, "DEMON")) {
+                pd->magestate = 20;
+                if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+            } else if (strcasestr(str, "DEMONS")) {
+                pd->magestate = 20;
+                if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+            } else if (strcasestr(str, "RITUAL")) {
+                pd->magestate = 30;
+                if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+            } else if (ch[co].flags & CF_GOD) {
+                if (strcasestr(str, "SET 1")) {
+                    pd->ritualdaemon = 1;
+                    pd->ritualstate = 3;
+                    say(cn, "set %d %d (%s)", pd->ritualdaemon, pd->ritualstate, daemonreal[pd->ritualdaemon]);
+                } else if (strcasestr(str, "SET 2")) {
+                    pd->ritualdaemon = 2;
+                    pd->ritualstate = 3;
+                    say(cn, "set %d %d (%s)", pd->ritualdaemon, pd->ritualstate, daemonreal[pd->ritualdaemon]);
+                } else if (strcasestr(str, "SET 3")) {
+                    pd->ritualdaemon = 3;
+                    pd->ritualstate = 3;
+                    say(cn, "set %d %d (%s)", pd->ritualdaemon, pd->ritualstate, daemonreal[pd->ritualdaemon]);
+                }
+            }
+
+            // inside square
+            if (pd->ritualstate && ch[co].x > namecoordx[3] + 2 && ch[co].x < namecoordx[1] - 2 && ch[co].y > namecoordy[2] + 2 && ch[co].y < namecoordy[0] - 2 && strcasestr(str, ":")) {
+
+                called = 0;
+
+                if (strcasestr(str, "shouts:")) {
+                    if (strcasestr(str, daemonreal[1])) called = 1;
+                    else if (strcasestr(str, daemonreal[2])) called = 2;
+                    else if (strcasestr(str, daemonreal[3])) called = 3;
+                } else if ((ch[co].flags & CF_GOD) && strcasestr(str, "SET")) called = pd->ritualdaemon;
+
+                say(cn, "%d %d %d", pd->ritualdaemon, called, pd->ritualstate);
+
+                if (pd->ritualstate == 3 && pd->ritualdaemon == called && ch[co].x == namecoordx[2] && ch[co].y == namecoordy[1]) {
+
+                    if (ritual_start(co, pd->ritualdaemon)) {
+                        sound_area(ch[cn].x, ch[cn].y, 41);
+                        log_char(co, LOG_SYSTEM, 0, "\260c3The Ritual of %s is fulfilled.\260c0", daemonreal[pd->ritualdaemon]);
+                        pd->ritualstate = 0;
+                    } else {
+                        log_char(co, LOG_SYSTEM, 0, "\260c3Thou have to call again, but wait a while to do so!\260c0");
+                        ch[co].endurance = ch[co].value[0][V_ENDURANCE] * POWERSCALE;
+                    }
+                } else ritual_hurt(co, pd, namecoordx[pd->ritualdaemon], namecoordy[pd->ritualdaemon]);
             }
         }
 
@@ -437,443 +719,49 @@ void lab2_deamon_driver(int cn, int ret, int lastact) {
         remove_message(cn, msg);
     }
 
-    // talking
-    switch (dat->talkstep) {
-    case 0: // warn
-        dat->talkticker = ticker + TICKS / 8;
-        dat->talkstep++;
-        break;
+    if (talkdir) turn(cn, talkdir);
 
-    case 1:
-        if (ticker < dat->talkticker) break;
-        say(cn, "STOP!");
-        dat->talkstep++;
-        dat->talkticker = ticker + 5 * TICKS;
-        if (ch[dat->co].player) player_driver_halt(ch[dat->co].player);
-        break;
-
-    case 2:
-        if (ticker < dat->talkticker) break;
-        say(cn, "On behalf of Elias, mine Master, I shall not allow anyone but himself to enter this family vault. So try to reach that door and I will kill thee!");
-        dat->talkstep++;
-        dat->talkticker = ticker + 8 * TICKS;
-        break;
-
-    case 3:
-        if (ticker < dat->talkticker) break;
-        say(cn, "Ohh. Excuse me, Master. I am ashamed not to have recognized thee immediately. So, Elias, if you might want to enter... WAIT!");
-        dat->talkstep++;
-        dat->talkticker = ticker + 4 * TICKS;
-        if (ch[dat->co].player) player_driver_halt(ch[dat->co].player);
-        break;
-
-    case 4:
-        if (ticker < dat->talkticker) break;
-        say(cn, "My eyes tricked me again. Thou art not Elias. I remember excatly his black hat and cape, and also his belt and boots. So, again, go away or I will kill thee!");
-        if (ch[dat->co].player) player_driver_halt(ch[dat->co].player);
-        dat->talkstep = 255;
-        break;
-
-    case 10: // elias
-        dat->talkticker = ticker + TICKS / 8;
-        dat->talkstep++;
-        break;
-
-    case 11:
-        if (ticker < dat->talkticker) break;
-        say(cn, "Ahhh, Master Elias.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 2 * TICKS;
-        break;
-
-    case 12:
-        if (ticker < dat->talkticker) break;
-        say(cn, "Excuse me for coming out of my Dimension. I hadn't recognized thee.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 6 * TICKS;
-        break;
-
-    case 13:
-        if (ticker < dat->talkticker) break;
-        say(cn, "But 'tis good to see thee around again. Last time we met thou wert in a bad condition. Very bad, I must say, very bad indeed.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 7 * TICKS;
-        break;
-
-    case 14:
-        if (ticker < dat->talkticker) break;
-        say(cn, "It must have been a couple of years since we last met. Maybe some couples more. Hahaha.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 7 * TICKS;
-        break;
-
-    case 15:
-        if (ticker < dat->talkticker) break;
-        say(cn, "But here I am, talking and talking. Thou sure hast more important things to do than listening to an old demon like me.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 9 * TICKS;
-        break;
-
-    case 16:
-        if (ticker < dat->talkticker) break;
-        say(cn, "So, farewell, Elias.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 3 * TICKS;
-        break;
-
-    case 17:
-        dat->co = 0;
-        dat->talkstep = 255;
-        break;
-
-    case 20: // quick elias
-        dat->talkticker = ticker + TICKS / 8;
-        dat->talkstep++;
-        break;
-
-    case 21:
-        if (ticker < dat->talkticker) break;
-        say(cn, "Ahh, it's you again, Master Elias. See You.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 3 * TICKS;
-        break;
-
-    case 22:
-        dat->co = 0;
-        dat->talkstep = 255;
-        break;
-
-    case 50: // masquerade
-        dat->talkticker = ticker + TICKS / 8;
-        dat->talkstep++;
-        break;
-
-    case 51:
-        if (ticker < dat->talkticker) break;
-        say(cn, "STOP!");
-        dat->talkstep++;
-        dat->talkticker = ticker + 5 * TICKS;
-        if (ch[dat->co].player) player_driver_halt(ch[dat->co].player);
-        break;
-
-    case 52:
-        if (ticker < dat->talkticker) break;
-        say(cn, "What kind of masquerade is that. Thou are wearing some parts of Elias stuff, but thou are not Elias.");
-        dat->talkstep++;
-        dat->talkticker = ticker + 4 * TICKS;
-        break;
-
-    case 53:
-        if (ticker < dat->talkticker) break;
-        say(cn, "Do not try to get into the family vault, I won't let you in, and thou will have to die!");
-        dat->talkstep = 255;
-        break;
+    if (dat->lasttalk + TICKS * 30 < ticker) {
+        if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_UP, ret, lastact)) return;
     }
 
-    // stop attacking when player tries to run away
-    if (dat->attacking) {
-        if (!(map[ch[dat->co].x + ch[dat->co].y * MAXMAP].flags & MF_NOMAGIC)) {
-            if (fight_driver_remove_enemy(cn, dat->co)) {
-                dat->attacking = 0;
-                say(cn, "Master Elias told me to let them run away, so my work is done.");
-            }
-        }
-    }
-
-    // do we need a teleport ? (validate enemy first, cause otherwise we'll teleport into nirwana)
-    if (dat->co && ch[dat->co].flags && ch[dat->co].serial == dat->serial) {
-        if (dat->attacking && pathfinder(ch[cn].x, ch[cn].y, ch[dat->co].x, ch[dat->co].y, 2, NULL, 0) == -1 && pathfinder(ch[cn].x, ch[cn].y, ch[dat->co].x, ch[dat->co].y, 1, NULL, 0) == -1) {
-            int oldx, oldy;
-
-            oldx = ch[cn].x;
-            oldy = ch[cn].y;
-            teleport_char_driver(cn, ch[dat->co].x, ch[dat->co].y);
-            if (oldx != ch[cn].x || oldy != ch[cn].y) {
-                create_mist(oldx, oldy);
-                create_mist(ch[cn].x, ch[cn].y);
-                return;
-            }
-        }
-    }
-
-    // fighting
-    fight_driver_update(cn);
-    if (fight_driver_attack_visible(cn, 0)) return;
-    if (fight_driver_follow_invisible(cn)) return;
-
-    // rest of standard action
-    if (regenerate_driver(cn)) return;
-    if (spell_self_driver(cn)) return;
-
-    // remove deamon
-    if (!dat->co || (!dat->attacking && char_see_char(cn, dat->co) == 0) || ch[dat->co].serial != dat->serial || !ch[dat->co].flags) {
-        create_mist(ch[cn].x, ch[cn].y);
-        remove_destroy_char(cn);
-        return;
-    }
-
-    // go home (???)
-    if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_DOWN, ret, lastact)) return;
-
-    // turn to char
-    if (!dat->attacking) turn(cn, offset2dx(ch[cn].x, ch[cn].y, ch[dat->co].x, ch[dat->co].y));
-
-    do_idle(cn, TICKS / 2);
+    do_idle(cn, TICKS);
 }
 
-// ------------------------------
+// -- daemon driver -------------------------------------------------------------------------------------------------
 
-int create_lab2_regenerate_spell(int cn, /*const*/ char *name);
-void set_lab2_regenerate_spell_startat(int in, int value);
-
-struct lab2_undead_driver_data {
-    char aggressive;
-    char helper;
-    char undead;
-    char patrol;
-    unsigned char pat; // current patrol coordinate
-    unsigned char patstep; // numer of steps
-    unsigned char dummy; // 4 byte alignment
-    unsigned char patx[8], paty[8]; // patrol coords
-    int graveit; // the grave item (where he will return to) // short2int
-    int regenit; // the regenrate item    // short2int
-
-    int co; // set by the grave. the enemy, just for the died driver and grave bit logic
-    int serial; // set by the grave. the enemy, just for the died driver and grave bit logic // short2int
-
-    int nextwaitticker; // used by patrol2 undead not to wait more than once behind the door
-};
-
-struct lab2_grave_data {
-    char item; // grave leads to an item (0=no, 1=hat, 2=cape, 3=boots, 4=belt, 5=amulet (elias), 6=ring (arathas)
-    char dummy[3];
-    int co; // 0 = grave closed, otherwise grave open and undead still walking around // short2int
-    int serial; // short2int
-    int nr; // grave number used as index into bit array
-};
-
-int graves_enumerated = 0;
-int max_crypt = 0, max_yard = 0, max_grave = 0;
-int sizeof_player_data = 0;
-
-#define LAB2_GRAVE_VERSION 2
-#define MAX_DESCRIBED_GRAVE 40
-
-struct described_grave {
-    int x, y; // coord of the grave
-    char *description; // take care, a pointer
-};
-
-struct described_grave described_grave[MAX_DESCRIBED_GRAVE] =
-    {
-        {194, 183, "%s is buried in the third grave behind the chapel."}, {192, 183, "%s is buried at the left side of her husband John."}, {186, 183, "%s is buried in the seventh grave behind the chapel."}, {184, 183, "%s is buried at the left side of her husband John."}, {176, 194, "For his generosity %s is buried in the third grave of the first row next to the northwestern chapel aisle."}, {176, 196, "%s is buried at the left side of her husband John."}, {173, 191, "For his generosity %s is buried in the first grave of the second row next to the northwestern chapel aisle."}, {173, 193, "%s is buried at the left side of her husband John."}, {199, 195, "For his generosity %s is buried in the first grave of the second row next to the southeastern chapel aisle."}, {199, 193, "%s is buried at the left side of her husband John."}, {196, 196, "For his generosity %s is buried in the first grave of the first row next to the southeastern chapel aisle."}, {196, 194, "%s is buried at the left side of her husband John."}, {160, 233, "%s is buried in the fifth grave of the second row in the southwest section of the graveyard."}, {158, 233, "%s is buried at the left side of her husband John."}, {162, 230, "%s is buried in the fourth grave of the third row in the southwest section of the graveyard."}, {160, 230, "%s is buried at the left side of her husband John."}, {210, 244, "%s is buried in the fourth grave of the second row in the southeast section of the graveyard."}, {208, 244, "%s is buried at the left side of her husband John."}, {206, 232, "%s is buried in the sixth grave of the sixth row in the southeast section of the graveyard."}, {204, 232, "%s is buried at the left side of her husband John."}, {172, 228, "%s is buried in the fifth grave of the first row in the northwest entrance section of the graveyard."}, {172, 226, "%s is buried at the left side of her husband John."}, {181, 224, "%s is buried in the seventh grave of the last row in the northwest entrance section of the graveyard."}, {181, 222, "%s is buried at the left side of her husband John."}, {191, 222, "%s is buried in the first grave of the last row in the southeast entrance section of the graveyard."}, {191, 224, "%s is buried at the left side of her husband John."}, {197, 232, "%s is buried in the sixth grave of the second row in the southeast entrance section of the graveyard."}, {197, 234, "%s is buried at the left side of her husband John."}, {155, 211, "%s is buried in the second grave of the first row in the section with the cross in front of the administrative building."}, {155, 209, "%s is buried at the left side of her husband John."}, {164, 201, "%s is buried in the seventh grave of the last row in the section with the cross in front of the administrative building."}, {164, 199, "%s is buried at the left side of her husband John."}, {158, 189, "%s is buried in the second grave of the second row in the section without the cross in front of the administravive building."}, {158, 187, "%s is buried at the left side of her husband John."}, {161, 189, "%s is buried in the second grave of the third row in the section without the cross in front of the administravive building."}, {161, 187, "%s is buried at the left side of her husband John."}, {208, 182, "%s is buried in the first grave in the northeastern part of the northeast section of the graveyard."}, {210, 182, "%s is buried at the left side of her husband John."}, {214, 191, "%s is buried in the fourth grave of the last row in the northeastern part of the northeast section of the graveyard."}, {212, 191, "%s is buried at the left side of her husband John."}};
-
-int get_grave_value(char *array, int nr) {
-    int byte, bit, cur;
-
-    if (nr < 0 || nr >= max_grave) {
-        xlog("fatal get_grave_bit parameter nr=%d in %s %d", nr, __FILE__, __LINE__);
-        return -1;
-    }
-
-#ifdef GRAVE_TWO_BITS
-    byte = (2 * nr) / 8;
-    bit = (2 * nr) % 8;
-    cur = array[byte] & (3 << bit);
-#else
-    byte = nr / 8;
-    bit = nr % 8;
-    cur = array[byte] & (1 << bit);
-#endif
-
-    return cur;
-}
-
-int inc_grave_value(unsigned char *array, int nr) {
-    int byte, bit, old;
-
-    if (nr < 0 || nr >= max_grave) {
-        xlog("fatal set_grave_bit parameter nr=%d in %s %d", nr, __FILE__, __LINE__);
-        return -1;
-    }
-
-#ifdef GRAVE_TWO_BITS
-    byte = (2 * nr) / 8;
-    bit = (2 * nr) % 8;
-    old = array[byte] & (3 << bit);
-
-    if (old == 0) array[byte] = (array[byte] & (~(3 << bit))) | (1 << bit);
-    else if (old == 1) array[byte] = (array[byte] & (~(3 << bit))) | (2 << bit);
-    else if (old == 2) array[byte] = (array[byte] & (~(3 << bit))) | (3 << bit);
-#else
-    byte = nr / 8;
-    bit = nr % 8;
-    old = array[byte] & (1 << bit);
-    array[byte] |= (1 << bit);
-#endif
-
-    return old;
-}
-
-void enumerate_graves(void) {
-    int x, y, in, mn;
-    struct lab2_grave_data *dat;
-
-    for (y = 0; y < MAXMAP; y++) {
-        for (x = 0; x < MAXMAP; x++) {
-            if (!(in = map[mn = x + y * MAXMAP].it)) continue;
-            if (it[in].driver != IDR_LAB2_GRAVE) continue;
-
-            dat = (struct lab2_grave_data *)it[in].drdata;
-
-            // is the grave actually a grave and not a book
-            if (dat->item >= 1 && dat->item <= 4) continue;
-
-            dat->nr = max_grave++;
-
-            if (map[mn].flags & MF_NOMAGIC) max_crypt++;
-            else max_yard++;
-
-            // remove the marker from the map ;)
-            if (map[mn].fsprite == (5 << 16)) {
-                map[mn].fsprite = 0;
-                set_sector(x, y);
-            }
-        }
-    }
-
-#ifdef GRAVE_TWO_BITS
-    sizeof_player_data = sizeof(struct lab2_player_data) + (max_grave * 2 + 7) / 8;
-#else
-    sizeof_player_data = sizeof(struct lab2_player_data) + (max_grave + 7) / 8;
-#endif
-
-    xlog("found %d graves (crypt=%d yard=%d) in lab2 (%d bytes)", max_grave, max_crypt, max_yard, sizeof_player_data);
-    graves_enumerated = 1;
-}
-
-int get_player_grave_value(int in, int cn, struct lab2_grave_data *grave_dat) {
-    struct lab2_player_data *player_dat;
-
-    if (!(ch[cn].flags & CF_PLAYER)) return 0;
-
-    player_dat = set_data(cn, DRD_LAB2_PLAYER, sizeof_player_data);
-    if (!player_dat) return 0;
-
-    return get_grave_value(player_dat->bitarray, grave_dat->nr);
-}
-
-void set_player_described_graves(int cn, struct lab_ppd *ppd) {
-    if (ppd->graveversion == LAB2_GRAVE_VERSION) return;
-
-    ppd->graveversion = LAB2_GRAVE_VERSION;
-    do {
-        ppd->graveindex[0] = RANDOM(10) * 4;
-        ppd->graveindex[1] = RANDOM(10) * 4;
-        ppd->graveindex[2] = RANDOM(10) * 4;
-
-    } while (ppd->graveindex[0] == ppd->graveindex[1] || ppd->graveindex[1] == ppd->graveindex[2] || ppd->graveindex[2] == ppd->graveindex[0]);
-
-    ppd->graveindex[0] += RANDOM(2) * 2;
-    ppd->graveindex[1] += RANDOM(2) * 2;
-    ppd->graveindex[2] += RANDOM(2) * 2;
-    ppd->graveindex[3] = ppd->graveindex[2] + 1;
-}
-
-void lab2_undead_driver_parse(int cn, struct lab2_undead_driver_data *dat) {
+void lab5_daemon_driver_parse(int cn, struct lab5_daemon_data *dat) {
     char *ptr, name[64], value[64];
 
-    dat->aggressive = 0;
-    dat->helper = 0;
-
     for (ptr = nextnv(ch[cn].arg, name, value); ptr; ptr = nextnv(ptr, name, value)) {
-        if (!strcmp(name, "aggressive")) dat->aggressive = atoi(value);
-        else if (!strcmp(name, "helper")) dat->helper = atoi(value);
-        else if (!strcmp(name, "patrol")) dat->patrol = atoi(value);
-        else if (!strcmp(name, "undead")) dat->undead = atoi(value);
+        if (!strcmp(name, "type")) dat->type = atoi(value);
         else elog("unknown arg for %s (%d): %s", ch[cn].name, cn, name);
+    }
+
+    if (dat->type == 1) { // master
+        dat->attackstart += ticker;
+    } else if (dat->type == 2) { // gunned
+        dat->dir = DX_LEFT;
+        dat->attackstart = 2147483647;
+    } else {
+        dat->attackstart += ticker;
     }
 }
 
-void lab2_undead_driver(int cn, int ret, int lastact) {
-    struct lab2_undead_driver_data *dat;
+void lab5_daemon_driver(int cn, int ret, int lastact) {
     struct msg *msg, *next;
-    int co, in, mn, p;
-    static int drx = -1, dry; // door x/y
-    static int scx, scy, ecx, ecy; // start cooridor x/y, end cooridor x/y
+    int in, co, imm = -1;
+    struct lab5_daemon_data *dat;
 
-    dat = set_data(cn, DRD_LAB2_UNDEAD, sizeof(*dat));
-    if (!dat) return; // oops...
-
-    // set corridor coords relative to the char position
-    if (drx == -1 && dat->patrol == 2) {
-        drx = ch[cn].tmpx - 3;
-        dry = ch[cn].tmpy - 8;
-        scx = ch[cn].tmpx - 2;
-        scy = ch[cn].tmpy - 10;
-        ecx = ch[cn].tmpx + 17;
-        ecy = ch[cn].tmpy - 6;
-    }
+    dat = set_data(cn, DRD_LAB5_DAEMON, sizeof(struct lab5_daemon_data));
+    if (!dat) return;
 
     // loop through our messages
     for (msg = ch[cn].msg; msg; msg = next) {
         next = msg->next;
 
         if (msg->type == NT_CREATE) {
-
-            lab2_undead_driver_parse(cn, dat);
-
-            if (dat->graveit) { // i'm to lazy to create tons of templates
-                dat->aggressive = 0;
-                dat->helper = 0;
-                fight_driver_set_dist(cn, 10, 0, 100);
-            } else {
-                fight_driver_set_dist(cn, 14, 0, 18);
-            }
-
-            // only undead get the regenerate feature
-            if (dat->undead) {
-                dat->regenit = create_lab2_regenerate_spell(cn, "lab2_regenerate_spell");
-            }
-
-            // is it a patrol undead
-            if (dat->patrol == 1) {
-                // graveyard (first coord ist at the edge of the top left weld)
-                dat->patx[0] = 168;
-                dat->paty[0] = 178;
-                dat->patx[1] = dat->patx[0] + 0;
-                dat->paty[1] = dat->paty[0] + 40;
-                dat->patx[2] = dat->patx[0] + 36;
-                dat->paty[2] = dat->paty[0] + 40;
-                dat->patx[3] = dat->patx[0] + 36;
-                dat->paty[3] = dat->paty[0] + 0;
-                dat->patstep = 4;
-                fight_driver_set_dist(cn, 0, 10, 0);
-                dat->helper = 0;
-            }
-
-            if (dat->patrol == 2) {
-                // crypta (first coord ist chr position x and y+1)
-                dat->patx[0] = 171;
-                dat->paty[0] = 164;
-                dat->patx[1] = dat->patx[0] - 33;
-                dat->paty[1] = dat->paty[0] + 0;
-                dat->patx[2] = dat->patx[0] - 33;
-                dat->paty[2] = dat->paty[0] - 18;
-                dat->patx[3] = dat->patx[0] - 6;
-                dat->paty[3] = dat->paty[0] - 18;
-                dat->patx[4] = dat->patx[0] - 4;
-                dat->paty[4] = dat->paty[0] - 18; // -- say hm.
-                dat->patx[5] = dat->patx[0] - 33;
-                dat->paty[5] = dat->paty[0] - 18;
-                dat->patx[6] = dat->patx[0] - 33;
-                dat->paty[6] = dat->paty[0] + 0;
-                dat->patx[7] = dat->patx[0] + 0;
-                dat->paty[7] = dat->paty[0] + 0;
-                dat->patstep = 8;
-                fight_driver_set_dist(cn, 0, 10, 0);
-                dat->helper = 0;
-            }
+            lab5_daemon_driver_parse(cn, dat);
         }
 
         if (msg->type == NT_TEXT) {
@@ -881,626 +769,434 @@ void lab2_undead_driver(int cn, int ret, int lastact) {
             tabunga(cn, co, (char *)msg->dat2);
         }
 
-        if (msg->type == NT_GIVE) {
-            if (!ch[cn].citem) {
-                remove_message(cn, msg);
-                continue;
-            } // ??? i saw something like this at DBs source
-
+        if (msg->type == NT_CHAR) {
             co = msg->dat1;
-            in = ch[cn].citem;
-
-            if (it[in].driver == IDR_LAB2_WATER && it[in].drdata[0] == 5) {
-
-                // destroy item
-                destroy_item(in);
-                ch[cn].citem = 0;
-
-                if (ch[co].flags) log_char(co, LOG_SYSTEM, 0, "You spill the holy water all over the %s.", ch[cn].name);
-
-                // check if we are in the secure area
-                mn = ch[cn].x + ch[cn].y * MAXMAP;
-                if (((map[mn].flags & MF_NOMAGIC) && !(ch[co].flags & CF_NONOMAGIC)) || dat->undead == 0) {
-                    say(cn, "Mwahahahaha...");
-                } else {
-                    say(cn, "Arrgh!");
-                    ch[cn].flags &= ~CF_NODEATH;
-                    create_mist(ch[cn].x, ch[cn].y);
-                    set_lab2_regenerate_spell_startat(dat->regenit, ticker + 20 * TICKS);
-                    hurt(cn, 20 * POWERSCALE, co, 1, 0, 0); // he might die,...
-                    remove_message(cn, msg); // we use return, so we remove the message here
-                    return; // ... so we return here!
+            if (dat->type == 1) { // master
+                if (ch[co].flags & CF_PLAYER && char_see_char(cn, co)) {
+                    if ((in = ch[co].item[WN_RHAND]) == 0 || it[in].ID != IID_LAB5_WEAPON) imm = 1;
+                    else if (imm == -1) imm = 0;
                 }
-            } else {
-                // destroy everything we get
-                destroy_item(in);
-                ch[cn].citem = 0;
+            } else imm = 0;
+
+            if (dat->type == 2) { // gunned
+                if (ch[co].flags & CF_PLAYER && ch[co].y < namecoordy[0] + 25 && char_see_char(cn, co)) fight_driver_add_enemy(cn, co, 1, 1);
             }
         }
 
-        standard_message_driver(cn, msg, dat->aggressive, dat->helper);
-
-        // the crypt patrol will remove everyone in the second corridor from his enemy list
-        if (dat->patrol == 2 && msg->type == NT_CHAR) {
-            co = msg->dat1;
-            if (cn != co && ch[co].x >= scx && ch[co].y >= scy && ch[co].x <= ecx && ch[co].y <= ecy && char_see_char(cn, co)) fight_driver_remove_enemy(cn, co);
-        }
-
+        standard_message_driver(cn, msg, dat->aggressive, 1);
         remove_message(cn, msg);
     }
 
-    // a nice thing, kill them when entering the cathedral
-    if (map[ch[cn].x + ch[cn].y * MAXMAP].gsprite == 20456 || map[ch[cn].x + ch[cn].y * MAXMAP].gsprite == 17062) {
-        say(cn, "Arrgh!");
-        create_mist(ch[cn].x, ch[cn].y);
-        kill_char(cn, 0);
-        return;
-    }
+    // switch to attack
+    if (dat->aggressive == 0 && ticker > dat->attackstart) dat->aggressive = 1;
+
+    // immortal switch
+    if (imm == 1) ch[cn].flags |= CF_IMMORTAL;
+    else if (imm == 0) ch[cn].flags &= ~CF_IMMORTAL;
 
     // fighting
     fight_driver_update(cn);
     if (fight_driver_attack_visible(cn, 0)) return;
     if (fight_driver_follow_invisible(cn)) return;
 
-    // the crypt patrol will close the door, if he is near to it
-    if (dat->patrol == 2 && (in = map[drx + dry * MAXMAP].it) && it[in].driver == 2 && it[in].drdata[0] == 1 && abs(ch[cn].x - drx) < 3 && abs(ch[cn].y - dry) < 3 && ch[cn].x < drx) { // door is present and open
-        if (use_item(cn, in)) return;
-    }
-
-    // regeneration
+    // rest of standard action
     if (regenerate_driver(cn)) return;
     if (spell_self_driver(cn)) return;
+    if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, dat->dir, ret, lastact)) return;
 
-    // patroling
-    if (dat->patrol) {
-        p = dat->pat;
-        if (move_driver(cn, dat->patx[p], dat->paty[p], 0)) return;
-        if (tmove_driver(cn, dat->patx[p], dat->paty[p], 0)) return;
-        if (abs(ch[cn].x - dat->patx[p]) < 3 && abs(ch[cn].y - dat->paty[p]) < 3) {
-            dat->pat = (dat->pat + 1) % dat->patstep;
-            if (dat->patrol == 2 && p == 0) { do_idle(cn, TICKS * 2); }
-            if (dat->patrol == 2 && p == 3) {
-                say(cn, "A gust of wind?");
-                do_idle(cn, TICKS * 2);
-            }
-            if (dat->patrol == 2 && p == 4) {
-                say(cn, "Strange.");
-                do_idle(cn, TICKS * 2);
-            }
-            return;
-        }
-    }
-
-    // rest of standard action
-    if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_DOWN, ret, lastact)) return;
-
-    // use the grave
-    if (dat->graveit) {
-        if (use_driver(cn, dat->graveit, 0)) return;
-    }
-
+    // nothing left to do
     do_idle(cn, TICKS / 2);
 }
 
-void lab2_undead_died_driver(int cn, int co) {
-    struct lab2_grave_data *grave_dat;
-    struct lab2_undead_driver_data *undead_dat;
-    struct lab2_player_data *player_dat;
-    int val, in2;
-    int slot, gold = 0;
-    struct lab_ppd *ppd;
+// -- item driver ---------------------------------------------------------------------------------------------------
 
-    if (!co) return;
-    if (!(ch[co].flags & CF_PLAYER)) return;
+// drdata[0]=type               1=obelisk
+//                              2=fireface
+//                              3=chestbox
+//                              4=combopotion
+//                              5=nameplate
+//                              6=realnameplate
+//                              7=entrance
+//                              8=backdoor
+//                              9=gun
+//                              10=pike
+//                              11=no potion door
+//                              12=manapotion
+//                              13=lightface
 
-    undead_dat = set_data(cn, DRD_LAB2_UNDEAD, sizeof(*undead_dat));
-    if (!undead_dat) return;
-    if (!undead_dat->graveit) return;
+// fireface                     drdata[1]=time init
+// chestbox                     drdata[1]=content
+//                              drdata[2]=chestbox number
+//                              drdata[3]=open/closed
+// nameplate                    drdata[1]=daemon
+// realnameplate                drdata[1]=daemon
+// entrance                     drdata[1]=daemon
+// gun                          drdata[1]=state
+// pike                         drdata[1]=state
+// lightface                    drdata[1]=time init
+// lightface                    drdata[2]=interval
 
-    // only the ones that opened the grave count
-    if (undead_dat->co != co || undead_dat->serial != ch[co].serial) return;
+int numchestboxes = 0;
+int sizeofchestboxes = 0;
 
-    grave_dat = (struct lab2_grave_data *)it[undead_dat->graveit].drdata;
-    player_dat = set_data(co, DRD_LAB2_PLAYER, sizeof_player_data);
-    if (!player_dat) return;
+void count_chestboxes(void) {
+    int x, y, in;
 
-    // ok, here we go...
-    val = get_grave_value(player_dat->bitarray, grave_dat->nr);
-
-    if (val == 0) {
-        if (map[it[undead_dat->graveit].x + it[undead_dat->graveit].y * MAXMAP].flags & MF_NOMAGIC) {
-            // crypta grave
-            player_dat->numcrypt++;
-
-            if (player_dat->numcrypt == max_crypt - 1) {
-                ppd = set_data(co, DRD_LAB_PPD, sizeof(struct lab_ppd));
-                if (ppd && ppd->timesgotcryptgold == 0) {
-                    log_char(co, LOG_SYSTEM, 0, "Thou notice a silent jingling as thine enemy hits the ground.");
-                    ppd->timesgotcryptgold++;
-                    gold = 500;
-                } else if (ppd && ppd->timesgotcryptgold == 1) {
-                    log_char(co, LOG_SYSTEM, 0, "Again thou notice a silent jingling as thine enemy hits the ground.");
-                    ppd->timesgotcryptgold++;
-                    gold = 500;
-                } else log_char(co, LOG_SYSTEM, 0, "Thou notice nothing special as thine enemy hits the ground.");
-            }
-        } else {
-            // yard grave
-            player_dat->numyard++;
-
-            if (player_dat->numyard == max_yard - 1) {
-                ppd = set_data(co, DRD_LAB_PPD, sizeof(struct lab_ppd));
-                if (ppd && ppd->timesgotyardgold == 0) {
-                    log_char(co, LOG_SYSTEM, 0, "Thou notice a loud jingling as thine enemy hits the ground.");
-                    ppd->timesgotyardgold++;
-                    gold = 7500;
-                } else if (ppd && ppd->timesgotyardgold == 1) {
-                    log_char(co, LOG_SYSTEM, 0, "Again thou notice a loud jingling as thine enemy hits the ground.");
-                    ppd->timesgotyardgold++;
-                    gold = 7500;
-                } else log_char(co, LOG_SYSTEM, 0, "Thou notice nothing special as thine enemy hits the ground.");
-            }
-        }
-
-        // add money
-        for (slot = 30; gold && slot < INVENTORYSIZE; slot++) {
-            if (ch[cn].item[slot] == 0) {
-                in2 = ch[cn].item[slot] = create_money_item(gold * 100);
-                it[in2].carried = cn;
-                break;
-            }
+    for (y = 0; y < MAXMAP; y++) {
+        for (x = 0; x < MAXMAP; x++) {
+            if (!(in = map[x + y * MAXMAP].it)) continue;
+            if (it[in].driver != IDR_LAB5_ITEM || it[in].drdata[0] != 3) continue;
+            it[in].drdata[2] = numchestboxes++;
         }
     }
 
-    inc_grave_value(player_dat->bitarray, grave_dat->nr);
-};
+    if (numchestboxes > 255) { xlog("too many chestboxes in lab5."); }
 
-void lab2_grave(int in, int cn);
+    sizeofchestboxes = (numchestboxes + 7) / 8;
 
-void lab2_arathas_awakes_all(int in, int cn) {
-    struct lab2_player_data *player_dat;
-    struct lab2_grave_data *grave_dat;
-    static int rx[10] = {-6, -3, 0, +3, +6, -6, -3, 0, +3, +6};
-    static int ry[10] = {+3, +3, +3, +3, +3, -3, -3, -3, -3, -3};
-    int mn, i;
-
-    if (!(ch[cn].flags & CF_PLAYER)) return;
-
-    player_dat = set_data(cn, DRD_LAB2_PLAYER, sizeof_player_data);
-    if (!player_dat) return;
-
-    for (i = 0; i < 10; i++) {
-        mn = (it[in].x + rx[i]) + (it[in].y + ry[i]) * MAXMAP;
-        // we won't need to, but we check the flags here cause it looks nicer if the grave won't open
-        grave_dat = (struct lab2_grave_data *)it[map[mn].it].drdata;
-        if (get_grave_value(player_dat->bitarray, grave_dat->nr) == 0) lab2_grave(map[mn].it, cn);
-    }
-};
-
-void lab2_grave(int in, int cn) {
-    int co, in2, slot;
-    struct lab2_grave_data *dat;
-    struct lab2_undead_driver_data *cdat;
-    struct lab_ppd *ppd;
-    int val, item;
-
-    if (!graves_enumerated) enumerate_graves();
-
-    dat = (struct lab2_grave_data *)it[in].drdata;
-
-    if (cn) {
-
-        if (ch[cn].driver == CDR_LAB2UNDEAD) {
-            remove_destroy_char(cn);
-            return;
-        }
-
-        // already open
-        if (dat->co) return;
-
-        // players only
-        if (!(ch[cn].flags & CF_PLAYER)) return;
-
-        // get ppd
-        ppd = set_data(cn, DRD_LAB_PPD, sizeof(struct lab_ppd));
-        if (!ppd) {
-            log_char(cn, LOG_SYSTEM, 0, "Congratulations, you detected bug no. 12/HIHO/17. Please report this to the development team.");
-            return;
-        }
-
-        // set the graves (will return immediately if this is already done)
-        set_player_described_graves(cn, ppd);
-
-        // it's a book (quick and dirty, but it fits ;)
-        switch (dat->item) {
-        case 1:
-            log_char(cn, LOG_SYSTEM, 0, described_grave[ppd->graveindex[0]].description, "Henry");
-            return;
-        case 2:
-            log_char(cn, LOG_SYSTEM, 0, described_grave[ppd->graveindex[1]].description, "Eldrick");
-            return;
-        case 3:
-            log_char(cn, LOG_SYSTEM, 0, described_grave[ppd->graveindex[2]].description, "John");
-            return;
-        case 4:
-            log_char(cn, LOG_SYSTEM, 0, described_grave[ppd->graveindex[3]].description, "Mariah");
-            return;
-        }
-
-        // check if it's one of the players graves (or one of the fixed item graves)
-        if (it[in].x == described_grave[ppd->graveindex[0]].x && it[in].y == described_grave[ppd->graveindex[0]].y) item = 1;
-        else if (it[in].x == described_grave[ppd->graveindex[1]].x && it[in].y == described_grave[ppd->graveindex[1]].y) item = 2;
-        else if (it[in].x == described_grave[ppd->graveindex[2]].x && it[in].y == described_grave[ppd->graveindex[2]].y) item = 3;
-        else if (it[in].x == described_grave[ppd->graveindex[3]].x && it[in].y == described_grave[ppd->graveindex[3]].y) item = 4;
-        else if (dat->item) item = dat->item;
-        else item = 0;
-
-        // check if the player already had this grave (ignore if it's a special one)
-        val = get_player_grave_value(in, cn, dat);
-
-        if (item == 0 && val > 0) {
-            log_char(cn, LOG_SYSTEM, 1, "This grave is empty");
-
-            // store the undead values and open the grave
-            dat->co = -1;
-            dat->serial = -1;
-            it[in].sprite++;
-
-            set_sector(it[in].x, it[in].y);
-
-            // set the timer for checking if the undead is still around (not true, just to have it a few seconds open ;)
-            call_item(it[in].driver, in, 0, ticker + TICKS * 5);
-
-            return;
-        }
-
-        // create enemy (special items only on undead, except elias (5), he's a skeleton )
-        if (item != 5 && (item || RANDOM(100) <= 66)) co = create_char("lab2_undead", 0);
-        else co = create_char("lab2_skeleton", 0);
-        if (!co) {
-            xlog("create_char failed (%s,%d)", __FILE__, __LINE__);
-            return;
-        }
-
-        // if it is a special grave, create the item
-        if (item) {
-
-            for (slot = 30; slot < INVENTORYSIZE; slot++)
-                if (ch[co].item[slot] == 0) break;
-
-            if (slot < INVENTORYSIZE) {
-                switch (item) {
-                case 1:
-                    in2 = create_item("lab2_elias_hat");
-                    break;
-                case 2:
-                    in2 = create_item("lab2_elias_cape");
-                    break;
-                case 3:
-                    in2 = create_item("lab2_elias_boots");
-                    break;
-                case 4:
-                    in2 = create_item("lab2_elias_belt");
-                    break;
-                case 5:
-                    in2 = create_item("lab2_elias_amulet");
-                    strcpy(ch[co].name, "Elias Skeleton");
-                    ch[co].value[1][V_HP] = 5;
-                    ch[co].value[1][V_ATTACK] = 5;
-                    ch[co].value[1][V_PARRY] = 5;
-                    ch[co].level = 1;
-                    break;
-                case 6:
-                    in2 = create_item("lab2_arathas_ring");
-                    strcpy(ch[co].name, "Undead Arathas");
-                    break;
-                default:
-                    xlog("unkown item number %d in %s %d", item, __FILE__, __LINE__);
-                    in2 = 0;
-                    break;
-                }
-
-                if (in2) {
-                    ch[co].item[slot] = in2;
-                    it[in2].carried = co;
-                } else xlog("failed to create item %d in %s %d", item, __FILE__, __LINE__);
-            } else xlog("no free slot found, sorry in %s %d", __FILE__, __LINE__);
-        }
-
-        // initialize his values
-        ch[co].dir = DX_DOWN;
-        ch[co].flags &= ~CF_RESPAWN;
-        update_char(co);
-
-        ch[co].hp = ch[co].value[0][V_HP] * POWERSCALE;
-        ch[co].endurance = ch[co].value[0][V_ENDURANCE] * POWERSCALE;
-        ch[co].mana = ch[co].value[0][V_MANA] * POWERSCALE;
-
-        // drop him to map
-        if (!drop_char(co, it[in].x, it[in].y, 0)) {
-            destroy_char(co);
-            xlog("drop_char failed (%s,%d)", __FILE__, __LINE__);
-            return;
-        }
-
-        // set values of the secure move driver
-        ch[co].tmpx = ch[co].x;
-        ch[co].tmpy = ch[co].y;
-
-        // set grave item of the char where he can return to
-        if ((cdat = set_data(co, DRD_LAB2_UNDEAD, sizeof(*cdat)))) {
-            cdat->graveit = in;
-            cdat->co = cn; // just to remember for the died driver
-            cdat->serial = ch[cn].serial; // just to remember for the died driver
-        }
-
-        // set enemy
-        if (fight_driver_add_enemy(co, cn, 1, 1)) say(co, "Thou woke me, %s. Now, thou die!", ch[cn].name);
-
-        // store the undead values and open the grave
-        dat->co = co;
-        dat->serial = ch[co].serial;
-        it[in].sprite++;
-
-        set_sector(it[in].x, it[in].y);
-
-        // set the timer for checking if the undead is still around
-        call_item(it[in].driver, in, 0, ticker + TICKS * 5);
-
-        // and now to something completely different. arathas awakes the other graves
-        if (item == 6) lab2_arathas_awakes_all(in, cn);
-    } else {
-        if (!dat->co) return;
-
-        // he's gone
-        if (dat->serial == -1 || !ch[dat->co].flags || ch[dat->co].serial != dat->serial) {
-            it[in].sprite--;
-            dat->co = 0;
-            dat->serial = 0;
-            set_sector(it[in].x, it[in].y);
-            return;
-        }
-
-        // set the timer for checking if the undead is still around
-        call_item(it[in].driver, in, 0, ticker + TICKS * 5);
-    }
+    xlog("found %d chests in lab5 (%d bytes)", numchestboxes, sizeofchestboxes);
 }
 
-// ------------------------------
+int check_chestbox(int cn, int in) {
+    unsigned char *dat;
+    int nr, byte, bit, ret;
 
-// drdata[0]:   0=not inited; 1=well; 2=altar; 3=bowl(unused); 4=waterbowl; 5=holy water bowl;
-void lab2_water(int in, int cn) {
-    int in2, in3;
+    dat = set_data(cn, DRD_LAB5_CHESTBOX, sizeofchestboxes);
+    if (!dat) return 1;
 
-    if (cn) {
-        if (it[in].drdata[0] == 1) {
-            if (ch[cn].citem) {
-                log_char(cn, LOG_SYSTEM, 0, "You won't throw this into the water, will you?");
+    nr = it[in].drdata[2];
+
+    if (nr >= numchestboxes) {
+        xlog("take more care of chestboxes in %s %d!!!", __FILE__, __LINE__);
+        return 1;
+    }
+
+    byte = nr / 8;
+    bit = nr % 8;
+
+    ret = dat[byte] & (1 << bit);
+    dat[byte] |= (1 << bit);
+
+    return ret;
+}
+
+#define GUNRELOAD (2 * TICKS / 3)
+
+void lab5_item(int in, int cn) {
+    struct lab5_player_data *pd;
+    char *drdata, dx, dy;
+    int in2;
+
+    drdata = it[in].drdata;
+
+    if (!numchestboxes) count_chestboxes();
+
+    if (!cn) {
+
+        // fireface
+        if (drdata[0] == 2) {
+            if (it[in].sprite == 11135) {
+                dx = 1;
+                dy = 0;
+            } else if (it[in].sprite == 11136) {
+                dx = 0;
+                dy = -1;
+            } else if (it[in].sprite == 11137) {
+                dx = -1;
+                dy = 0;
+            } else {
+                dx = 0;
+                dy = 1;
+            }
+            create_fireball(0, it[in].x + dx, it[in].y + dy, it[in].x + dx + dx, it[in].y + dy + dy, 50);
+
+            if (drdata[1] == 0) {
+                drdata[1] = 1;
+                call_item(it[in].driver, in, 0, ticker + (((it[in].x + it[in].y) % 17) + 1) * TICKS);
+            } else call_item(it[in].driver, in, 0, ticker + 5 * TICKS);
+        }
+
+        // lightface
+        if (drdata[0] == 13) {
+            if (it[in].sprite == 11135) {
+                dx = 1;
+                dy = 0;
+            } else if (it[in].sprite == 11136) {
+                dx = 0;
+                dy = -1;
+            } else if (it[in].sprite == 11137) {
+                dx = -1;
+                dy = 0;
+            } else {
+                dx = 0;
+                dy = 1;
+            }
+            create_ball(0, it[in].x + dx, it[in].y + dy, it[in].x + dx + dx, it[in].y + dy + dy, 40);
+
+            if (drdata[1] == 0) {
+                drdata[1] = 1;
+                call_item(it[in].driver, in, 0, ticker + (((it[in].x + it[in].y) % 10) + 1) * TICKS);
+            } else if (drdata[2] == 4) {
+                call_item(it[in].driver, in, 0, ticker + 9 * TICKS);
+                drdata[2] = 0;
+            } else {
+                call_item(it[in].driver, in, 0, ticker + 7 * TICKS / 4);
+                drdata[2]++;
+            }
+        }
+
+        // chestbox
+        if (drdata[0] == 3) {
+            if (!drdata[3]) return;
+            drdata[3] = 0;
+            it[in].sprite--;
+            set_sector(it[in].x, it[in].y);
+        }
+
+        // nameplate
+        if (drdata[0] == 5) {
+            namecoordx[(int)drdata[1]] = it[in].x;
+            namecoordy[(int)drdata[1]] = it[in].y;
+        }
+
+        // entrance
+        if (drdata[0] == 7) {
+            it[in].sprite = 0;
+            set_sector(it[in].x, it[in].y);
+        }
+
+        // backdoor
+        if (drdata[0] == 8) {
+            static int bcnt = 0;
+            daemondoorx[bcnt] = it[in].x;
+            daemondoory[bcnt] = it[in].y;
+            bcnt++;
+        }
+
+        // gun
+        if (drdata[0] == 9) {
+            if (!drdata[1]) return;
+            drdata[1]--;
+            it[in].sprite--;
+            set_sector(it[in].x, it[in].y);
+            if (drdata[1]) call_item(it[in].driver, in, 0, ticker + GUNRELOAD);
+        }
+
+        // pike
+        if (drdata[0] == 10) {
+            if (!drdata[1]) return;
+            drdata[1] = 0;
+            it[in].sprite--;
+            set_sector(it[in].x, it[in].y);
+        }
+
+    } else {
+
+        // obelisk
+        if (drdata[0] == 1) {
+            ch[cn].hp = ch[cn].value[0][V_HP] * POWERSCALE;
+            ch[cn].mana = ch[cn].value[0][V_MANA] * POWERSCALE;
+            ch[cn].endurance = ch[cn].value[0][V_ENDURANCE] * POWERSCALE;
+            ch[cn].lifeshield = get_lifeshield_max(cn) * POWERSCALE;
+            sound_area(ch[cn].x, ch[cn].y, 41);
+        }
+
+        // chestbox
+        if (drdata[0] == 3) {
+
+            char *str;
+
+            if (drdata[3]) return;
+            if (ch[cn].citem) return;
+
+            // check if it was already opened
+            if (check_chestbox(cn, in)) {
+                log_char(cn, LOG_SYSTEM, 0, "Thou canst not open the chest again.");
                 return;
             }
 
-            in2 = create_item("lab2_waterbowl");
+            // open box (and call close timer)
+            drdata[3] = 1;
+            it[in].sprite++;
+            set_sector(it[in].x, it[in].y);
+            call_item(it[in].driver, in, 0, ticker + 2 * TICKS);
+
+            // which item
+            switch (drdata[1]) {
+            case 1:
+                str = "lab5_combopotion";
+                break;
+            case 2:
+                str = "lab5_staff";
+                break;
+            case 3:
+                str = "lab5_dagger";
+                break;
+            case 4:
+                str = "lab5_sword";
+                break;
+            case 5:
+                str = "lab5_twohanded";
+                break;
+            case 6:
+                str = "lab5_manapotion";
+                break;
+            case 7:
+                str = "lab5_manslayer";
+                break;
+            default:
+                str = "oops";
+                break;
+            }
+
+            // create and give potion to player
+            in2 = create_item(str);
             log_char(cn, LOG_SYSTEM, 0, "You received a %s.", it[in2].name);
 
-            if (ch[cn].flags & CF_PLAYER) dlog(cn, in2, "took from lab2_water");
+            if (!in2) {
+                xlog("failed to create '%s' item in %s %d", str, __FILE__, __LINE__);
+                return;
+            }
+
             ch[cn].citem = in2;
             ch[cn].flags |= CF_ITEMS;
             it[in2].carried = cn;
-        } else if (it[in].drdata[0] == 2) {
-            if (!ch[cn].citem || it[ch[cn].citem].driver != IDR_LAB2_WATER || it[ch[cn].citem].drdata[0] != 4) {
-                log_char(cn, LOG_SYSTEM, 0, "You feel the holyness of the Altar. Water would be holy now, if you had some.");
+        }
+
+        // combopotion
+        if (drdata[0] == 4) {
+            ch[cn].hp = ch[cn].value[0][V_HP] * POWERSCALE;
+            ch[cn].mana = ch[cn].value[0][V_MANA] * POWERSCALE;
+            ch[cn].endurance = ch[cn].value[0][V_ENDURANCE] * POWERSCALE;
+            if (ch[cn].value[1][V_MAGICSHIELD]) ch[cn].lifeshield = get_lifeshield_max(cn) * POWERSCALE;
+            log_area(ch[cn].x, ch[cn].y, LOG_INFO, cn, 10, "%s drinks a potion.", ch[cn].name);
+            remove_item(in);
+            free_item(in);
+        }
+
+        // manapotion
+        if (drdata[0] == 12) {
+            ch[cn].mana = ch[cn].value[0][V_MANA] * POWERSCALE;
+            if (ch[cn].value[1][V_MAGICSHIELD]) ch[cn].lifeshield = get_lifeshield_max(cn) * POWERSCALE;
+            log_area(ch[cn].x, ch[cn].y, LOG_INFO, cn, 10, "%s drinks a potion.", ch[cn].name);
+            remove_item(in);
+            free_item(in);
+        }
+
+        // nameplate
+        if (drdata[0] == 5) {
+
+            // get pd
+            pd = set_data(cn, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) return;
+
+            if (pd->ritualstate == 0) {
+                sound_area(ch[cn].x, ch[cn].y, 41);
+                pd->ritualdaemon = drdata[1];
+                pd->ritualstate = 1;
+                log_char(cn, LOG_SYSTEM, 0, "Thou canst read the symbols now. They form the words:");
+                log_char(cn, LOG_SYSTEM, 0, "\260c3The Ritual of %s started.\260c0", daemonname[pd->ritualdaemon]);
+            } else ritual_hurt(cn, pd, it[in].x, it[in].y);
+        }
+
+        // realnameplate
+        if (drdata[0] == 6) {
+
+            // get pd
+            pd = set_data(cn, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) return;
+
+            if (pd->ritualstate == 0) {
+                log_char(cn, LOG_SYSTEM, 0, "Nothing happens.");
                 return;
             }
 
-            in2 = ch[cn].citem;
-            in3 = create_item("lab2_holywaterbowl");
-
-            replace_item_char(in2, in3);
-            free_item(in2);
-
-            log_char(cn, LOG_SYSTEM, 0, "The water inside your bowl is holy now");
-        } else if (it[in].drdata[0] == 4 || it[in].drdata[0] == 5) {
-            log_char(cn, LOG_SYSTEM, 0, "Skoll!");
+            if (pd->ritualstate == 1 && pd->ritualdaemon == drdata[1]) {
+                sound_area(ch[cn].x, ch[cn].y, 41);
+                pd->ritualstate = 2;
+                log_char(cn, LOG_SYSTEM, 0, "Thou canst read the symbols now. They form the words:");
+                log_char(cn, LOG_SYSTEM, 0, "\260c3The ritual of %s is the Ritual of %s.\260c0", daemonname[pd->ritualdaemon], daemonreal[pd->ritualdaemon]);
+            } else ritual_hurt(cn, pd, it[in].x, it[in].y);
         }
-    } else {
-        if (it[in].drdata[0] == 0) {
-            // init
-            switch (it[in].sprite) {
-            case 11008:
-            case 11009:
-            case 11010:
-                it[in].drdata[0] = 2;
-                break;
 
-            case 20793:
-            case 20794:
-            case 20795:
-            case 20796:
-                it[in].drdata[0] = 1;
-                break;
+        // entrance
+        if (drdata[0] == 7) {
 
-            case 11011:
-                it[in].drdata[0] = 3;
-                break;
-            case 11012:
-                it[in].drdata[0] = 4;
-                break;
-            case 11013:
-                it[in].drdata[0] = 5;
-                break;
+            static int hurttrans[4] = {2, 3, 0, 1};
 
-            default:
-                xlog("unknown sprite %d/%s in %s %d", it[in].sprite, it[in].name, __FILE__, __LINE__);
-                break;
+            // get pd
+            pd = set_data(cn, DRD_LAB5_PLAYER, sizeof(struct lab5_player_data));
+            if (!pd) return;
+
+            if (pd->ritualstate == 0) return;
+
+            if (pd->ritualstate == 2 && pd->ritualdaemon == drdata[1]) {
+                sound_area(ch[cn].x, ch[cn].y, 41);
+                pd->ritualdaemon = drdata[1];
+                pd->ritualstate = 3;
+                log_char(cn, LOG_SYSTEM, 0, "Mathor tells you: \"The ritual continues. Well done so far, %s.\"", ch[cn].name);
+            } else {
+                if (drdata[1] == 2) log_char(cn, LOG_SYSTEM, 0, "Mathor tells you: \"Sorry. But a strange power forced me.\"");
+                ritual_hurt(cn, pd, namecoordx[hurttrans[(int)drdata[1]]], namecoordy[hurttrans[(int)drdata[1]]]);
             }
         }
-    }
-}
 
-// ------------------------------
-
-// -- 500
-// -- 7500
-
-void lab2_stepaction(int in, int cn) {
-    int type;
-
-    type = it[in].drdata[0];
-
-    switch (type) {
-    case 1:
-        break;
-    case 2:
-        break;
-    default:
-        xlog("unknown lab2 stepaction type %d in %s %d", type, __FILE__, __LINE__);
-        return;
-    }
-
-    if (!cn) {
-        switch (type) {
-        case 1:
-        case 2:
-            it[in].sprite = 0;
-            update_item(in);
-            break;
+        // backdoor
+        if (drdata[0] == 8) {
+            // watch the syntax!
+            if (!teleport_char_driver(cn, namecoordx[2], namecoordy[1]))
+                if (!teleport_char_driver(cn, namecoordx[0], namecoordy[0]))
+                    if (!teleport_char_driver(cn, namecoordx[1], namecoordy[1]))
+                        if (!teleport_char_driver(cn, namecoordx[2], namecoordy[2]))
+                            teleport_char_driver(cn, namecoordx[3], namecoordy[3]);
         }
-        return;
-    }
 
-    switch (type) {
-    case 1: // demon warning
-        if (ch[cn].dir != DX_UP) break;
-        if (!(ch[cn].flags & CF_PLAYER)) break;
-        lab2_deamon_create(it[in].x, it[in].y - 5, cn);
-        break;
+        // gun
+        if (drdata[0] == 9) {
+            if (drdata[1]) {
+                log_char(cn, LOG_SYSTEM, 0, "Thou canst not push the lever.");
+                return;
+            }
+            drdata[1] = 7;
+            it[in].sprite += 7;
+            set_sector(it[in].x, it[in].y);
+            call_item(it[in].driver, in, 0, ticker + GUNRELOAD);
 
-    case 2: // demon killing
-        if (!(ch[cn].flags & CF_PLAYER)) break;
-        notify_area(it[in].x, it[in].y, NT_NPC, NTID_LAB2_DEAMONCHECK, cn, 0);
-        break;
-    }
-}
+            create_fireball(cn, it[in].x + 2, it[in].y, it[in].x + 60, it[in].y, 100);
+        }
 
-// ------------------------------
+        // pike
+        if (drdata[0] == 10) {
+            hurt(cn, 5 * POWERSCALE, 0, 1, 0, 0);
+            if (drdata[1]) return;
+            drdata[1]++;
+            it[in].sprite++;
+            set_sector(it[in].x, it[in].y);
+            call_item(it[in].driver, in, 0, ticker + 5 * TICKS);
+        }
 
-struct lab2_regenerate_data {
-    char speed; // speed in TICKS/24 ;-)
-    char regen; // percentage (0..255) of missing hitpoints to be regained
-    char arg3; // dummy for arguments
-    char arg4; // dummy for arguments
-    unsigned int cn; // cn to regenerate (won't need the serial, cause it's a spell)
-    int startat; // tickervalue when to start (modify this value and regeneration will stop it startat>ticker)
-};
+        // no potion door
+        if (drdata[0] == 11) {
+            if (ch[cn].x < it[in].x && has_potion(cn)) {
+                log_char(cn, LOG_SYSTEM, 0, "\260c3Thou canst not enter carrying a mana, healing or combo potion!\260c0");
+                return;
+            }
 
-// use this funtion to add the regenerate spell item to
-// a character. returns 0 if not possible, otherwise it returns the
-// item number (to be stored for more sophisticated stuff like the stop
-// and go timers)
-int create_lab2_regenerate_spell(int cn, /*const*/ char *name) {
-    int slot, in;
-    struct lab2_regenerate_data *dat;
-
-    slot = may_add_spell(cn, IDR_LAB2_REGENERATE);
-    if (slot == 0) return 0;
-
-    in = create_item(name);
-    if (in == 0) return 0;
-
-    ch[cn].item[slot] = in;
-    it[in].carried = cn;
-
-    dat = (struct lab2_regenerate_data *)it[in].drdata;
-    dat->cn = cn;
-
-    ch[cn].flags |= CF_NODEATH;
-
-    return in;
-}
-
-void set_lab2_regenerate_spell_startat(int in, int value) {
-    struct lab2_regenerate_data *dat;
-
-    if (in == 0) {
-        xlog("illegal call of regenerate spell in %s %d", __FILE__, __LINE__);
-        return;
-    }
-    if (it[in].driver != IDR_LAB2_REGENERATE) {
-        xlog("illegal call of regenerate spell in %s %d", __FILE__, __LINE__);
-        return;
-    }
-
-    dat = (struct lab2_regenerate_data *)it[in].drdata;
-    dat->startat = value;
-}
-
-void lab2_regenerate(int in, int cn) {
-    struct lab2_regenerate_data *dat;
-    int max, diff, add;
-
-    if (cn) return;
-
-    dat = (struct lab2_regenerate_data *)it[in].drdata;
-
-    if (it[in].carried == dat->cn) {
-        if (ticker >= dat->startat) {
-            max = ch[dat->cn].value[0][V_HP] * POWERSCALE;
-            diff = max - ch[dat->cn].hp;
-            if (diff > 0) add = dat->regen * diff / 256;
-            else add = 1;
-            ch[dat->cn].hp = min(max, ch[dat->cn].hp + add);
-            ch[dat->cn].flags |= CF_NODEATH;
-        } else ch[dat->cn].flags &= ~CF_NODEATH;
-    }
-
-    call_item(it[in].driver, in, 0, ticker + dat->speed * TICKS / 24);
-}
-
-// ------------------------------
-
-int ch_driver(int nr, int cn, int ret, int lastact) {
-    switch (nr) {
-    case CDR_LAB2HERALD:
-        lab2_herald_driver(cn, ret, lastact);
-        return 1;
-    case CDR_LAB2DEAMON:
-        lab2_deamon_driver(cn, ret, lastact);
-        return 1;
-    case CDR_LAB2UNDEAD:
-        lab2_undead_driver(cn, ret, lastact);
-        return 1;
-    default:
-        return 0;
+            if (ch[cn].x < it[in].x) teleport_char_driver(cn, it[in].x - 9, it[in].y - 7);
+            else teleport_char_driver(cn, it[in].x + 9, it[in].y + 7);
+        }
     }
 }
 
-int it_driver(int nr, int in, int cn) {
-    switch (nr) {
-    case IDR_LAB2_GRAVE:
-        lab2_grave(in, cn);
-        return 1;
-    case IDR_LAB2_WATER:
-        lab2_water(in, cn);
-        return 1;
-    case IDR_LAB2_STEPACTION:
-        lab2_stepaction(in, cn);
-        return 1;
-    case IDR_LAB2_REGENERATE:
-        lab2_regenerate(in, cn);
-        return 1;
-    default:
-        return 0;
-    }
-}
+// -- general -------------------------------------------------------------------------------------------------------
 
 int ch_died_driver(int nr, int cn, int co) {
     switch (nr) {
-    case CDR_LAB2UNDEAD:
-        lab2_undead_died_driver(cn, co);
+    case CDR_LAB5DAEMON:
         return 1;
-    case CDR_LAB2DEAMON:
+    case CDR_LAB5SEYAN:
         return 1;
-    case CDR_LAB2HERALD:
+    case CDR_LAB5MAGE:
         return 1;
     default:
         return 0;
@@ -1509,11 +1205,37 @@ int ch_died_driver(int nr, int cn, int co) {
 
 int ch_respawn_driver(int nr, int cn) {
     switch (nr) {
-    case CDR_LAB2UNDEAD:
+    case CDR_LAB5DAEMON:
         return 1;
-    case CDR_LAB2DEAMON:
+    case CDR_LAB5SEYAN:
         return 1;
-    case CDR_LAB2HERALD:
+    case CDR_LAB5MAGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+int ch_driver(int nr, int cn, int ret, int lastact) {
+    switch (nr) {
+    case CDR_LAB5DAEMON:
+        lab5_daemon_driver(cn, ret, lastact);
+        return 1;
+    case CDR_LAB5SEYAN:
+        lab5_seyan_driver(cn, ret, lastact);
+        return 1;
+    case CDR_LAB5MAGE:
+        lab5_mage_driver(cn, ret, lastact);
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+int it_driver(int nr, int in, int cn) {
+    switch (nr) {
+    case IDR_LAB5_ITEM:
+        lab5_item(in, cn);
         return 1;
     default:
         return 0;

@@ -24,7 +24,7 @@
 #include "quest_exp.h"
 #include "item_id.h"
 #include "skill.h"
-#include "area1.h"
+#include "cameron.h"
 #include "database.h"
 #include "questlog.h"
 #include "statistics.h"

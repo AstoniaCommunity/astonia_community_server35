@@ -15,10 +15,10 @@ runtime/generic/alchemy.dll \
 runtime/generic/mine.dll \
 runtime/generic/professor.dll \
 runtime/generic/sidestory.dll \
-runtime/1/gwendylon.dll \
+runtime/1/cameron.dll \
 runtime/1/shrike.dll \
-runtime/2/area2.dll \
-runtime/3/area3.dll \
+runtime/2/below_aston.dll \
+runtime/3/aston.dll \
 runtime/3/gatekeeper.dll \
 runtime/3/military.dll \
 runtime/3/arena.dll \
@@ -30,7 +30,7 @@ runtime/11/palace.dll \
 runtime/14/random.dll \
 runtime/15/swamp.dll \
 runtime/16/forest.dll \
-runtime/17/two.dll \
+runtime/17/exkordon.dll \
 runtime/18/bones.dll \
 runtime/19/nomad.dll \
 runtime/19/saltmine.dll \
@@ -41,10 +41,9 @@ runtime/22/lab4.dll \
 runtime/22/lab5.dll \
 runtime/23/strategy.dll \
 runtime/25/warped.dll \
-runtime/27/staffer.dll \
-runtime/29/staffer2.dll \
-runtime/28/staffer3.dll \
-runtime/31/warrmines.dll \
+runtime/26/below_aston2.dll \
+runtime/29/brannington.dll \
+runtime/28/bran_forest.dll \
 runtime/33/tunnel.dll \
 runtime/36/caligar.dll \
 runtime/37/arkhata.dll 
@@ -161,45 +160,31 @@ runtime/generic/simple_baddy.dll:	.dllobj/simple_baddy.o
 	$(CC) $(DDFLAGS) -o simple_baddy.tmp .dllobj/simple_baddy.o
 	@mv simple_baddy.tmp runtime/generic/simple_baddy.dll
 
-runtime/1/gwendylon.dll:	.dllobj/gwendylon.o
+runtime/generic/mine.dll:	.dllobj/mine.o
+	@mkdir -p runtime/generic
+	$(CC) $(DDFLAGS) -o mine.tmp .dllobj/mine.o
+	@mv mine.tmp runtime/generic/mine.dll
+
+runtime/1/cameron.dll:	.dllobj/cameron.o
 	@mkdir -p runtime/1
-	$(CC) $(DDFLAGS) -o gwendylon.tmp .dllobj/gwendylon.o
-	@mv gwendylon.tmp runtime/1/gwendylon.dll
+	$(CC) $(DDFLAGS) -o cameron.tmp .dllobj/cameron.o
+	@mv cameron.tmp runtime/1/cameron.dll
 
 runtime/1/shrike.dll:	.dllobj/shrike.o
 	@mkdir -p runtime/1
 	$(CC) $(DDFLAGS) -o shrike.tmp .dllobj/shrike.o
 	@mv shrike.tmp runtime/1/shrike.dll
 
-runtime/2/area2.dll:	.dllobj/area2.o
+runtime/2/below_aston.dll:	.dllobj/below_aston.o
 	@mkdir -p runtime/2
-	$(CC) $(DDFLAGS) -o area2.tmp .dllobj/area2.o
-	@mv area2.tmp runtime/2/area2.dll
+	$(CC) $(DDFLAGS) -o below_aston.tmp .dllobj/below_aston.o
+	@mv below_aston.tmp runtime/2/below_aston.dll
 
-runtime/3/area3.dll:	.dllobj/area3.o
+runtime/3/aston.dll:	.dllobj/aston.o
 	@mkdir -p runtime/3
-	$(CC) $(DDFLAGS) -o area3.tmp .dllobj/area3.o
-	@mv area3.tmp runtime/3/area3.dll
+	$(CC) $(DDFLAGS) -o aston.tmp .dllobj/aston.o
+	@mv aston.tmp runtime/3/aston.dll
 
-runtime/22/lab2.dll:	.dllobj/lab2.o
-	@mkdir -p runtime/22
-	$(CC) $(DDFLAGS) -o lab2.tmp .dllobj/lab2.o
-	@mv lab2.tmp runtime/22/lab2.dll
-
-runtime/22/lab3.dll:	.dllobj/lab3.o
-	@mkdir -p runtime/22
-	$(CC) $(DDFLAGS) -o lab3.tmp .dllobj/lab3.o
-	@mv lab3.tmp runtime/22/lab3.dll
-
-runtime/22/lab4.dll:	.dllobj/lab4.o
-	@mkdir -p runtime/22
-	$(CC) $(DDFLAGS) -o lab4.tmp .dllobj/lab4.o
-	@mv lab4.tmp runtime/22/lab4.dll
-
-runtime/22/lab5.dll:	.dllobj/lab5.o
-	@mkdir -p runtime/22
-	$(CC) $(DDFLAGS) -o lab5.tmp .dllobj/lab5.o
-	@mv lab5.tmp runtime/22/lab5.dll
 
 runtime/3/arena.dll:	.dllobj/arena.o
 	@mkdir -p runtime/3
@@ -219,15 +204,15 @@ runtime/3/military.dll:	.dllobj/military.o
 	@mv military.tmp runtime/3/military.dll
 	@mv military.tmp2 runtime/29/military.dll
 
-runtime/6/edemon.dll:	.dllobj/edemon.o
-	@mkdir -p runtime/6
-	$(CC) $(DDFLAGS) -o edemon.tmp .dllobj/edemon.o
-	@mv edemon.tmp runtime/6/edemon.dll
-
 runtime/5/sewers.dll:	.dllobj/sewers.o
 	@mkdir -p runtime/5
 	$(CC) $(DDFLAGS) -o sewers.tmp .dllobj/sewers.o
 	@mv sewers.tmp runtime/5/sewers.dll
+
+runtime/6/edemon.dll:	.dllobj/edemon.o
+	@mkdir -p runtime/6
+	$(CC) $(DDFLAGS) -o edemon.tmp .dllobj/edemon.o
+	@mv edemon.tmp runtime/6/edemon.dll
 
 runtime/8/fdemon.dll:	.dllobj/fdemon.o
 	@mkdir -p runtime/8
@@ -259,10 +244,10 @@ runtime/16/forest.dll:	.dllobj/forest.o
 	$(CC) $(DDFLAGS) -o forest.tmp .dllobj/forest.o
 	@mv forest.tmp runtime/16/forest.dll
 
-runtime/17/two.dll:	.dllobj/two.o
+runtime/17/exkordon.dll:	.dllobj/exkordon.o
 	@mkdir -p runtime/17
-	$(CC) $(DDFLAGS) -o two.tmp .dllobj/two.o
-	@mv two.tmp runtime/17/two.dll
+	$(CC) $(DDFLAGS) -o exkordon.tmp .dllobj/exkordon.o
+	@mv exkordon.tmp runtime/17/exkordon.dll
 
 runtime/18/bones.dll:	.dllobj/bones.o
 	@mkdir -p runtime/18
@@ -279,37 +264,25 @@ runtime/19/saltmine.dll:	.dllobj/saltmine.o
 	$(CC) $(DDFLAGS) -o saltmine.tmp .dllobj/saltmine.o
 	@mv saltmine.tmp runtime/19/saltmine.dll
 
-runtime/27/staffer.dll:	.dllobj/staffer.o
-	@mkdir -p runtime/26
-	@mkdir -p runtime/27
-	$(CC) $(DDFLAGS) -o staffer.tmp .dllobj/staffer.o
-	@cp staffer.tmp staffer.tmp2
-	@mv staffer.tmp2 runtime/26/staffer.dll
-	@mv staffer.tmp runtime/27/staffer.dll
+runtime/22/lab2.dll:	.dllobj/lab2.o
+	@mkdir -p runtime/22
+	$(CC) $(DDFLAGS) -o lab2.tmp .dllobj/lab2.o
+	@mv lab2.tmp runtime/22/lab2.dll
 
-runtime/29/staffer2.dll:	.dllobj/staffer2.o
-	@mkdir -p runtime/29
-	$(CC) $(DDFLAGS) -o staffer2.tmp .dllobj/staffer2.o
-	@cp staffer2.tmp staffer2b.tmp
-	@mv staffer2b.tmp runtime/27/staffer2.dll
-	@mv staffer2.tmp runtime/29/staffer2.dll
+runtime/22/lab3.dll:	.dllobj/lab3.o
+	@mkdir -p runtime/22
+	$(CC) $(DDFLAGS) -o lab3.tmp .dllobj/lab3.o
+	@mv lab3.tmp runtime/22/lab3.dll
 
-runtime/28/staffer3.dll:	.dllobj/staffer3.o
-	@mkdir -p runtime/28
-	$(CC) $(DDFLAGS) -o staffer3.tmp .dllobj/staffer3.o
-	@cp staffer3.tmp staffer3b.tmp
-	@mv staffer3b.tmp runtime/27/staffer3.dll
-	@mv staffer3.tmp runtime/28/staffer3.dll
+runtime/22/lab4.dll:	.dllobj/lab4.o
+	@mkdir -p runtime/22
+	$(CC) $(DDFLAGS) -o lab4.tmp .dllobj/lab4.o
+	@mv lab4.tmp runtime/22/lab4.dll
 
-runtime/25/warped.dll:	.dllobj/warped.o
-	@mkdir -p runtime/25
-	$(CC) $(DDFLAGS) -o warped.tmp .dllobj/warped.o
-	@mv warped.tmp runtime/25/warped.dll
-
-runtime/generic/mine.dll:	.dllobj/mine.o
-	@mkdir -p runtime/generic
-	$(CC) $(DDFLAGS) -o mine.tmp .dllobj/mine.o
-	@mv mine.tmp runtime/generic/mine.dll
+runtime/22/lab5.dll:	.dllobj/lab5.o
+	@mkdir -p runtime/22
+	$(CC) $(DDFLAGS) -o lab5.tmp .dllobj/lab5.o
+	@mv lab5.tmp runtime/22/lab5.dll
 
 runtime/22/lab1.dll:		.dllobj/lab1.o
 	@mkdir -p runtime/22
@@ -323,6 +296,26 @@ runtime/23/strategy.dll: 	.dllobj/strategy.o
 	@cp strategy.tmp strategy2.tmp
 	@mv strategy.tmp runtime/23/strategy.dll
 	@mv strategy2.tmp runtime/24/strategy.dll
+
+runtime/25/warped.dll:	.dllobj/warped.o
+	@mkdir -p runtime/25
+	$(CC) $(DDFLAGS) -o warped.tmp .dllobj/warped.o
+	@mv warped.tmp runtime/25/warped.dll
+
+runtime/26/below_aston2.dll:	.dllobj/below_aston2.o
+	@mkdir -p runtime/26
+	$(CC) $(DDFLAGS) -o below_aston2.tmp .dllobj/below_aston2.o
+	@mv below_aston2.tmp runtime/26/below_aston2.dll
+
+runtime/28/bran_forest.dll:	.dllobj/bran_forest.o
+	@mkdir -p runtime/28
+	$(CC) $(DDFLAGS) -o bran_forest.tmp .dllobj/bran_forest.o
+	@mv bran_forest.tmp runtime/28/bran_forest.dll
+
+runtime/29/brannington.dll:	.dllobj/brannington.o
+	@mkdir -p runtime/29
+	$(CC) $(DDFLAGS) -o brannington.tmp .dllobj/brannington.o
+	@mv brannington.tmp runtime/29/brannington.dll
 
 runtime/33/tunnel.dll: 	.dllobj/tunnel.o
 	@mkdir -p runtime/33
@@ -338,11 +331,6 @@ runtime/37/arkhata.dll: 	.dllobj/arkhata.o
 	@mkdir -p runtime/37
 	$(CC) $(DDFLAGS) -o arkhata.tmp .dllobj/arkhata.o
 	@mv arkhata.tmp runtime/37/arkhata.dll
-
-runtime/31/warrmines.dll: .dllobj/warrmines.o
-	@mkdir -p runtime/31
-	$(CC) $(DDFLAGS) -o warrmines.tmp .dllobj/warrmines.o
-	@mv warrmines.tmp runtime/31/warrmines.dll
 
 # ------- Tools -----
 

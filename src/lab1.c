@@ -2,7 +2,6 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -11,21 +10,15 @@
 #include "notify.h"
 #include "direction.h"
 #include "do.h"
-#include "path.h"
-#include "error.h"
 #include "drdata.h"
 #include "see.h"
-#include "death.h"
 #include "talk.h"
 #include "database.h"
 #include "create.h"
 #include "drvlib.h"
 #include "tool.h"
-#include "effect.h"
-#include "light.h"
-#include "los.h"
+#include "item_id.h"
 #include "libload.h"
-#include "act.h"
 #include "lab.h"
 
 // library helper functions needed for init
@@ -50,147 +43,387 @@ int driver(int type, int nr, int obj, int ret, int lastact) {
     }
 }
 
-//----------------------- drvlib extension
+// -- seyan driver --------------------------------------------------------------------------------------------------
 
-static int attack_check_target(int m) {
-    if (map[m].flags & MF_MOVEBLOCK) return 0;
-    if (map[m].flags & MF_DOOR) return 1;
-    if (map[m].ch && (ch[map[m].ch].flags & (CF_PLAYER | CF_PLAYERLIKE)) && ch[map[m].ch].action == AC_IDLE) return 1;
-    if (map[m].flags & MF_TMOVEBLOCK) return 0;
-
-    return 1;
-}
-
-// goto item and use it, returns 0 if not possible. check co if there is an enemy
-int use_and_attack_driver(int cn, int in, int spec, int *co) {
-    int dx, dy, dir, mn;
-
-    if (co) *co = 0;
-
-    if (cn < 1 || cn >= MAXCHARS) {
-        error = ERR_ILLEGAL_CHARNO;
-        return 0;
-    }
-    if (in < 1 || in >= MAXITEM) {
-        error = ERR_ILLEGAL_ITEMNO;
-        return 0;
-    }
-    if (!(it[in].flags & IF_USE)) {
-        error = ERR_NOT_USEABLE;
-        return 0;
-    }
-
-    dx = it[in].x - ch[cn].x;
-    dy = it[in].y - ch[cn].y;
-
-    // if we're close enough, use it
-    if (dx == 0 && dy == 1 && !(it[in].flags & IF_FRONTWALL)) return do_use(cn, DX_DOWN, spec);
-    if (dx == 0 && dy == -1) return do_use(cn, DX_UP, spec);
-    if (dx == 1 && dy == 0 && !(it[in].flags & IF_FRONTWALL)) return do_use(cn, DX_RIGHT, spec);
-    if (dx == -1 && dy == 0) return do_use(cn, DX_LEFT, spec);
-
-    if (it[in].flags & IF_FRONTWALL) {
-        dir = -1;
-        if (!(map[it[in].x + it[in].y * MAXMAP + 1].flags & (MF_MOVEBLOCK | MF_TMOVEBLOCK))) dir = pathfinder(ch[cn].x, ch[cn].y, it[in].x + 1, it[in].y, 0, attack_check_target, 0);
-        if (dir == -1 && !(map[it[in].x + it[in].y * MAXMAP + MAXMAP].flags & (MF_MOVEBLOCK | MF_TMOVEBLOCK))) dir = pathfinder(ch[cn].x, ch[cn].y, it[in].x, it[in].y + 1, 0, attack_check_target, 0);
-    } else dir = pathfinder(ch[cn].x, ch[cn].y, it[in].x, it[in].y, 1, attack_check_target, 0);
-
-    if (dir != -1) {
-        if (do_walk(cn, dir)) return 1;
-        if (do_use(cn, dir, 0)) return 1;
-
-        if (co) {
-            dx2offset(dir, &dx, &dy, NULL);
-            mn = ch[cn].x + dx + (ch[cn].y + dy) * MAXMAP;
-            if (attack_check_target(mn)) *co = map[mn].ch;
-        }
-    }
-
-    return 0;
-}
-
-// ------------------------------
-
-#define MAX_GNOMETORCH 10
-
-struct labgnome_driver_data {
-    int usetarget; // short2int
-    unsigned char numtorch;
-    int torch[MAX_GNOMETORCH]; // short2int
-    unsigned char outch;
-    unsigned char fighter;
-    unsigned char master;
-    unsigned char text;
-
-    unsigned char aggressive;
-    unsigned char helper;
-    unsigned char dir;
+struct lab4_player_data {
+    unsigned char seyan4state; // the talk state of the seyan
+    unsigned char seyan4got; // bit1=crown bit2=szepter
 };
 
-static int __gnomex;
-static int __gnomey;
+struct lab4_seyan_data {
+    int cv_co; // current victim
+    int cv_serial; // current victim
+    int lasttalk;
+};
 
-int qsortproc_gnometorch(const void *a, const void *b) {
-    int da, db;
-
-    da = (it[*((int *)(a))].x - __gnomex) * (it[*((int *)(a))].x - __gnomex) + (it[*((int *)(a))].y - __gnomey) * (it[*((int *)(a))].y - __gnomey); // short2int
-    db = (it[*((int *)(b))].x - __gnomex) * (it[*((int *)(b))].x - __gnomex) + (it[*((int *)(b))].y - __gnomey) * (it[*((int *)(b))].y - __gnomey); // short2int
-    return db - da;
+void set_seyan_state(struct lab4_player_data *pd) {
+    if ((pd->seyan4got & (1 << 0)) && (pd->seyan4got & (1 << 1))) pd->seyan4state = 30;
+    else if ((pd->seyan4got & (1 << 0))) pd->seyan4state = 10;
+    else if ((pd->seyan4got & (1 << 1))) pd->seyan4state = 20;
+    else pd->seyan4state = 0;
 }
 
-static int scan_gnometorch_check_target(int m) {
-    if (map[m].flags & MF_MOVEBLOCK) return 0;
-    if (map[m].it && it[map[m].it].driver == 2) return 0;
-    return 1;
-}
+void lab4_seyan_driver(int cn, int ret, int lastact) {
+    struct lab4_player_data *pd;
+    static struct lab4_seyan_data datbuf; // we only have one, so there is no need to use the memory system (?)
+    struct lab4_seyan_data *dat = &datbuf;
+    struct msg *msg, *next;
+    int co;
+    int talkdir = 0, didsay = 0;
+    char *str;
 
-void scan_gnometorches(int cn, struct labgnome_driver_data *dat) {
-    int x, y, sx, sy, ex, ey, m;
+    // loop through our messages
+    for (msg = ch[cn].msg; msg; msg = next) {
+        next = msg->next;
 
-    sx = max(ch[cn].x - 15, 0);
-    sy = max(ch[cn].y - 15, 0);
-    ex = min(ch[cn].x + 15, MAXMAP);
-    ey = min(ch[cn].y + 15, MAXMAP);
+        if (msg->type == NT_GIVE) {
+            if (!ch[cn].citem) {
+                remove_message(cn, msg);
+                continue;
+            } // ??? i saw something like this at DBs source
+            co = msg->dat1;
 
-    for (y = sy; y < ey && dat->numtorch < MAX_GNOMETORCH; y++) {
-        for (x = sx; x < ex && dat->numtorch < MAX_GNOMETORCH; x++) {
-            m = x + y * MAXMAP;
-            if (map[m].it && it[map[m].it].driver == IDR_LABTORCH && los_can_see(cn, ch[cn].x, ch[cn].y, x, y, 15)) {
-                if (pathfinder(ch[cn].x, ch[cn].y, x, y, 1, scan_gnometorch_check_target, 0) == -1) continue;
-                dat->torch[dat->numtorch++] = map[m].it;
+            // players only
+            if (ch[co].flags & CF_PLAYER) {
+
+                // get lab ppd
+                pd = set_data(co, DRD_LAB4_PLAYER, sizeof(struct lab4_player_data));
+                if (!pd) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+
+                // check item
+                if (it[ch[cn].citem].ID == IID_LAB4_CROWN) {
+                    pd->seyan4got |= (1 << 0);
+                    set_seyan_state(pd);
+                    if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+                }
+                if (it[ch[cn].citem].ID == IID_LAB4_SZEPTER) {
+                    pd->seyan4got |= (1 << 1);
+                    set_seyan_state(pd);
+                    if (dat->cv_co && (dat->cv_co != co || ch[dat->cv_co].serial != dat->cv_serial)) { say(cn, "%s, please be patient while i'm talking to others.", ch[co].name); }
+                }
+            }
+
+            // destroy everything we get
+            destroy_item(ch[cn].citem);
+            ch[cn].citem = 0;
+        }
+
+        if (msg->type == NT_CHAR) {
+
+            co = msg->dat1;
+
+            // dont talk
+            if (!(ch[co].flags & CF_PLAYER)) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to other NPCs
+            if (ch[co].driver == CDR_LOSTCON) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to players without connection
+            if (ticker < dat->lasttalk + 5 * TICKS) {
+                remove_message(cn, msg);
+                continue;
+            } // only talk when the old sentence is read
+            if (!char_see_char(cn, co) || cn == co) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to someone we cant see, and dont talk to ourself
+            if (char_dist(cn, co) > 10) {
+                remove_message(cn, msg);
+                continue;
+            } // dont talk to someone far away
+
+            // remove cv
+            if (dat->cv_co) {
+                if (!ch[dat->cv_co].flags || ch[dat->cv_co].serial != dat->cv_serial || char_dist(cn, dat->cv_co) > 10 || !char_see_char(cn, dat->cv_co)) {
+                    dat->cv_co = 0;
+                }
+            }
+
+            // only talk to cv
+            if (dat->cv_co && dat->cv_co != co) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // set new cv
+            if (!dat->cv_co) {
+                dat->cv_co = co;
+                dat->cv_serial = ch[co].serial;
+            }
+
+            // get lab ppd
+            pd = set_data(co, DRD_LAB4_PLAYER, sizeof(struct lab4_player_data));
+            if (!pd) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            switch (pd->seyan4state) {
+            // INTRO
+            case 0:
+                say(cn, "Hello %s. This is thy first mission in the Labyrinth.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 1:
+                say(cn, "Listen, %s. To the east is an entrance to the Gnalbs winter residence.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 2:
+                say(cn, "The Gnalbs are peaceful creatures, but their King and their Mage and the Guards are not.");
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 3:
+                say(cn, "Bring me the King's Crown, and the Mage's Szepter to prove thou art worthy to enter the next Gate.");
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 4:
+                say(cn, "Go ahead now, %s, and fulfil thine destiny.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 5:
+                dat->cv_co = 0;
+                break;
+
+            // received crown (szepter missing)
+            case 10:
+                say(cn, "Thou broughtst me the Kings Crown. Now, %s, seek for the Mage's Szepter.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 11:
+                dat->cv_co = 0;
+                break;
+
+            // received szepter (corwn missing)
+            case 20:
+                say(cn, "Thou broughtst me the Mages Szepter. Now, %s, seek for the King's Crown.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 21:
+                dat->cv_co = 0;
+                break;
+
+            // received both, opening gate
+            case 30:
+                say(cn, "%s, thou broughtst me the King's Crown and the Mage's Szepter.", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 31:
+                say(cn, "Now I will open a magic gate for thee. Use it, and thou wilt be able to travel to the next part of the Labyrinth.");
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 32:
+                create_lab_exit(co, 10);
+                say(cn, "Mayest Thou Past The Last Gate, %s", ch[co].name);
+                didsay = 1;
+                pd->seyan4state++;
+                break;
+            case 33:
+                dat->cv_co = 0;
+                break;
+            }
+
+            if (didsay) {
+                dat->lasttalk = ticker;
+                talkdir = offset2dx(ch[cn].x, ch[cn].y, ch[co].x, ch[co].y);
             }
         }
+
+        if (msg->type == NT_TEXT) {
+
+            co = msg->dat3;
+            str = (char *)msg->dat2;
+
+            tabunga(cn, co, (char *)msg->dat2);
+
+            if (co == cn) {
+                remove_message(cn, msg);
+                continue;
+            }
+            if (!(ch[co].flags & CF_PLAYER)) {
+                remove_message(cn, msg);
+                continue;
+            }
+            if (!char_see_char(cn, co)) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // get lab ppd
+            pd = set_data(co, DRD_LAB4_PLAYER, sizeof(struct lab4_player_data));
+            if (!pd) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            if (strcasestr(str, "REPEAT")) {
+                say(cn, "I will repeat, %s", ch[co].name);
+                set_seyan_state(pd);
+            }
+        }
+
+        standard_message_driver(cn, msg, 0, 0);
+        remove_message(cn, msg);
     }
 
-    // sort by distance
-    __gnomex = ch[cn].x;
-    __gnomey = ch[cn].y;
-    qsort(dat->torch, dat->numtorch, sizeof(int), qsortproc_gnometorch); // short2int
+    if (talkdir) turn(cn, talkdir);
+
+    if (dat->lasttalk + TICKS * 30 < ticker) {
+        if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_RIGHTDOWN, ret, lastact)) return;
+    }
+
+    do_idle(cn, TICKS);
 }
 
-void labgnome_driver_parse(int cn, struct labgnome_driver_data *dat) {
+// -- gnalb driver --------------------------------------------------------------------------------------------------
+
+struct gnalb_path {
+    int x;
+    int y;
+    int next[4];
+};
+
+struct gnalb_path gnalb_path[] =
+    {
+        {0, 0, {0, 0, 0, 0}}, // 0
+
+        {52, 228, {45, 2, 0, 0}}, // 1
+        {56, 231, {1, 3, 0, 0}}, // 2
+        {61, 233, {2, 4, 0, 0}}, // 3
+        {65, 234, {3, 5, 0, 0}}, // 4
+        {68, 236, {4, 6, 0, 0}}, // 5
+        {73, 237, {5, 7, 0, 0}}, // 6
+        {77, 238, {6, 8, 0, 0}}, // 7
+        {81, 239, {7, 9, 0, 0}}, // 8
+        {83, 239, {8, 10, 0, 0}}, // 9
+        {88, 238, {9, 11, 0, 0}}, // 10
+        {89, 236, {10, 12, 0, 0}}, // 11
+        {90, 233, {11, 13, 0, 0}}, // 12
+        {90, 230, {12, 14, 0, 0}}, // 13
+        {89, 227, {13, 15, 0, 0}}, // 14
+        {90, 225, {14, 16, 0, 0}}, // 15
+        {92, 223, {15, 17, 47, 0}}, // 16 -- cross 2 --
+        {92, 220, {16, 18, 0, 0}}, // 17
+        {93, 217, {17, 19, 0, 0}}, // 18
+        {92, 213, {18, 20, 0, 0}}, // 19
+        {89, 209, {19, 21, 0, 0}}, // 20
+        {87, 206, {20, 22, 0, 0}}, // 21
+        {86, 203, {21, 23, 0, 0}}, // 22
+        {86, 201, {22, 24, 63, 0}}, // 23 -- cross 1 --
+        {82, 200, {23, 25, 0, 0}}, // 24
+        {78, 199, {24, 26, 0, 0}}, // 25
+        {74, 197, {25, 27, 0, 0}}, // 26
+        {71, 197, {26, 28, 0, 0}}, // 27
+        {69, 199, {27, 29, 0, 0}}, // 28
+        {67, 201, {28, 30, 0, 0}}, // 29
+        {66, 205, {29, 31, 0, 0}}, // 30
+        {67, 207, {30, 32, 0, 0}}, // 31
+        {67, 210, {31, 33, 0, 0}}, // 32
+        {68, 213, {32, 34, 0, 0}}, // 33
+        {67, 216, {33, 35, 0, 0}}, // 34
+        {67, 218, {34, 36, 0, 0}}, // 35
+        {65, 220, {35, 37, 0, 0}}, // 36
+        {62, 218, {36, 38, 0, 0}}, // 37
+        {58, 215, {37, 39, 0, 0}}, // 38
+        {54, 213, {38, 40, 0, 0}}, // 39
+        {51, 213, {39, 41, 0, 0}}, // 40
+        {49, 214, {40, 42, 0, 0}}, // 41
+        {48, 217, {41, 43, 0, 0}}, // 42
+        {48, 219, {42, 44, 0, 0}}, // 43
+        {49, 222, {43, 45, 0, 0}}, // 44
+        {50, 225, {44, 1, 0, 0}}, // 45
+
+        {0, 0, {0, 0, 0, 0}}, // 46
+
+        {95, 226, {16, 48, 0, 0}}, // 47 -- cross 2 --
+        {97, 227, {47, 49, 0, 0}}, // 48
+        {99, 229, {48, 50, 0, 0}}, // 49
+        {102, 229, {49, 51, 0, 0}}, // 50
+        {104, 230, {50, 52, 0, 0}}, // 51
+        {106, 228, {51, 53, 0, 0}}, // 52
+        {108, 225, {52, 54, 0, 0}}, // 53
+        {107, 221, {53, 55, 0, 0}}, // 54
+        {106, 217, {54, 56, 0, 0}}, // 55
+        {105, 213, {55, 57, 0, 0}}, // 56
+        {104, 209, {56, 58, 0, 0}}, // 57
+        {103, 205, {57, 59, 0, 0}}, // 58
+        {100, 201, {58, 60, 0, 0}}, // 59
+        {97, 199, {59, 61, 0, 0}}, // 60
+        {93, 199, {60, 62, 0, 0}}, // 61
+        {90, 200, {61, 63, 0, 0}}, // 62
+        {87, 199, {62, 23, 0, 0}}, // 63 -- cross 1 --
+
+};
+
+int max_gnalb_path = sizeof(gnalb_path) / sizeof(struct gnalb_path);
+
+struct lab4_gnalb_driver_data {
+    char type; // 1=guard, 2=gnalb, 3=young, 4=mage, 5=king
+    char aggressive, helper;
+    char dummyA;
+
+    // gnalb
+    int path, lastpath;
+};
+
+void lab4_gnalb_driver_parse(int cn, struct lab4_gnalb_driver_data *dat) {
     char *ptr, name[64], value[64];
 
-    dat->fighter = 0;
-    dat->text = 0;
-    dat->master = 0;
-
     for (ptr = nextnv(ch[cn].arg, name, value); ptr; ptr = nextnv(ptr, name, value)) {
-        if (!strcmp(name, "fighter")) dat->fighter = atoi(value);
-        else if (!strcmp(name, "text")) dat->text = atoi(value);
-        else if (!strcmp(name, "master")) dat->master = atoi(value);
-        else if (!strcmp(name, "aggressive")) dat->aggressive = atoi(value);
-        else if (!strcmp(name, "helper")) dat->helper = atoi(value);
+        if (!strcmp(name, "type")) dat->type = atoi(value);
         else elog("unknown arg for %s (%d): %s", ch[cn].name, cn, name);
     }
 }
 
-void labgnome_driver(int cn, int ret, int lastact) {
-    struct labgnome_driver_data *dat;
-    struct msg *msg, *next;
-    int co, in, i, mn;
+void lab4_gnalb_driver_init(int cn, struct lab4_gnalb_driver_data *dat) {
+    int p;
 
-    dat = set_data(cn, DRD_LABGNOMEDRIVER, sizeof(*dat));
+    if (dat->type == 1) {
+        int dist, mindist = 10000;
+        for (p = 1; p < max_gnalb_path; p++) {
+            if ((dist = map_dist(ch[cn].x, ch[cn].y, gnalb_path[p].x, gnalb_path[p].y)) < mindist) {
+                mindist = dist;
+                dat->path = p;
+            }
+        }
+    }
+
+    if (dat->type == 1) {
+        // guard
+        dat->aggressive = 1;
+        dat->helper = 1;
+        fight_driver_set_dist(cn, 0, 10, 20);
+    } else if (dat->type == 2) {
+        xlog("CANTBETRUE in %s %d", __FILE__, __LINE__);
+    } else {
+        // crazy
+        dat->aggressive = 0;
+        dat->helper = 0;
+        fight_driver_set_dist(cn, 0, 10, 0);
+    }
+}
+
+void lab4_gnalb_driver(int cn, int ret, int lastact) {
+    struct lab4_gnalb_driver_data *dat;
+    struct msg *msg, *next;
+    int co, cc, in;
+    char *str;
+
+    // get data
+    dat = set_data(cn, DRD_LAB4_GNALB, sizeof(struct lab4_gnalb_driver_data));
     if (!dat) return; // oops...
 
     // loop through our messages
@@ -198,42 +431,73 @@ void labgnome_driver(int cn, int ret, int lastact) {
         next = msg->next;
 
         if (msg->type == NT_CREATE) {
-
-            labgnome_driver_parse(cn, dat);
-            if (dat->fighter) fight_driver_set_dist(cn, 30, 0, 60);
-            else if (dat->master) {
-                fight_driver_set_dist(cn, 14, 0, 14);
-                ch[cn].flags |= CF_IMMORTAL;
-            } else {
-                fight_driver_set_dist(cn, 15, 0, 15);
-                scan_gnometorches(cn, dat);
-            }
-
-            // turn inside room
-            mn = ch[cn].x + ch[cn].y * MAXMAP;
-            dat->dir = DX_DOWN;
-
-            if (map[mn - 1].flags & MF_SIGHTBLOCK) dat->dir = DX_RIGHT;
-            if (map[mn + 1].flags & MF_SIGHTBLOCK) dat->dir = DX_LEFT;
+            lab4_gnalb_driver_parse(cn, dat);
+            lab4_gnalb_driver_init(cn, dat);
         }
 
-        // we got a torch calling
-        if (msg->type == NT_NPC && msg->dat1 == NTID_LABGNOMETORCH) {
-            in = msg->dat2;
-            co = msg->dat3;
+        if (msg->type == NT_GIVE) {
 
-            // is it one of our torches?
-            for (i = 0; i < dat->numtorch; i++) {
-                if (in == dat->torch[i] && fight_driver_add_enemy(cn, co, 1, 1)) {
-                    shout(cn, "Hurgha. Master me told protecting torch. Prepare to die %s!", ch[co].name);
-                    break;
-                }
-            }
+            co = msg->dat1;
+            if (!(in = ch[cn].citem)) {
+                remove_message(cn, msg);
+                continue;
+            } // ??? i saw something like this at DBs source
+
+            // destroy everything we get
+            destroy_item(ch[cn].citem);
+            ch[cn].citem = 0;
         }
 
         if (msg->type == NT_TEXT) {
             co = msg->dat3;
-            tabunga(cn, co, (char *)msg->dat2);
+            str = (char *)msg->dat2;
+            tabunga(cn, co, str);
+            if (co == cn) {
+                remove_message(cn, msg);
+                continue;
+            }
+        }
+
+        if (msg->type == NT_SEEHIT && dat->type == 2) {
+
+            cc = msg->dat1;
+            co = msg->dat2;
+            if (!cc || !co) {
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // is the victim our friend? then help
+            if (co != cn && ch[co].group == ch[cn].group) {
+                if (!is_valid_enemy(cn, cc, -1)) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+                if (char_dist(cn, cc) > 10) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+                fight_driver_add_enemy(cn, cc, 1, 1);
+                remove_message(cn, msg);
+                continue;
+            }
+
+            // is the attacker our friend? then help
+            if (cc != cn && ch[cc].group == ch[cn].group) {
+                if (!is_valid_enemy(cn, co, -1)) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+                if (char_dist(cn, co) > 10) {
+                    remove_message(cn, msg);
+                    continue;
+                }
+                fight_driver_add_enemy(cn, co, 0, 1);
+                remove_message(cn, msg);
+                continue;
+            }
+            remove_message(cn, msg);
+            continue;
         }
 
         standard_message_driver(cn, msg, dat->aggressive, dat->helper);
@@ -245,238 +509,125 @@ void labgnome_driver(int cn, int ret, int lastact) {
     if (fight_driver_attack_visible(cn, 0)) return;
     if (fight_driver_follow_invisible(cn)) return;
 
-    // checking torches
-    if (dat->usetarget == 0 || it[dat->usetarget].drdata[0] == 1) {
-
-        dat->usetarget = 0;
-
-        for (i = 0; i < dat->numtorch; i++) {
-            if (it[dat->torch[i]].drdata[0] == 0) { // torch is off
-                dat->usetarget = dat->torch[i];
-                say(cn, "Master me told keeping torch burning.");
-            }
-        }
-    }
-
-    // use torch, or attack all (possible) chars around it
-    if (dat->usetarget) {
-        if (use_and_attack_driver(cn, dat->usetarget, 0, &co)) return;
-        if (co)
-            if (fight_driver_add_enemy(cn, co, 1, 1)) shout(cn, "You're in my way %s! Die!", ch[co].name);
-    }
-
     // rest of standard action
     if (regenerate_driver(cn)) return;
     if (spell_self_driver(cn)) return;
-    if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, dat->dir, ret, lastact)) return;
 
-    // nonsense
-    if (!dat->master) {
-        switch (RANDOM(500)) {
+    // gnalb guards patroling
+    if (dat->type == 1 && dat->path) {
+
+        fight_driver_set_home(cn, ch[cn].x, ch[cn].y);
+
+        if (swap_move_driver(cn, gnalb_path[dat->path].x, gnalb_path[dat->path].y, 1)) return;
+        if (map_dist(ch[cn].x, ch[cn].y, gnalb_path[dat->path].x, gnalb_path[dat->path].y) < 4) {
+            int p;
+
+            do p = RANDOM(4);
+            while (gnalb_path[dat->path].next[p] == 0 || (gnalb_path[dat->path].next[1] != 0 && gnalb_path[dat->path].next[p] == dat->lastpath));
+            dat->lastpath = dat->path;
+            dat->path = gnalb_path[dat->path].next[p];
+        } else do_idle(cn, TICKS / 2);
+
+        return;
+    }
+
+    // crazy gnalb talking
+    if (dat->type == 3) {
+
+        switch (RANDOM(50)) {
         case 0:
-            say(cn, "Grmadasd.");
+            whisper(cn, "Me saw right in Fire.");
             break;
         case 1:
-            say(cn, "Huas. Grkasd Wod.");
+            whisper(cn, "Me not crazy. In me house me saw in fire.");
             break;
         case 2:
-            if (dat->numtorch) say(cn, "Me have to protect %d torch. Hungrfa.", dat->numtorch);
+            whisper(cn, "Me will get it out.");
             break;
         case 3:
-            say(cn, "Me have dark here feeling.");
+            whisper(cn, "Fire hot, but me not crazy.");
             break;
+        case 4:
+            whisper(cn, "Tell mage me saw in fire, me not crazy.");
+            break;
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+            if (do_use(cn, DX_RIGHT, 0)) return;
         }
+
+        if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_RIGHT, ret, lastact)) return;
+        // nothing left to do
+        do_idle(cn, TICKS / 2);
+        return;
     }
+
+    if (secure_move_driver(cn, ch[cn].tmpx, ch[cn].tmpy, DX_DOWN, ret, lastact)) return;
 
     // nothing left to do
     do_idle(cn, TICKS / 2);
 }
 
-void labgnome_died_driver(int cn, int co) {
-    struct labgnome_driver_data *dat;
+// -- item driver ---------------------------------------------------------------------------------------------------
 
-    dat = set_data(cn, DRD_LABGNOMEDRIVER, sizeof(*dat));
-    if (!dat) return; // oops...
+// drdata[0]=type               1=fireplace_key
 
-    if (dat->text) say(cn, "Arrrggh. %s me killed, but %s never kills master behind door. Master can be killed only by Deathfibrin.", ch[co].name, ch[co].name);
-    if (dat->master) {
-        if (co && (ch[co].flags & CF_PLAYER)) create_lab_exit(co, 20);
-    }
-}
+void lab4_item(int in, int cn) {
+    char *drdata;
+    int in2;
 
-void labtorch(int in, int cn) {
-    if (!cn) {
-        it[in].drdata[1] = it[in].mod_value[0];
+    drdata = it[in].drdata;
+
+    if (!cn) return;
+
+    if (drdata[0] == 1) {
+        // fireplace_key
+        if (ch[cn].citem) return;
+        in2 = create_item("lab4_mage_key");
+        if (in2) {
+            log_char(cn, LOG_SYSTEM, 0, "You took the key out of the fire.");
+            if (ch[cn].flags & CF_PLAYER) dlog(cn, in2, "took from lab4_item");
+            ch[cn].citem = in2;
+            ch[cn].flags |= CF_ITEMS;
+            it[in2].carried = cn;
+        }
         return;
     }
-
-    if (it[in].drdata[0] == 0) {
-        if (ch[cn].flags & CF_PLAYER) return; // players may not light torches
-
-        it[in].sprite++;
-        it[in].drdata[0] = 1;
-        it[in].mod_value[0] = it[in].drdata[1];
-        add_item_light(in);
-    } else {
-        remove_item_light(in);
-        it[in].sprite--;
-        it[in].drdata[0] = 0;
-        it[in].mod_value[0] = 0;
-        notify_area(it[in].x, it[in].y, NT_NPC, NTID_LABGNOMETORCH, in, cn);
-    }
 }
 
-struct deathfibrin_data {
-    int amount;
-    char init;
-    char used;
-    int tickerused; // used to prevent staff from vanishing during use
-    int tickervanish; // used to remove the staff from the map if it's to long alone
-};
+// -- general -------------------------------------------------------------------------------------------------------
 
-int deathfibrin_scan(int cn) {
-    int x, y, sx, sy, ex, ey, m, co;
-
-    sx = max(ch[cn].x - 8, 0);
-    sy = max(ch[cn].y - 8, 0);
-    ex = min(ch[cn].x + 8, MAXMAP);
-    ey = min(ch[cn].y + 8, MAXMAP);
-
-    for (y = sy; y < ey; y++) {
-        for (x = sx; x < ex; x++) {
-            m = x + y * MAXMAP;
-            if ((co = map[m].ch) && ch[co].driver == CDR_LABGNOMEDRIVER && !strcmp(ch[co].name, "Immortal Master") && char_see_char(cn, co)) return co;
-        }
-    }
-    return 0;
-}
-
-int deathfibrin_check(int in, struct deathfibrin_data *dat) {
-    int oldsprite;
-
-    // check if it should vanisch
-    if (dat->amount == 0) {
-        remove_item(in);
-        destroy_item(in);
+int ch_died_driver(int nr, int cn, int co) {
+    switch (nr) {
+    case CDR_LAB4SEYAN:
         return 1;
+    case CDR_LAB4GNALB:
+        return 1;
+    default:
+        return 0;
     }
-
-    // determin the sprite number
-    oldsprite = it[in].sprite;
-    it[in].sprite = min(10427, 10428 - 10 * (dat->amount + 500) / 10000);
-    if (oldsprite != it[in].sprite) update_item(in);
-
-    sprintf(it[in].description, "Staff containing %d%% Deathfibrin", dat->amount / 100);
-
-    return 0;
 }
 
-void deathfibrin(int in, int cn) {
-    int co, x, y, fn, mn, in2;
-    struct deathfibrin_data *dat;
-
-    // shrine
-    if (it[in].sprite == 10428) {
-        if (!cn) return;
-
-        if (ch[cn].citem) {
-            log_char(cn, LOG_SYSTEM, 0, "The Shrine of Deathfibrin seems to ignore everything. It may want to give you something.");
-            return;
-        }
-
-        in2 = create_item("deathfibrin");
-        log_char(cn, LOG_SYSTEM, 0, "You received a %s.", it[in2].name);
-        bondtake_item(in2, cn);
-
-        if (ch[cn].flags & CF_PLAYER) dlog(cn, in2, "took deathfibrin");
-        ch[cn].citem = in2;
-        ch[cn].flags |= CF_ITEMS;
-        it[in2].carried = cn;
-
-        return;
-    }
-
-    // staff
-    dat = (struct deathfibrin_data *)it[in].drdata;
-
-    if (cn) {
-        if (!it[in].carried) {
-            log_char(cn, LOG_SYSTEM, 0, "You need to carry this to use it.");
-            return;
-        }
-        // scan around to find the master
-        co = deathfibrin_scan(cn);
-        if (!co) {
-            log_char(cn, LOG_SYSTEM, 0, "Nothing happens. There is no immortal close enough. %d", map[ch[cn].x + ch[cn].y * MAXMAP].light);
-            return;
-        }
-
-        //  add the show effect
-        fn = create_show_effect(EF_PULSEBACK, cn, ticker, ticker + 7, 20, 42);
-        if (fn) {
-            ef[fn].x = ch[co].x;
-            ef[fn].y = ch[co].y;
-        }
-        dat->tickerused = ticker + 7;
-
-        // hurt the master
-        ch[co].flags &= ~CF_IMMORTAL;
-        hurt(co, 10 * POWERSCALE, cn, 1, 0, 0);
-        ch[co].flags |= CF_IMMORTAL;
-        say(co, "Oh no! Deathfibrin hurts.");
-
-        // remove amount
-        dat->amount = max(0, dat->amount - 1000);
-        if (deathfibrin_check(in, dat)) {
-            log_char(cn, LOG_SYSTEM, 0, "\260c3Your %s vanished.", it[in].name);
-            return;
-        }
-    } else {
-        // init values
-        if (dat->init == 0) {
-            dat->init = 1;
-            dat->amount = 10000;
-            deathfibrin_check(in, dat);
-        }
-
-        // get position
-        if (it[in].carried) {
-            co = it[in].carried;
-            x = ch[co].x;
-            y = ch[co].y;
-            dat->tickervanish = 0;
-        } else {
-            co = 0;
-            x = it[in].x;
-            y = it[in].y;
-            if (dat->tickervanish == 0) dat->tickervanish = ticker + 10 * 60 * TICKS;
-        }
-
-        // remove amount (do not if it's in use)
-        if (map[mn = x + y * MAXMAP].light > 4 && ticker > dat->tickerused) {
-            dat->amount = max(0, dat->amount - (map[mn].light - 3) * (map[mn].light * map[mn].light - 3));
-            if (deathfibrin_check(in, dat) && co) {
-                log_char(co, LOG_SYSTEM, 0, "\260c3Your %s vanished.", it[in].name);
-                return;
-            }
-        }
-
-        // remove staff, if it's left alone to long
-        if (dat->tickervanish && ticker > dat->tickervanish) {
-            dat->amount = 0;
-            deathfibrin_check(in, dat);
-            return;
-        }
-
-        // set timer
-        call_item(IDR_DEATHFIBRIN, in, 0, ticker + TICKS / 4);
+int ch_respawn_driver(int nr, int cn) {
+    switch (nr) {
+    case CDR_LAB4SEYAN:
+        return 1;
+    case CDR_LAB4GNALB:
+        return 1;
+    default:
+        return 0;
     }
 }
 
 int ch_driver(int nr, int cn, int ret, int lastact) {
     switch (nr) {
-    case CDR_LABGNOMEDRIVER:
-        labgnome_driver(cn, ret, lastact);
+    case CDR_LAB4SEYAN:
+        lab4_seyan_driver(cn, ret, lastact);
+        return 1;
+    case CDR_LAB4GNALB:
+        lab4_gnalb_driver(cn, ret, lastact);
         return 1;
     default:
         return 0;
@@ -485,29 +636,8 @@ int ch_driver(int nr, int cn, int ret, int lastact) {
 
 int it_driver(int nr, int in, int cn) {
     switch (nr) {
-    case IDR_LABTORCH:
-        labtorch(in, cn);
-        return 1;
-    case IDR_DEATHFIBRIN:
-        deathfibrin(in, cn);
-        return 1;
-    default:
-        return 0;
-    }
-}
-
-int ch_died_driver(int nr, int cn, int co) {
-    switch (nr) {
-    case CDR_LABGNOMEDRIVER:
-        labgnome_died_driver(cn, co);
-        return 1;
-    default:
-        return 0;
-    }
-}
-int ch_respawn_driver(int nr, int cn) {
-    switch (nr) {
-    case CDR_LABGNOMEDRIVER:
+    case IDR_LAB4_ITEM:
+        lab4_item(in, cn);
         return 1;
     default:
         return 0;

@@ -20,7 +20,7 @@
 #include "item_id.h"
 #include "libload.h"
 #include "sector.h"
-#include "staffer_ppd.h"
+#include "misc2_ppd.h"
 #include "player_driver.h"
 #include "questlog.h"
 

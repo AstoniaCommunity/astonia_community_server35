@@ -22,7 +22,7 @@
 #include "item_id.h"
 #include "libload.h"
 #include "sector.h"
-#include "area3.h"
+#include "aston.h"
 #include "questlog.h"
 
 // library helper functions needed for init

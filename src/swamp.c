@@ -23,7 +23,7 @@
 #include "libload.h"
 #include "quest_exp.h"
 #include "item_id.h"
-#include "area3.h"
+#include "aston.h"
 #include "sector.h"
 #include "questlog.h"
 

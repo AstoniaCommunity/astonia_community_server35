@@ -20,7 +20,7 @@
 #include "libload.h"
 #include "player_driver.h"
 #include "sector.h"
-#include "area1.h"
+#include "cameron.h"
 
 // library helper functions needed for init
 int ch_driver(int nr, int cn, int ret, int lastact); // character driver (decides next action)

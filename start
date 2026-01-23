@@ -10,71 +10,69 @@ echo chatserver
 sleep 1
 
 # Start all the areas
-./server35 -a 1 -d
+./server35 -a 1 -d # Cameron
 sleep 1
-./server35 -a 2 -d
+./server35 -a 2 -d # Below Aston
 sleep 1
-./server35 -a 3 -d
+./server35 -a 3 -d # Aston
 sleep 1
-./server35 -a 4 -d
+./server35 -a 4 -d # Earth Pents
 sleep 1
-./server35 -a 5 -d
+./server35 -a 5 -d # Aston Sewers
 sleep 1
-./server35 -a 6 -d
+./server35 -a 6 -d # Earth Underground
 sleep 1
-./server35 -a 7 -d
+./server35 -a 7 -d # Fire Pents
 sleep 1
-./server35 -a 8 -d
+./server35 -a 8 -d # Fire Underground
 sleep 1
-./server35 -a 9 -d
+./server35 -a 9 -d # Ice Pents
 sleep 1
-./server35 -a 10 -d
+./server35 -a 10 -d # Ice Underground
 sleep 1
-./server35 -a 11 -d
+./server35 -a 11 -d # Ice Palace
 sleep 1
-./server35 -a 12 -d
+./server35 -a 12 -d # Mines
 sleep 1
-./server35 -a 13 -d
+./server35 -a 13 -d # Clan Halls
 sleep 1
-./server35 -a 14 -d
+./server35 -a 14 -d # Random Dungeons
 sleep 1
-./server35 -a 15 -d
+./server35 -a 15 -d # Swamps
 sleep 1
-./server35 -a 16 -d
+./server35 -a 16 -d # Exkordon Forest
 sleep 1
-./server35 -a 17 -d
+./server35 -a 17 -d # Exkordon
 sleep 1
-./server35 -a 18 -d
+./server35 -a 18 -d # Bone Tower
 sleep 1
-./server35 -a 19 -d
+./server35 -a 19 -d # Nomad Plains
 sleep 1
-#./server35 -a 20 -d
-#sleep 1
-#./server35 -a 21 -d
-#sleep 1
-./server35 -a 22 -d
+#20-21 empty
+./server35 -a 22 -d # Labs
 sleep 1
-./server35 -a 23 -d
+./server35 -a 23 -d # Ice Army Caves 1
 sleep 1
-./server35 -a 24 -d
+./server35 -a 24 -d # Ice Army Caves 2
 sleep 1
-./server35 -a 25 -d
+./server35 -a 25 -d # Rodney's Warped World
 sleep 1
-./server35 -a 26 -d
+./server35 -a 26 -d # Below Aston 2
 sleep 1
-#./server35 -a 27 -d
-#sleep 1
-./server35 -a 28 -d
+#27 empty
+./server35 -a 28 -d # Brannington Forest + Robbers
 sleep 1
-./server35 -a 29 -d
+./server35 -a 29 -d # Brannington
 sleep 1
-./server35 -a 30 -d
+./server35 -a 30 -d # Clan Spawners
 sleep 1
-./server35 -a 33 -d
+#31-32 empty
+./server35 -a 33 -d # Long Tunnels
 sleep 1
-./server35 -a 36 -d
+#34-35 empty
+./server35 -a 36 -d # Caligar
 sleep 1
-./server35 -a 37 -d
+./server35 -a 37 -d # Arkhata
 sleep 1
 
 echo Done

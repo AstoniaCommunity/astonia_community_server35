@@ -19,7 +19,7 @@
 #include "libload.h"
 #include "item_id.h"
 #include "database.h"
-#include "area3.h"
+#include "aston.h"
 #include "sector.h"
 #include "questlog.h"
 #include "statistics.h"

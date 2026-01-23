@@ -17,7 +17,7 @@
 #include "tool.h"
 #include "item_id.h"
 #include "libload.h"
-#include "staffer_ppd.h"
+#include "misc2_ppd.h"
 #include "questlog.h"
 
 #define BRANFO_EXP_BASE 10000
