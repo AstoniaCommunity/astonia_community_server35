@@ -176196,6 +176196,7 @@ flag=MF_NEUTRAL
 
 field="17,176"
 gsprite=20454
+it=depot4
 flag=MF_INDOORS
 flag=MF_NEUTRAL
 

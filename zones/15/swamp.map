@@ -66654,18 +66654,23 @@ gsprite=20808
 
 field="237,66"
 gsprite=20806
+flag=MF_NEUTRAL
 
 field="238,66"
-gsprite=20807
+gsprite=793858375
+flag=MF_NEUTRAL
 
 field="239,66"
-gsprite=20808
+gsprite=793858376
+flag=MF_NEUTRAL
 
 field="240,66"
-gsprite=20806
+gsprite=793858374
+flag=MF_NEUTRAL
 
 field="241,66"
 gsprite=20807
+flag=MF_NEUTRAL
 
 field="242,66"
 gsprite=20808
@@ -67632,19 +67637,30 @@ field="236,67"
 gsprite=20811
 
 field="237,67"
-gsprite=20809
+gsprite=793661769
+flag=MF_NEUTRAL
 
 field="238,67"
-gsprite=20810
+gsprite=793822059
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="239,67"
-gsprite=20811
+gsprite=50035
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="240,67"
-gsprite=20809
+gsprite=50033
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="241,67"
-gsprite=20810
+gsprite=793792842
+flag=MF_NEUTRAL
 
 field="242,67"
 gsprite=20811
@@ -68623,19 +68639,30 @@ field="236,68"
 gsprite=20814
 
 field="237,68"
-gsprite=20812
+gsprite=793661772
+flag=MF_NEUTRAL
 
 field="238,68"
-gsprite=20813
+gsprite=50028
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="239,68"
-gsprite=20814
+gsprite=50036
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="240,68"
-gsprite=20812
+gsprite=50032
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="241,68"
-gsprite=20813
+gsprite=793792845
+flag=MF_NEUTRAL
 
 field="242,68"
 gsprite=20814
@@ -69614,19 +69641,30 @@ field="236,69"
 gsprite=20808
 
 field="237,69"
-gsprite=20806
+gsprite=793661766
+flag=MF_NEUTRAL
 
 field="238,69"
-gsprite=20807
+gsprite=50029
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="239,69"
-gsprite=20808
+gsprite=50030
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="240,69"
-gsprite=20806
+gsprite=793887599
+flag=MF_RESTAREA
+flag=MF_PEACE
+flag=MF_NEUTRAL
 
 field="241,69"
-gsprite=20807
+gsprite=793792839
+flag=MF_NEUTRAL
 
 field="242,69"
 gsprite=20808
@@ -70591,18 +70629,23 @@ gsprite=20811
 
 field="237,70"
 gsprite=20809
+flag=MF_NEUTRAL
 
 field="238,70"
-gsprite=20810
+gsprite=793727306
+flag=MF_NEUTRAL
 
 field="239,70"
-gsprite=20811
+gsprite=793727307
+flag=MF_NEUTRAL
 
 field="240,70"
-gsprite=20809
+gsprite=793727305
+flag=MF_NEUTRAL
 
 field="241,70"
 gsprite=20810
+flag=MF_NEUTRAL
 
 field="242,70"
 gsprite=20811
@@ -72528,6 +72571,7 @@ gsprite=20807
 
 field="233,72"
 gsprite=20808
+it=mr_swap_light_on
 
 field="234,72"
 gsprite=20806
@@ -72543,6 +72587,7 @@ gsprite=20806
 
 field="238,72"
 gsprite=20807
+it=mr_swap_light_on
 
 field="239,72"
 gsprite=20808
@@ -73509,15 +73554,12 @@ flag=MF_MOVEBLOCK
 
 field="233,73"
 gsprite=20811
-fsprite=20910
+fsprite=20909
 flag=MF_SIGHTBLOCK
 flag=MF_MOVEBLOCK
 
 field="234,73"
 gsprite=20809
-fsprite=20909
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 
 field="235,73"
 gsprite=20810
@@ -74473,6 +74515,7 @@ gsprite=20813
 
 field="233,74"
 gsprite=20814
+it=mr_swap_light_on
 
 field="234,74"
 gsprite=20812
@@ -74488,18 +74531,21 @@ gsprite=20812
 
 field="238,74"
 gsprite=20813
+it=mr_swap_light_on
 
 field="239,74"
 gsprite=20814
 
 field="240,74"
 gsprite=20812
+it=depot4
 
 field="241,74"
 gsprite=20813
 
 field="242,74"
 gsprite=20814
+it=depot2
 
 field="243,74"
 gsprite=20812
@@ -77298,6 +77344,7 @@ gsprite=20812
 
 field="232,77"
 gsprite=20813
+it=transport19
 
 field="233,77"
 gsprite=20814

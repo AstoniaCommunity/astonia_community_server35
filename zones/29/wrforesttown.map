@@ -188307,6 +188307,7 @@ flag=MF_SHOUTBLOCK
 
 field="227,190"
 gsprite=20296
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="228,190"
@@ -188315,8 +188316,7 @@ flag=MF_INDOORS
 
 field="229,190"
 gsprite=20295
-it=depot2
-flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="230,190"
 gsprite=20296
@@ -188328,7 +188328,7 @@ flag=MF_INDOORS
 
 field="232,190"
 gsprite=20295
-ch=trader
+flag=MF_INDOORS
 
 field="233,190"
 gsprite=20296
@@ -188336,11 +188336,11 @@ flag=MF_INDOORS
 
 field="234,190"
 gsprite=20294
-it=depot4
 flag=MF_INDOORS
 
 field="235,190"
 gsprite=20295
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,190"
@@ -189376,6 +189376,7 @@ flag=MF_SHOUTBLOCK
 
 field="227,191"
 gsprite=20299
+it=depot1
 flag=MF_INDOORS
 
 field="228,191"
@@ -190520,7 +190521,6 @@ flag=MF_INDOORS
 
 field="235,192"
 gsprite=20292
-it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,192"
@@ -191656,77 +191656,41 @@ flag=MF_SOUNDBLOCK
 flag=MF_SHOUTBLOCK
 
 field="227,193"
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20296
+it=depot3
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="228,193"
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20294
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="229,193"
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20295
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="230,193"
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20296
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="231,193"
 gsprite=20294
-it=rich_wood_door1
 flag=MF_INDOORS
 
 field="232,193"
 gsprite=20295
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="233,193"
 gsprite=20296
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="234,193"
 gsprite=20294
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="235,193"
 gsprite=20295
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="236,193"
 fsprite=59166
@@ -192795,6 +192759,7 @@ flag=MF_INDOORS
 
 field="232,194"
 gsprite=20298
+ch=trader
 flag=MF_INDOORS
 
 field="233,194"
@@ -193885,7 +193850,6 @@ flag=MF_INDOORS
 
 field="235,195"
 gsprite=20292
-it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,195"
@@ -196007,73 +195971,40 @@ flag=MF_SOUNDBLOCK
 flag=MF_SHOUTBLOCK
 
 field="227,197"
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20299
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="228,197"
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20297
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="229,197"
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20298
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="230,197"
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20299
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="231,197"
 gsprite=20297
-it=rich_wood_door1
 flag=MF_INDOORS
 
 field="232,197"
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20298
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="233,197"
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20299
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="234,197"
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20297
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="235,197"
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+gsprite=20298
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="236,197"
 fsprite=59166
@@ -197217,11 +197148,11 @@ flag=MF_SHOUTBLOCK
 
 field="228,198"
 gsprite=20291
-it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="229,198"
 gsprite=20292
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="230,198"
@@ -197230,20 +197161,27 @@ flag=MF_INDOORS
 
 field="231,198"
 gsprite=20291
+fsprite=21300
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="232,198"
 gsprite=20292
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="233,198"
 gsprite=20293
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,198"
 gsprite=20291
-it=depot2
+fsprite=21301
 flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="235,198"
 gsprite=20292
@@ -198413,18 +198351,26 @@ flag=MF_INDOORS
 
 field="231,199"
 gsprite=20294
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="232,199"
 gsprite=20295
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="233,199"
 gsprite=20296
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,199"
 gsprite=20294
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="235,199"
@@ -199481,22 +199427,31 @@ flag=MF_INDOORS
 
 field="231,200"
 gsprite=20297
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="232,200"
 gsprite=20298
-ch=trader
+fsprite=21295
+flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="233,200"
 gsprite=20299
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,200"
 gsprite=20297
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="235,200"
 gsprite=20298
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,200"
@@ -206915,23 +206870,31 @@ flag=MF_INDOORS
 
 field="231,207"
 gsprite=20291
-ch=trader
+fsprite=21295
+flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="232,207"
 gsprite=20292
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="233,207"
 gsprite=20293
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,207"
 gsprite=20291
-it=depot2
+fsprite=21295
 flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="235,207"
 gsprite=20292
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,207"
@@ -208011,18 +207974,26 @@ flag=MF_INDOORS
 
 field="231,208"
 gsprite=20294
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="232,208"
 gsprite=20295
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="233,208"
 gsprite=20296
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,208"
 gsprite=20294
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="235,208"
@@ -209155,18 +209126,26 @@ flag=MF_INDOORS
 
 field="231,209"
 gsprite=20297
+fsprite=21299
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="232,209"
 gsprite=20298
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="233,209"
 gsprite=20299
+fsprite=21295
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="234,209"
 gsprite=20297
+fsprite=21298
+flag=MF_MOVEBLOCK
 flag=MF_INDOORS
 
 field="235,209"
@@ -210264,80 +210243,39 @@ flag=MF_SHOUTBLOCK
 
 field="227,210"
 gsprite=20293
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="228,210"
 gsprite=20291
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="229,210"
 gsprite=20292
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="230,210"
 gsprite=20293
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="231,210"
 gsprite=20291
-it=rich_wood_door1
 flag=MF_INDOORS
 
 field="232,210"
 gsprite=20292
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="233,210"
 gsprite=20293
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="234,210"
 gsprite=20291
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="235,210"
 gsprite=20292
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="236,210"
 gsprite=20293
@@ -212505,7 +212443,6 @@ flag=MF_INDOORS
 
 field="235,212"
 gsprite=20298
-it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="236,212"
@@ -213603,6 +213540,7 @@ flag=MF_INDOORS
 
 field="232,213"
 gsprite=20292
+ch=trader
 flag=MF_INDOORS
 
 field="233,213"
@@ -214771,80 +214709,40 @@ flag=MF_SHOUTBLOCK
 
 field="227,214"
 gsprite=20296
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
+it=depot3
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="228,214"
 gsprite=20294
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="229,214"
 gsprite=20295
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="230,214"
 gsprite=20296
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="231,214"
 gsprite=20294
-it=rich_wood_door1
 flag=MF_INDOORS
 
 field="232,214"
 gsprite=20295
-fsprite=59165
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="233,214"
 gsprite=20296
-fsprite=59166
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="234,214"
 gsprite=20294
-fsprite=59163
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="235,214"
 gsprite=20295
-fsprite=59164
-flag=MF_SIGHTBLOCK
-flag=MF_MOVEBLOCK
 flag=MF_INDOORS
-flag=MF_SOUNDBLOCK
-flag=MF_SHOUTBLOCK
 
 field="236,214"
 gsprite=20296
@@ -215910,8 +215808,7 @@ flag=MF_INDOORS
 
 field="229,215"
 gsprite=20298
-it=depot2
-flag=MF_MOVEBLOCK
+flag=MF_INDOORS
 
 field="230,215"
 gsprite=20299
@@ -215931,7 +215828,6 @@ flag=MF_INDOORS
 
 field="234,215"
 gsprite=20297
-it=depot4
 flag=MF_INDOORS
 
 field="235,215"
@@ -216984,6 +216880,7 @@ flag=MF_SHOUTBLOCK
 
 field="227,216"
 gsprite=20293
+it=depot1
 flag=MF_INDOORS
 
 field="228,216"
@@ -218078,6 +217975,7 @@ flag=MF_SHOUTBLOCK
 
 field="227,217"
 gsprite=20296
+it=mr_standing_light_on
 flag=MF_INDOORS
 
 field="228,217"
@@ -218098,7 +217996,7 @@ flag=MF_INDOORS
 
 field="232,217"
 gsprite=20295
-ch=trader
+flag=MF_INDOORS
 
 field="233,217"
 gsprite=20296

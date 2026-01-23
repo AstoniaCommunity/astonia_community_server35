@@ -95428,6 +95428,7 @@ flag=MF_INDOORS
 
 field="191,110"
 gsprite=20299
+it=depot2
 flag=MF_INDOORS
 
 field="192,110"
@@ -95436,6 +95437,7 @@ flag=MF_INDOORS
 
 field="193,110"
 gsprite=20298
+it=depot4
 flag=MF_INDOORS
 
 field="194,110"

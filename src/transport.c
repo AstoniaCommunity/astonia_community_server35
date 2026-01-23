@@ -61,7 +61,7 @@ static struct trans trans[] =
         {"Ice 5", 189, 80, 11}, //16
         {"Nomad Plains", 16, 124, 19}, //17
         {"*empty*", 0, 0, 0}, //18
-        {"*empty*", 0, 0, 0}, //19
+        {"Swamps", 235, 77, 15}, //19
         {"Forest", 181, 117, 16}, //20
         {"Exkordon", 65, 106, 17}, //21
         {"Brannington", 202, 226, 29}, //22

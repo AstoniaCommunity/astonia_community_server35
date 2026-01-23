@@ -208,6 +208,18 @@ driver=18
 arg="11"        # nr 16
 ;
 
+transport19:
+name="Transport"
+description="A transport."
+sprite=21340    #20283
+flag=IF_USE
+flag=IF_MOVEBLOCK
+mod_index=V_LIGHT
+mod_value=64
+driver=18
+arg="13"        # nr 19
+;
+
 transport20:
 name="Transport"
 description="A transport."
