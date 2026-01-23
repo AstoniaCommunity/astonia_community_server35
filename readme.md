@@ -28,11 +28,11 @@ sudo mysql_secure_installation
 ./my <install/create_tables.sql 
 ./my merc35 <install/merc.sql
 echo "Welcome to Astonia" >motd.txt
-rm MYSQLPASSWD
+rm install/MYSQLPASSWD
 # the "my" script is very handy, but also a security risk!
 make -j 4
 ./server35
-# look for errors, the CTRL-C to stop
+# look for errors, then CTRL-C to stop
 ./start # will start all areas and the chatserver
 ./create_account <email> <password>
 ./create_character 1 Ishtar MWG
