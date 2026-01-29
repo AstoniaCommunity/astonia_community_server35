@@ -105,13 +105,15 @@ void config_string(char *buf) {
     config_set_name(name, value);
 }
 
-void config_file(char *file) {
+void config_file(char *file, int isfailok) {
     FILE *fp;
     char buf[MAXLINE];
 
     if (!(fp = fopen(file, "r"))) {
-        fprintf(stderr, "Could not open config file '%s'.\n", file);
-        exit(1);
+        if (!isfailok) {
+            fprintf(stderr, "Could not open config file '%s'.\n", file);
+            exit(1);
+        } else return;
     }
 
     while (fgets(buf, MAXLINE, fp))

@@ -48,7 +48,7 @@ int main(int argc, char *args[]) {
             config_string(optarg);
             break;
         case 'f':
-            config_file(optarg);
+            config_file(optarg, 0);
             break;
         case 'e':
             config_getenv();

@@ -155,7 +155,7 @@ int main(int argc, char *args[]) {
     printf("\n");
 
     // load serverkey from file first so it can be overwritten by config
-    config_file(".serverkey");
+    config_file(".serverkey", 1);
 
     if (argc > 1) {
         while (1) {
@@ -186,7 +186,7 @@ int main(int argc, char *args[]) {
                 config_string(optarg);
                 break;
             case 'f':
-                config_file(optarg);
+                config_file(optarg, 0);
                 break;
             case 'e':
                 config_getenv();
