@@ -130,7 +130,7 @@ driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=10;chardist=0;stopdist=30;"
 group=2
 class=1
-respawn=120
+respawn=240
 ;
 
 #---- Area Above 1, Skeleton Maze, Skelly with key2 ----
@@ -333,7 +333,7 @@ special_strength=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=10;chardist=0;stopdist=30;"
-respawn=120
+respawn=240
 group=2
 class=2
 ;
@@ -402,5 +402,5 @@ driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=10;chardist=0;stopdist=30;"
 group=2
 class=1
-respawn=120
+respawn=240
 ;

@@ -286,20 +286,20 @@ void tunneldoor(int in, int cn) {
                     it[in2].sprite = 0;
                     if (b1cnt == b1) {
                         map[m].fsprite = 0;
-                        map[m].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK);
+                        map[m].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK);
                     } else {
                         map[m].fsprite = 59791;
-                        map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK;
+                        map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK;
                     }
                     b1cnt++;
                 } else if (it[in2].ID == IID_TUNNELDOOR2) { // block marker 2
                     it[in2].sprite = 0;
                     if (b2cnt == b2) {
                         map[m].fsprite = 0;
-                        map[m].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK);
+                        map[m].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK);
                     } else {
                         map[m].fsprite = 59791;
-                        map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK;
+                        map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK;
                     }
                     b2cnt++;
                 } else if (it[in2].ID == IID_TUNNELENEMY1) { // creeper marker 1
@@ -319,7 +319,7 @@ void tunneldoor(int in, int cn) {
                 } else if (it[in2].driver == IDR_TUNNELDOOR2) {
                     it[in2].sprite = 0;
                     map[m].fsprite = 59791;
-                    map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK;
+                    map[m].flags |= MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK;
                 }
             }
         }
@@ -345,7 +345,7 @@ void mean_door(int in, int cn) {
             }
         }
         map[it[in].x + it[in].y * MAXMAP].fsprite = 0;
-        map[it[in].x + it[in].y * MAXMAP].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK);
+        map[it[in].x + it[in].y * MAXMAP].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK | MF_SOUNDBLOCK);
         set_sector(it[in].x, it[in].y);
     }
 }

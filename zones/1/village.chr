@@ -312,7 +312,7 @@ gold=27
 driver=19
 group=2
 class=12
-respawn=120
+respawn=240
 ;
 
 #---- Area Above 1, City, Thief Guard ----
@@ -374,7 +374,7 @@ gold=7
 driver=7
 arg="aggressive=0;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=30;"
 arg="helpid=3;"
-respawn=120
+respawn=240
 group=2
 class=13
 ;

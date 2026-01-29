@@ -200783,6 +200783,7 @@ flag=MF_INDOORS
 
 field="27,160"
 gsprite=59780
+it=creeper_mean
 flag=MF_SIGHTBLOCK
 flag=MF_INDOORS
 

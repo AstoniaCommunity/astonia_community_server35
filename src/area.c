@@ -43,8 +43,8 @@ static struct section section[] =
         {"Mad Mages", 7}, //12
         {"Mad Knights", 8}, //13
         {"Cameron", 0}, //14
-        {"Creeper Death Run", 14}, //15
-        {"Creepers", 13}, //16
+        {"Creeper Death Run", 16}, //15
+        {"Creepers", 14}, //16
         {"Zombie Showdown", 13}, //17
         {"Zombie II", 13}, //18
         {"Zombie III", 13}, //19
@@ -228,6 +228,8 @@ static struct section section[] =
         {"Icy Lair", 52}, //170
         {"Zombies!", 52}, //171
         {"Gang Territory", 63}, //172
+        {"Imperial Station", 0}, //173
+        {"Smuggler's Hideout", 15}, //174
 
 };
 
@@ -498,7 +500,9 @@ static struct sector sector25[] = {
     {0, 0, 0, 0}};
 
 static struct sector sector26[] = {
-    {1, 1, 165, 55, 124}, // dragons breath (rho)
+    {1, 1, 165, 55, 124}, // dragons breath (below aston 2, rho)
+    {92, 99, 129, 133, 173}, // imperial commander (below aston 2)
+    {1, 57, 129, 133, 174}, // smugglers (below aston 2)
     {0, 0, 0, 0}};
 
 static struct sector sector27[] = {

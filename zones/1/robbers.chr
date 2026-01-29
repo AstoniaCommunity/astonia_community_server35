@@ -62,7 +62,7 @@ special_strength=2
 driver=17
 group=2
 class=10
-respawn=120
+respawn=240
 ;
 
 #---- Area Above 1, Robber, Standard Robber ----
@@ -128,7 +128,7 @@ special_strength=2
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=30;"
-respawn=120
+respawn=240
 group=2
 class=10
 ;
@@ -198,7 +198,7 @@ special_strength=2
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=30;"
-respawn=120
+respawn=240
 group=2
 class=10
 ;
@@ -268,7 +268,7 @@ special_strength=2
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=30;"
-respawn=120
+respawn=240
 group=2
 class=10
 ;

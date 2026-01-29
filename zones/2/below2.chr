@@ -64,7 +64,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=21
 ;
@@ -135,7 +135,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=22
 ;
@@ -206,7 +206,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=23
 ;
@@ -277,7 +277,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=24
 ;
@@ -350,7 +350,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=21
 ;
@@ -639,7 +639,6 @@ group=3
 class=26
 ;
 
-
 big_baddy:
 name="Strong Zombie"
 description="A half rotten corpse."
@@ -706,7 +705,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=27
 ;
@@ -774,7 +773,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=28
 ;
@@ -842,7 +841,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=29
 ;
@@ -910,7 +909,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=30
 ;
@@ -1184,7 +1183,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=31
 ;
@@ -1252,7 +1251,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=32
 ;
@@ -1320,7 +1319,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=33
 ;
@@ -1388,7 +1387,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=34
 ;
@@ -1458,7 +1457,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=35
 ;
@@ -1528,7 +1527,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=36
 ;
@@ -1598,7 +1597,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=40;chardist=0;stopdist=80;"
-respawn=120
+respawn=240
 group=3
 class=37
 ;
@@ -1668,7 +1667,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=38
 ;
@@ -1738,7 +1737,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=39
 ;
@@ -1808,7 +1807,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=11
 ;
@@ -1878,7 +1877,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=11
 ;
@@ -1948,7 +1947,7 @@ balanced=1
 
 driver=31
 #arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=42
 ;
@@ -2082,7 +2081,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=39
 ;
@@ -2154,7 +2153,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=40
 ;
@@ -2224,7 +2223,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=43
 ;
@@ -2294,7 +2293,7 @@ balanced=1
 
 driver=7
 arg="aggressive=0;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=43
 ;
@@ -2364,7 +2363,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=43
 ;
@@ -2434,7 +2433,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=44
 ;
@@ -2504,7 +2503,7 @@ balanced=1
 
 driver=34
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=240
+respawn=360
 group=4
 class=41
 ;
@@ -2574,7 +2573,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=48
 ;
@@ -2643,7 +2642,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=49
 ;
@@ -2712,7 +2711,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=50
 ;
@@ -2781,7 +2780,7 @@ balanced=1
 
 driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=120
+respawn=240
 group=4
 class=51
 ;
@@ -2852,7 +2851,7 @@ balanced=1
 
 driver=38
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=40;"
-respawn=240
+respawn=360
 group=4
 class=45
 ;

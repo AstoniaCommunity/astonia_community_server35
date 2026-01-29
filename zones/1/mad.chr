@@ -60,7 +60,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -127,7 +127,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -195,7 +195,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -263,7 +263,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -331,7 +331,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -399,7 +399,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -467,7 +467,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=60;"
-respawn=120
+respawn=240
 group=2
 class=17
 ;
@@ -597,11 +597,10 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=60;"
-respawn=180
+respawn=240
 group=2
 class=18
 ;
-
 
 mad_knight_nowarcry:
 name="Mad Knight"
@@ -740,7 +739,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=60;"
-respawn=180
+respawn=240
 group=2
 class=18
 ;
@@ -812,7 +811,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=60;"
-respawn=180
+respawn=240
 group=2
 class=18
 ;
@@ -884,7 +883,7 @@ special_strength=3
 
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=60;"
-respawn=180
+respawn=240
 group=2
 class=18
 ;

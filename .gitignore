@@ -10,4 +10,5 @@ v3.*
 *.log
 *.o
 *.d
+.serverkey
 accman/var

@@ -5,6 +5,7 @@ struct config_data {
     char *dbpass;
     char *dbname;
     char *chathost;
+    char *svrkey;
 };
 extern struct config_data config_data;
 

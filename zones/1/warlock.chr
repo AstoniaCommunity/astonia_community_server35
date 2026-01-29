@@ -64,7 +64,7 @@ gold_random=500
 special_prob=100
 special_strength=2
 
-respawn=300
+respawn=450
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=60;chardist=0;stopdist=120;"
 group=2
@@ -134,7 +134,7 @@ gold_random=500
 special_prob=100
 special_strength=2
 
-respawn=300
+respawn=450
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=30;chardist=0;stopdist=50;"
 group=2
@@ -202,7 +202,7 @@ gold_random=200
 special_prob=100
 special_strength=2
 
-respawn=180
+respawn=240
 driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=60;chardist=0;stopdist=120;"
 group=2

@@ -14,7 +14,8 @@ struct config_data config_data = {
     .dbuser = "root",
     .dbpass = "tgbdwf3h",
     .dbname = "merc35",
-    .chathost = "localhost"};
+    .chathost = "localhost",
+    .svrkey = "4242"};
 
 void config_set_name(char *name, char *value) {
     if (!strcmp(name, "dbhost")) {
@@ -35,6 +36,10 @@ void config_set_name(char *name, char *value) {
     }
     if (!strcmp(name, "chathost")) {
         config_data.chathost = strdup(value);
+        return;
+    }
+    if (!strcmp(name, "svrkey")) {
+        config_data.svrkey = strdup(value);
         return;
     }
     fprintf(stderr, "config_set: unknown name '%s'.\n", name);
@@ -123,4 +128,5 @@ void config_getenv(void) {
     if ((tmp = getenv("AS35_DBPASS"))) config_data.dbpass = tmp;
     if ((tmp = getenv("AS35_DBNAME"))) config_data.dbname = tmp;
     if ((tmp = getenv("AS35_CHATHOST"))) config_data.chathost = tmp;
+    if ((tmp = getenv("AS35_SVRKEY"))) config_data.svrkey = tmp;
 }

@@ -1251,6 +1251,7 @@ void create_dungeon(int cn, int co, int level, struct master_data *dat) {
     say(cn, "This dungeon will collapse in %.2f minutes.", DUNGEONTIME / (TICKS * 60.0));
 
     teleport_char_driver(co, xoff + 2, yoff + 58);
+    player_areainfo(ch[co].player, AIC_CLEAR);
 }
 
 void enter_dungeon(int cn, int co, int target, struct master_data *dat) {
@@ -1280,6 +1281,7 @@ void enter_dungeon(int cn, int co, int target, struct master_data *dat) {
     say(cn, "This dungeon will collapse in %.2f minutes,", tmp / (TICKS * 60.0));
 
     teleport_char_driver(co, (target % 4) * 61 + 4, (target / 4) * 61 + 60);
+    player_areainfo(ch[co].player, AIC_CLEAR);
 }
 
 void list_dungeon(int cn, struct master_data *dat) {

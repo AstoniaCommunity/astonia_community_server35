@@ -36430,6 +36430,9 @@ flag=MF_SHOUTBLOCK
 
 field="167,28"
 gsprite=50155
+fsprite=20274
+flag=MF_SIGHTBLOCK
+flag=MF_MOVEBLOCK
 
 field="168,28"
 gsprite=50153
@@ -37582,6 +37585,9 @@ gsprite=50158
 
 field="168,29"
 gsprite=50156
+fsprite=20274
+flag=MF_SIGHTBLOCK
+flag=MF_MOVEBLOCK
 
 field="169,29"
 gsprite=50157

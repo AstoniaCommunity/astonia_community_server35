@@ -53,6 +53,9 @@
 #include "questlog.h"
 #include "shrine.h"
 #include "spell.h"
+#include "config.h"
+
+#define SERVER_PROTOCOL_VERSION 2
 
 #define MAX_IDLE (TICKS * 30)
 
@@ -350,9 +353,11 @@ static void read_login(int nr) {
     // clients v1 and better understand SV_PROTOCOL, so we tell them the server version
     if (player[nr]->client_version > 0) {
         buf[0] = SV_PROTOCOL;
-        buf[1] = 1;
+        buf[1] = SERVER_PROTOCOL_VERSION;
         psend(nr, buf, 2);
     }
+
+    player_areainfo(nr, 0);
 
     if (!(ch[cn].flags & CF_AREACHANGE)) {
         show_motd(nr);
@@ -2839,6 +2844,33 @@ int get_player_version(int nr) {
 int get_char_version(int cn) {
     int nr;
 
+    if (!player) return 0;
+
     if ((nr = ch[cn].player) && player[nr]) return player[nr]->client_version;
     else return 0;
+}
+
+void player_areainfo(int nr, unsigned short cmd) {
+    char buf[80];
+
+    if (!player) return;
+    if (!player[nr]) return;
+
+    if (player[nr]->client_version < 2) return;
+
+    buf[0] = SV_AREAINFO;
+    *(unsigned short *)(buf + 1) = cmd;
+
+    switch (cmd) {
+    case AIC_SETID:
+        *(unsigned short *)(buf + 3) = (unsigned short)areaID;
+        *(unsigned short *)(buf + 5) = atoi(config_data.svrkey); // server_key: vanilla 3.5 is 2, default is 4242
+        break;
+    case AIC_CLEAR:
+        *(unsigned short *)(buf + 3) = 0u;
+        *(unsigned short *)(buf + 5) = 0u;
+        break;
+    }
+
+    psend(nr, buf, 7);
 }

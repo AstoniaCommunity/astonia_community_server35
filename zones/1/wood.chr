@@ -500,7 +500,7 @@ driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=50;"
 group=2
 class=9
-respawn=90
+respawn=180
 ;
 
 #---- Area Above 1, Wood, Thief with key----
@@ -569,7 +569,7 @@ driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=50;"
 group=2
 class=9
-respawn=90
+respawn=180
 ;
 
 #---- Area Above 1, Wood, Thief with note ----
@@ -638,5 +638,5 @@ driver=7
 arg="aggressive=1;helper=1;scavenger=0;startdist=20;chardist=0;stopdist=50;"
 group=2
 class=9
-respawn=90
+respawn=180
 ;

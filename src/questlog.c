@@ -70,9 +70,9 @@ struct questlog questlog[] = {
     {"Join the Tribe", 63, 80, "Kalanur", "Nomad Plains", 10000, 0}, //32,
     {"Searching Sarkilar", 63, 80, "Kir Laas", "Nomad Plains", 450000, 0}, //33,
     {"A Golden Statue", 72, 90, "Kir Garan", "Nomad Plains", 280000, 0}, //34,
-    {"Smuggler Book", 10, 15, "Imp. Commander", "Below Aston 2", 1000, QLF_REPEATABLE}, //35,
-    {"Contraband", 10, 15, "Imp. Commander", "Below Aston 2", 0, 0}, //36, exp awarded in driver, 5000 total
-    {"Smuggler Leader", 10, 15, "Imp. Commander", "Below Aston 2", 2000, QLF_REPEATABLE}, //37,
+    {"Smuggler Book", 14, 17, "Imp. Commander", "Below Aston 2", 1000, QLF_REPEATABLE}, //35,
+    {"Contraband", 14, 17, "Imp. Commander", "Below Aston 2", 0, 0}, //36, exp awarded in driver, 4000 total
+    {"Smuggler Leader", 14, 17, "Imp. Commander", "Below Aston 2", 2000, QLF_REPEATABLE}, //37,
     {"The Family Heirloom", 32, 40, "Aristocrat", "Bran. Forest", 40000, QLF_REPEATABLE}, //38,
     {"Bear Hunt - Again", 32, 36, "Yoatin", "Bran. Forest", 40000, QLF_REPEATABLE}, //39,
     {"The Jewels of Brannington ", 34, 40, "Count B.", "Brannington", 0, QLF_REPEATABLE}, //40, exp awarded in driver, 120k total
