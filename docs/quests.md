@@ -27,7 +27,7 @@ Went right past the book and cleared the section. Found the book on the way back
 
 ## Contraband (Below Aston 2, Imp. Leader)
 
-Quest items as random drops. Not sure if this is a good idea. I got all but one twice on a single run, so it might be fine.
+_Quest items as random drops. Not sure if this is a good idea. I got all but one twice on a single run, so it might be fine._
 
 **4x1000 EXP, 27% of level 15.**
 
@@ -35,6 +35,24 @@ Quest items as random drops. Not sure if this is a good idea. I got all but one 
 
 Guild leader was a wimp, continuing the tradition.
 
-_The kill does not count unless you received the quest already. Considering that many players will just clear the area right away this might need fixing.
-_
+_The kill does not count unless you received the quest already. Considering that many players will just clear the area right away this might need fixing._
+
 **2000 EXP, 13% of level 15.**
+
+## Lab 1 (level 10) (Labyrinth, Observer)
+
+Did it too late, made it very easy. The hidden key is a nice touch. You either see it... or you don't.
+
+_Seems way too hard at level 10. Move to 15?_
+
+**928 EXP, 7% of level 14.**
+
+## Lab 2 (level 15) (Labyrinth, Laros)
+
+Demon summoning rituals and no regeneration, but lots of potions to be found.
+
+_Once again way too hard at its level. Maybe at 20?_
+
+**2982 EXP, 9% of level 20.**
+
+

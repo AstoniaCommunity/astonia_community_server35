@@ -197,8 +197,14 @@ int creeper_tab[191] = {
     228, 229, 230, 231, 232, 233, 234, 235, 237, 238,
     239};
 
+// reward players up to four times for solving a tunnel section
+// reducing the reward each time
+#define MAXREWARD 4
+static float reward_tab[MAXREWARD] = {
+    1.0f, 0.8f, 0.6f, 0.5f};
+
 void tunneldoor(int in, int cn) {
-    int x, y, in2, m, b1, b2, c, b1cnt = 0, b2cnt = 0, co, xoff, yoff, used, n, value;
+    int x, y, in2, m, b1, b2, c, b1cnt = 0, b2cnt = 0, co, xoff, yoff, used, n, value, cnt;
     struct tunnel_ppd *ppd;
 
     if (!cn) { // automatic call
@@ -211,25 +217,29 @@ void tunneldoor(int in, int cn) {
     if (it[in].drdata[0] == 2 || it[in].drdata[0] == 3) {
 
         if (teleport_char_driver(cn, 250, 250)) {
-            if (ppd->used[ppd->clevel] < 20) {
 
-                ppd->used[ppd->clevel]++;
+            // give reward for all levels from ch.level-10 to clevel:
+            for (n = max(10, ch[cn].level - 10); n <= ppd->clevel; n++) {
 
-                if (it[in].drdata[0] == 2) {
-                    value = level_value(ppd->clevel) / 10.0 / ppd->used[ppd->clevel];
-                    log_char(cn, LOG_SYSTEM, 0, "You have been given experience.");
-                    give_exp(cn, value);
-                    dlog(cn, 0, "got %d exp for solving long tunnel section %d (%d)", value, ppd->clevel, ppd->used[ppd->clevel]);
-                }
+                if (ppd->used[n] < MAXREWARD) {
+                    cnt = ppd->used[n]++;
 
-                if (it[in].drdata[0] == 3) {
-                    value = 50 / ppd->used[ppd->clevel];
-                    log_char(cn, LOG_SYSTEM, 0, "You have been given military rank.");
-                    give_military_pts_no_npc(cn, value, 1);
-                    dlog(cn, 0, "got %d military rank for solving long tunnel section %d (%d)", value, ppd->clevel, ppd->used[ppd->clevel]);
-                }
+                    if (it[in].drdata[0] == 2) {
+                        value = level_value(n) / 10.0 * reward_tab[cnt];
+                        log_char(cn, LOG_SYSTEM, 0, "You have been given %d experience for solving long tunnel section %d %d times.", value, n, cnt + 1);
+                        give_exp(cn, value);
+                        dlog(cn, 0, "got %d exp for solving long tunnel section %d (%d)", value, n, ppd->used[n]);
+                    }
 
-            } else log_char(cn, LOG_SYSTEM, 0, "You cannot get any more experience for this level.");
+                    if (it[in].drdata[0] == 3) {
+                        value = 50 * reward_tab[cnt];
+                        log_char(cn, LOG_SYSTEM, 0, "You have been given %d military points for solving long tunnel section %d %d times.", value, n, cnt + 1);
+                        give_military_pts_no_npc(cn, value, 1);
+                        dlog(cn, 0, "got %d military rank for solving long tunnel section %d (%d)", value, n, ppd->used[n]);
+                    }
+
+                } else if (n == ppd->clevel) log_char(cn, LOG_SYSTEM, 0, "You cannot get any more experience for this level.");
+            }
             ppd->clevel = 10;
         }
         return;
@@ -243,7 +253,13 @@ void tunneldoor(int in, int cn) {
             }
             ppd->clevel = n;
         }
-    } else ppd->clevel++;
+    } else {
+        if (ppd->clevel >= ch[cn].level) {
+            log_char(cn, LOG_SYSTEM, 0, "The door won't budge. You cannot go further until you've levelled up.");
+            return;
+        }
+        ppd->clevel++;
+    }
 
     if (ppd->clevel < 10) ppd->clevel = 10;
     if (ppd->clevel > 200) ppd->clevel = 200;

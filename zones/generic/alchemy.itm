@@ -1037,6 +1037,18 @@ arg="0205010A000000000000"
 driver=32
 ;
 
+hp40_potion:
+name="Magical Potion"
+description="A flask containing a magical liquid."
+sprite=50214
+value=50
+flag=IF_USE
+flag=IF_TAKE
+mod_index=V_HP
+mod_value=40
+arg="0205013C000000000000"
+driver=32
+;
 
 api22_potion:
 name="Ambrosia API22"
