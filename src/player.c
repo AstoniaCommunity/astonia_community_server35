@@ -357,7 +357,7 @@ static void read_login(int nr) {
         psend(nr, buf, 2);
     }
 
-    player_areainfo(nr, 0);
+    player_areainfo(nr, AIC_SETID, 0, 0);
 
     if (!(ch[cn].flags & CF_AREACHANGE)) {
         show_motd(nr);
@@ -2850,7 +2850,7 @@ int get_char_version(int cn) {
     else return 0;
 }
 
-void player_areainfo(int nr, unsigned short cmd) {
+void player_areainfo(int nr, unsigned short cmd, unsigned short x, unsigned short y) {
     char buf[80];
 
     if (!player) return;
@@ -2869,6 +2869,10 @@ void player_areainfo(int nr, unsigned short cmd) {
     case AIC_CLEAR:
         *(unsigned short *)(buf + 3) = 0u;
         *(unsigned short *)(buf + 5) = 0u;
+        break;
+    case AIC_REVEAL:
+        *(unsigned short *)(buf + 3) = x;
+        *(unsigned short *)(buf + 5) = y;
         break;
     }
 

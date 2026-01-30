@@ -161,4 +161,5 @@ int get_char_version(int cn);
 
 #define AIC_SETID 0
 #define AIC_CLEAR 1
-void player_areainfo(int nr, unsigned short cmd);
+#define AIC_REVEAL 2
+void player_areainfo(int nr, unsigned short cmd, unsigned short x, unsigned short y);

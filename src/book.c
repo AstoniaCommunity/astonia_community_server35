@@ -177,6 +177,9 @@ void book_driver(int in, int cn) {
         log_char(cn, LOG_SYSTEM, 0, "Going there is dangerous, and I might not make it back with my knowledge. I will keep other diaries there, so that my clan will be able to use my findings even after my death.");
         log_char(cn, LOG_SYSTEM, 0, "I have asked Avaisor to turn off the defense systems in an hour so that I can reach my outpost. Fate, let me survive!");
         player_special(cn, 0, 50287, 0);
+        player_areainfo(ch[cn].player, AIC_REVEAL, 139, 134); // outpost a
+        player_areainfo(ch[cn].player, AIC_REVEAL, 233, 180); // outpost b
+        player_areainfo(ch[cn].player, AIC_REVEAL, 117, 151); // enemy forces
         return;
 
     case BOOK_EDEMON4:
@@ -186,6 +189,9 @@ void book_driver(int in, int cn) {
         log_char(cn, LOG_SYSTEM, 0, "Fortunately, we made good progress with our demonic research project. We will not suffer much from the demons that escaped during the early stages of our research. And we can hope that they will delay the Isara's pursuit.");
         log_char(cn, LOG_SYSTEM, 0, "We will open the demon-gate before we leave. The steady flood of demons coming from it will give us the time we need and hinder the Isara.");
         player_special(cn, 0, 50305, 0);
+        player_areainfo(ch[cn].player, AIC_REVEAL, 52, 173); // gate
+        player_areainfo(ch[cn].player, AIC_REVEAL, 55, 183); // research lab
+        player_areainfo(ch[cn].player, AIC_REVEAL, 91, 190); // to research area
         return;
 
     case BOOK_IDEMON1:
