@@ -62,7 +62,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=101
-respawn=120
+respawn=180
 ;
 
 edemon1_key1:
@@ -131,7 +131,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=101
-respawn=120
+respawn=180
 ;
 
 edemon2:
@@ -198,7 +198,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=102
-respawn=120
+respawn=180
 ;
 
 edemon2s:
@@ -264,7 +264,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;notsecure=1;"
 group=3
 class=102
-respawn=120
+respawn=180
 ;
 
 edemon3:
@@ -331,7 +331,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=103
-respawn=120
+respawn=180
 ;
 
 edemon3_circle:
@@ -400,7 +400,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=103
-respawn=120
+respawn=180
 ;
 
 edemon3_rect:
@@ -469,7 +469,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=103
-respawn=120
+respawn=180
 ;
 
 edemon3_strike:
@@ -538,7 +538,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=103
-respawn=120
+respawn=180
 ;
 
 edemon4:
@@ -605,7 +605,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=104
-respawn=120
+respawn=180
 ;
 
 edemon4_crystal:
@@ -674,7 +674,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=104
-respawn=120
+respawn=180
 ;
 
 edemon5:
@@ -741,7 +741,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=105
-respawn=120
+respawn=180
 ;
 
 edemon5_orange:
@@ -811,7 +811,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=105
-respawn=120
+respawn=180
 ;
 
 edemon6:
@@ -878,7 +878,7 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=40;chardist=0;stopdist=60;"
 group=3
 class=106
-respawn=120
+respawn=180
 ;
 
 edemon6s:
@@ -945,5 +945,5 @@ driver=7
 arg="aggressive=1;helper=0;scavenger=0;startdist=0;chardist=40;stopdist=0;notsecure=1;mindist=2;"
 group=3
 class=106
-respawn=120
+respawn=180
 ;

@@ -55,4 +55,9 @@ _Once again way too hard at its level. Maybe at 20?_
 
 **2982 EXP, 9% of level 20.**
 
+## Earth Underground
+
+A whole area, not just a quest. Beginnings seem easy for the advertised level 20, later stages require up to a level 30 or better. Teamwork could do wonders here.
+
+**54000 EXP, 47% of level 30, in 30 steps.**
 

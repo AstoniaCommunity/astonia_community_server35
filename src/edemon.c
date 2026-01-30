@@ -352,7 +352,7 @@ void edemongate_driver(int in, int cn) {
                 }
             }
         }
-        call_item(it[in].driver, in, 0, ticker + TICKS * 25);
+        call_item(it[in].driver, in, 0, ticker + TICKS * 40);
     } else if (nr == 1) {
         static int pos[100] = {0}, co_nr[100], serial[100], maxpos = 0;
 
@@ -391,7 +391,7 @@ void edemongate_driver(int in, int cn) {
                 }
             }
         }
-        call_item(it[in].driver, in, 0, ticker + TICKS * 40);
+        call_item(it[in].driver, in, 0, ticker + TICKS * 90);
     }
 }
 
