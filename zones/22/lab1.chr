@@ -59,7 +59,7 @@ driver=199
 arg="aggressive=0;helper=1;"
 group=2
 class=372
-respawn=60
+respawn=120
 ;
 
 #---- labyrinth, deathfibrin gnomes ----
@@ -123,7 +123,7 @@ driver=199
 arg="aggressive=1;helper=1;fighter=1;"
 group=2
 class=373
-respawn=60
+respawn=120
 ;
 
 #---- labyrinth, deathfibrin gnomes ----
@@ -187,7 +187,7 @@ driver=199
 arg="aggressive=1;helper=1;fighter=1;text=1;"
 group=2
 class=373
-respawn=60
+respawn=120
 ;
 
 #---- labyrinth, deathfibrin gnomes ----
@@ -253,7 +253,7 @@ driver=199
 arg="aggressive=1;helper=1;fighter=1"
 group=2
 class=373
-respawn=60
+respawn=120
 ;
 
 #---- labyrinth, deathfibrin gnomes ----
@@ -318,5 +318,5 @@ driver=199
 arg="aggressive=1;helper=0;master=1;"
 group=2
 class=374
-respawn=60
+respawn=120
 ;

@@ -61,7 +61,7 @@ driver=198
 arg="aggressive=1;helper=1;undead=1;"
 group=2
 class=375
-respawn=60
+respawn=180
 ;
 
 lab2_undead_key:
@@ -127,7 +127,7 @@ driver=198
 arg="aggressive=1;helper=1;undead=1;"
 group=2
 class=375
-respawn=60
+respawn=180
 ;
 
 lab2_undead_patrol_graveyard:
@@ -192,7 +192,7 @@ driver=198
 arg="aggressive=1;helper=1;undead=1;patrol=1;"
 group=2
 class=375
-respawn=60
+respawn=180
 ;
 
 lab2_undead_patrol_crypta:
@@ -257,7 +257,7 @@ driver=198
 arg="aggressive=1;helper=1;undead=1;patrol=2;"
 group=2
 class=375
-respawn=60
+respawn=180
 ;
 
 # --- Skeleton ---
@@ -327,7 +327,7 @@ driver=198
 arg="aggressive=1;helper=1;"
 group=2
 class=376
-respawn=60
+respawn=180
 ;
 
 

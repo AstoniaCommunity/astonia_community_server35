@@ -55,6 +55,14 @@ _Once again way too hard at its level. Maybe at 20?_
 
 **2982 EXP, 9% of level 20.**
 
+## Lab 3 (level 20) (Labyrinth, no quest giver)
+
+This was... tedious. The idea is neat, it looks compact, but it's a lot of doors and rooms to carry that darned thing through.
+
+_Once again way too hard at its level. Maybe at 25?_
+
+**6896 EXP, 10% of level 25.**
+
 ## Earth Underground
 
 A whole area, not just a quest. Beginnings seem easy for the advertised level 20, later stages require up to a level 30 or better. Teamwork could do wonders here.

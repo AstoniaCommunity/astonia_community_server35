@@ -61,7 +61,7 @@ driver=7
 arg="aggressive=1;helper=1;startdist=20;stopdist=40;scavenger=4;"
 group=2
 class=379
-respawn=60
+respawn=120
 ;
 
 
@@ -129,7 +129,7 @@ driver=7
 arg="aggressive=1;helper=1;startdist=10;stopdist=16;scavenger=0;"
 group=2
 class=379
-respawn=60
+respawn=120
 ;
 
 
