@@ -2,7 +2,7 @@
 
 lab5_worker:
 name="Worker" description="A stupid looking little gnome."
-sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=28;stopdist=32;" respawn=90
+sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=28;stopdist=32;" respawn=120
 flag=CF_ALIVE flag=CF_INFRARED flag=CF_RESPAWN
 V_WIS=15 V_INT=20 V_AGI=20 V_STR=20
 V_HP=15 V_ENDURANCE=14
@@ -17,7 +17,7 @@ class=381
 
 lab5_worker_mage:
 name="Worker" description="A stupid looking little gnome."
-sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=38;stopdist=42;" respawn=90
+sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=38;stopdist=42;" respawn=120
 flag=CF_ALIVE flag=CF_INFRARED flag=CF_RESPAWN
 V_WIS=15 V_INT=20 V_AGI=20 V_STR=20
 V_HP=15 V_ENDURANCE=10 V_MANA=20
@@ -32,7 +32,7 @@ class=381
 
 lab5_worker_key1:
 name="Worker" description="A stupid looking little gnome."
-sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=38;stopdist=42;" respawn=90
+sprite=35 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=38;stopdist=42;" respawn=120
 flag=CF_ALIVE flag=CF_INFRARED flag=CF_RESPAWN
 V_WIS=15 V_INT=20 V_AGI=20 V_STR=20
 V_HP=15 V_ENDURANCE=14
@@ -48,7 +48,7 @@ class=381
 
 lab5_spider:
 name="Spider" description="An ugly, white Spider."
-sprite=21 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=28;stopdist=32;" respawn=60
+sprite=21 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=28;stopdist=32;" respawn=90
 flag=CF_ALIVE flag=CF_INFRARED flag=CF_RESPAWN
 V_WIS=15 V_INT=20 V_AGI=20 V_STR=20
 V_HP=15 V_ENDURANCE=14
@@ -65,7 +65,7 @@ class=602
 
 lab5_one_normal:
 name="Asfaloth" description="A demon with cripled wings."
-sprite=32 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=10;stopdist=16;" respawn=60
+sprite=32 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=10;stopdist=16;" respawn=120
 flag=CF_RESPAWN flag=CF_INFRARED
 V_WIS=15 V_INT=20 V_AGI=20 V_STR=20
 V_HP=15 V_ENDURANCE=14
@@ -128,7 +128,7 @@ class=383
 
 lab5_two_normal:
 name="Beronath" description="A winged demon."
-sprite=27 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=30;stopdist=40;" respawn=60
+sprite=27 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=30;stopdist=40;" respawn=90
 flag=CF_RESPAWN flag=CF_INFRARED
 V_WIS=14 V_INT=20 V_AGI=20 V_STR=20
 V_HP=10 V_ENDURANCE=5
@@ -143,7 +143,7 @@ class=384
 
 lab5_two_shortrange:
 name="Beronath" description="A winged demon."
-sprite=27 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=10;stopdist=12;" respawn=60
+sprite=27 sound=1 group=2 driver=7 arg="aggressive=1;helper=1;startdist=10;stopdist=12;" respawn=90
 flag=CF_RESPAWN flag=CF_INFRARED
 V_WIS=14 V_INT=20 V_AGI=20 V_STR=20
 V_HP=10 V_ENDURANCE=5

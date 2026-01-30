@@ -60,7 +60,7 @@ driver=7
 arg="aggressive=0;helper=1;startdist=16;stopdist=22;scavenger=2;"
 group=2
 class=380
-respawn=60
+respawn=90
 ;
 
 lab4_war_gnalb:
@@ -123,7 +123,7 @@ driver=7
 arg="aggressive=0;helper=1;startdist=16;stopdist=22;scavenger=2;"
 group=2
 class=380
-respawn=60
+respawn=90
 ;
 
 lab4_war_gnalb_fixed:
@@ -186,7 +186,7 @@ driver=7
 arg="aggressive=0;helper=0;startdist=18;stopdist=22;scavenger=0;"
 group=2
 class=380
-respawn=60
+respawn=120
 ;
 
 lab4_war_gnalb_guard:
@@ -249,7 +249,7 @@ driver=7
 arg="aggressive=1;helper=1;startdist=16;stopdist=30;scavenger=0;"
 group=2
 class=380
-respawn=60
+respawn=120
 ;
 
 # --- gnalbs ---------------------------------------------------------------------------
@@ -314,7 +314,7 @@ driver=193                      # CDR_LAB4GNALB
 arg="type=1;"
 group=2
 class=380
-respawn=60
+respawn=120
 ;
 
 
@@ -380,7 +380,7 @@ driver=7
 arg="aggressive=1;helper=1;startdist=16;stopdist=30;"
 group=2
 class=380
-respawn=60
+respawn=120
 ;
 
 
@@ -448,7 +448,7 @@ driver=7
 arg="aggressive=0;helper=1;startdist=16;stopdist=30;"
 group=2
 class=380
-respawn=60
+respawn=120
 ;
 
 
@@ -513,7 +513,7 @@ driver=193                      # CDR_LAB4GNALB
 arg="type=3;"
 group=2
 class=380
-respawn=60
+respawn=90
 ;
 
 
@@ -579,4 +579,3 @@ driver=192              # CDR_LAB4SEYAN
 group=2
 respawn=60
 ;
-
