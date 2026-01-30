@@ -215,7 +215,7 @@ void book_driver(int in, int cn) {
 
     case BOOK_SWAMP:
         log_char(cn, LOG_SYSTEM, 0, "Contrary to my original belief, the swamp beasts possess no intelligence. The buildings they inhabitate must have been built by a now extinct people. I assume that the three stone circles have been built by the same people.");
-        log_char(cn, LOG_SYSTEM, 0, "Some pages later: I have discovered old drawings, showing humans fighting against swamp beasts. In the first pictures the humans flee from a huge beast. A bit further down, one of the drawings shows a human warrior standing in the center of a stone circle, holding a weapon in his hand. Strangely, it shows the sun being exactly below the warrior and the ground. The warrior seems to be waiting, and looking at the sun. In the next drawing, he is still standing in the stone circle, but now he is killing a small swamp beast. His weapon seems to be glowing.");
+        log_char(cn, LOG_SYSTEM, 0, "Some pages later: I have discovered old drawings, showing humans fighting against swamp beasts. In the first pictures the humans flee from a huge beast. A bit further down, one of the drawings shows a human warrior standing in the center of a stone circle, holding a weapon in his hand. In the next drawing, he is still standing in the stone circle, but now he is killing a small swamp beast. His weapon seems to be glowing.");
         return;
 
     case BOOK_PALACE1:

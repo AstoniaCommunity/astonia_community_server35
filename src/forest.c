@@ -701,11 +701,12 @@ void monster_dead(int cn, int co) {
 
     if (ch[co].x >= 182 && ch[co].y >= 185 && ch[co].x <= 192 && ch[co].y <= 192) bit = 8;
 
-    if (hour == 0 && bit && (in = ch[co].item[WN_RHAND]) && it[in].driver == 0 && !(it[in].drdata[36] & bit)) {
+    if (bit && (in = ch[co].item[WN_RHAND]) && it[in].driver == 0 && !(it[in].drdata[36] & bit)) {
         it[in].ID = IID_HARDKILL;
         it[in].drdata[37] += 6;
         it[in].drdata[36] |= bit;
-        it[in].flags |= IF_QUEST;
+        it[in].flags |= IF_QUEST | IF_FORCEUPDATE;
+        ch[co].flags |= CF_ITEMS;
         log_char(co, LOG_SYSTEM, 0, "Your %s starts to glow.", it[in].name);
     }
 }
