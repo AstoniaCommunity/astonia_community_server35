@@ -677,6 +677,10 @@ void barkeeper(int cn, int ret, int lastact) {
             ppd = set_data(co, DRD_TWOCITY_PPD, sizeof(struct twocity_ppd));
 
             if (ppd) {
+                if (ppd->sanwyn_state < 5) { // don't talk over sanwyn giving out her quest
+                    remove_message(cn, msg);
+                    continue;
+                }
                 switch (ppd->barkeeper_state) {
                 case 0:
                     say(cn, "Hello, %s. Welcome to the tavern of the Two Towns.", ch[co].name);
