@@ -348,7 +348,7 @@ void update_soldier(int co, int n, struct farmy_ppd *ppd) {
     if (ppd->soldier[n].type == 1) cc = create_char("army1s", 0);
     else cc = create_char("army2s", 0);
     if (!cc) {
-        elog("take_soldiers: could not create char");
+        elog("update_soldiers: could not create char");
         return;
     }
 
@@ -371,7 +371,7 @@ void update_soldier(int co, int n, struct farmy_ppd *ppd) {
     ch[co].value[1][V_HP] += 50;
     if (ch[co].value[1][V_MANA] > 0) ch[co].value[1][V_MANA] += 50;
 
-    destroy_items(co);
+    destroy_equipment(co);
     if (ppd->soldier[n].type == 1) {
         sprintf(buf, "sleeves%dq1", 5);
         in = ch[co].item[WN_ARMS] = create_item(buf);
@@ -1142,7 +1142,7 @@ void got_emote(int cn, int co, int slot, int nr, struct farmy_data *dat) {
 void fdemon_army(int cn, int ret, int lastact) {
     struct farmy_data *dat;
     struct msg *msg, *next;
-    int co, heal = 0, res, friend;
+    int co, heal = 0, res, friend, in, n;
 
     dat = set_data(cn, DRD_FARMYDATA, sizeof(struct farmy_data));
     if (!dat) return; // oops...
@@ -1170,7 +1170,7 @@ void fdemon_army(int cn, int ret, int lastact) {
 
             if (ch[co].group == ch[cn].group && cn != co) {
                 if (ch[cn].value[0][V_HEAL] &&
-                    ch[co].hp < ch[co].value[1][V_HP] * POWERSCALE / 3 &&
+                    ch[co].hp < ch[co].value[1][V_HP] * POWERSCALE / 2 &&
                     ch[cn].mana >= POWERSCALE * 4 &&
                     char_see_char(cn, co))
                     heal = co;
@@ -1243,6 +1243,34 @@ void fdemon_army(int cn, int ret, int lastact) {
                 break;
             }
         }
+        if (msg->type == NT_GIVE) {
+            co = msg->dat1;
+            if (co != dat->leader_cn) { // not from the boss, junk right away
+                if ((in = ch[cn].citem)) { // we still have it
+                    destroy_item(ch[cn].citem);
+                    ch[cn].citem = 0;
+                }
+            } else {
+                if ((in = ch[cn].citem)) {
+                    if (store_item(cn, in)) {
+                        ch[cn].citem = 0;
+                        if (it[in].driver == IDR_POTION) {
+                            say(cn, "A potion. Thank you, sir.");
+                        } else if (it[in].driver == IDR_FLASK) {
+                            say(cn, "A stat-potion. Why, thank you, sir!");
+                            use_item(cn, in);
+                        } else {
+                            say(cn, "I don't know how to handle that, sir!");
+                            remove_item(in);
+                            if (!give_char_item(co, in)) destroy_item(in);
+                        }
+                    } else {
+                        destroy_item(in);
+                        ch[cn].citem = 0;
+                    }
+                }
+            }
+        }
 
         if (msg->type == NT_DEAD && msg->dat2 == cn) { // we killed someone
             dat->emote.praise += dat->emote.bigmouth;
@@ -1255,9 +1283,36 @@ void fdemon_army(int cn, int ret, int lastact) {
     // do something. whenever possible, call do_idle with as high a tick count
     // as reasonable when doing nothing.
 
-    if (ch[cn].hp < ch[cn].value[0][V_HP] * POWERSCALE / 2) {
+    if (ch[cn].hp < ch[cn].value[0][V_HP] * POWERSCALE / 3) { // we're hurt
         dat->emote.fear += dat->emote.angst;
         dat->emote.boredom -= 500;
+
+        if (!has_spell(cn, IDR_HEAL)) {
+            for (n = 30; n < INVENTORYSIZE; n++) {
+                if ((in = ch[cn].item[n]) && it[in].driver == IDR_POTION && it[in].drdata[1]) { // healing or combo potion
+                    use_item(cn, in); // use potion
+                    break;
+                }
+            }
+        }
+    }
+
+    if (ch[cn].value[0][V_MANA] && ch[cn].mana < POWERSCALE * 5) {
+        if (!has_spell(cn, IDR_HEAL)) {
+            for (n = 30; n < INVENTORYSIZE; n++) {
+                if ((in = ch[cn].item[n]) && it[in].driver == IDR_POTION && it[in].drdata[2]) { // mana potion
+                    int i;
+                    for (i = 0; i < MAXSOLDIER + 1; i++) { // go over our platoon.
+                        co = dat->platoon[i];
+                        if (ch[co].flags & CF_USED && ch[co].hp < ch[co].value[0][V_HP] * POWERSCALE / 2) { // anyone hurt?
+                            use_item(cn, in); // use potion
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     if (dat->leader_cn) {

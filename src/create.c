@@ -1733,3 +1733,15 @@ int destroy_items(int cn) {
 
     return 1;
 }
+
+int destroy_equipment(int cn) {
+    int n, in;
+
+    for (n = 0; n < 10; n++)
+        if ((in = ch[cn].item[n])) {
+            remove_item_char(in);
+            destroy_item(in);
+        }
+
+    return 1;
+}

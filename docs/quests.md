@@ -69,3 +69,11 @@ A whole area, not just a quest. Beginnings seem easy for the advertised level 20
 
 **54000 EXP, 47% of level 30, in 30 steps.**
 
+## Fire Underground
+
+Platoon commander, with a bunch of... less than smart followers, activating defenses and collecting... something.
+
+_A lot of potential, but barely functional. Demons run back and forth instead of attacking, our soldiers cannot escape and die instead of fighting back. Needs another pass, improving demon and soldier AI._
+
+** 3 * 1000 + 2000 + 3000 + 3 * 4000 + ~30 * 2000 = 80,000 EXP, 30% of level 40.**
+

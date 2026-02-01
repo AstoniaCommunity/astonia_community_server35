@@ -18,6 +18,7 @@ void copy_char(struct character *dst, struct character *src);
 int alloc_item(void);
 void free_item(int in);
 int destroy_items(int cn);
+int destroy_equipment(int cn);
 int lookup_char(char *name);
 int lookup_item(char *name);
 int create_item_nr(int tmp);
