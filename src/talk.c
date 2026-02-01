@@ -113,12 +113,12 @@ int sound_area(int xc, int yc, int type) {
     return 1;
 }
 
-#define HOLLERDIST (DIST * 3)
-#define SHOUTDIST (DIST * 2)
-#define SAYDIST (DIST)
-#define EMOTEDIST (DIST / 2)
-#define QUIETSAYDIST (DIST / 3)
-#define WHISPERDIST (DIST / 4)
+#define SAYDIST 25
+#define HOLLERDIST (SAYDIST * 3)
+#define SHOUTDIST (SAYDIST * 2)
+#define EMOTEDIST (SAYDIST / 2)
+#define QUIETSAYDIST (SAYDIST / 3)
+#define WHISPERDIST (SAYDIST / 4)
 
 #define HOLLERCOST (12 * POWERSCALE)
 #define SHOUTCOST (6 * POWERSCALE)

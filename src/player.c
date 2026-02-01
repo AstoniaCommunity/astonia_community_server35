@@ -55,7 +55,7 @@
 #include "spell.h"
 #include "config.h"
 
-#define SERVER_PROTOCOL_VERSION 2
+#define SERVER_PROTOCOL_VERSION 3
 
 #define MAX_IDLE (TICKS * 30)
 
@@ -356,6 +356,9 @@ static void read_login(int nr) {
         buf[1] = SERVER_PROTOCOL_VERSION;
         psend(nr, buf, 2);
     }
+
+    if (player[nr]->client_version >= 3) player[nr]->dist = 40;
+    else player[nr]->dist = 25;
 
     player_areainfo(nr, AIC_SETID, 0, 0);
 
@@ -1205,42 +1208,42 @@ static int player_check_scroll(int nr, int x, int y) {
             buf[0] = SV_SCROLL_RIGHT;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap, player[nr]->cmap + 1, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - 1));
+            memmove(player[nr]->cmap, player[nr]->cmap + 1, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - 1));
         } else if (player[nr]->x == x + 1 && player[nr]->y == y) {
             buf[0] = SV_SCROLL_LEFT;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap + 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - 1));
+            memmove(player[nr]->cmap + 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - 1));
         } else if (player[nr]->x == x && player[nr]->y == y - 1) {
             buf[0] = SV_SCROLL_DOWN;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap, player[nr]->cmap + (DIST * 2 + 1), sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1)));
+            memmove(player[nr]->cmap, player[nr]->cmap + (DIST(nr) * 2 + 1), sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1)));
         } else if (player[nr]->x == x && player[nr]->y == y + 1) {
             buf[0] = SV_SCROLL_UP;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap + (DIST * 2 + 1), player[nr]->cmap, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1)));
+            memmove(player[nr]->cmap + (DIST(nr) * 2 + 1), player[nr]->cmap, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1)));
         } else if (player[nr]->x == x + 1 && player[nr]->y == y + 1) {
             buf[0] = SV_SCROLL_LEFTUP;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap + (DIST * 2 + 1) + 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1) - 1));
+            memmove(player[nr]->cmap + (DIST(nr) * 2 + 1) + 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1) - 1));
         } else if (player[nr]->x == x + 1 && player[nr]->y == y - 1) {
             buf[0] = SV_SCROLL_LEFTDOWN;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap, player[nr]->cmap + (DIST * 2 + 1) - 1, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1) + 1));
+            memmove(player[nr]->cmap, player[nr]->cmap + (DIST(nr) * 2 + 1) - 1, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1) + 1));
         } else if (player[nr]->x == x - 1 && player[nr]->y == y + 1) {
             buf[0] = SV_SCROLL_RIGHTUP;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap + (DIST * 2 + 1) - 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1) + 1));
+            memmove(player[nr]->cmap + (DIST(nr) * 2 + 1) - 1, player[nr]->cmap, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1) + 1));
         } else if (player[nr]->x == x - 1 && player[nr]->y == y - 1) {
             buf[0] = SV_SCROLL_RIGHTDOWN;
             psend(nr, buf, 1);
 
-            memmove(player[nr]->cmap, player[nr]->cmap + (DIST * 2 + 1) + 1, sizeof(struct cmap) * ((DIST * 2 + 1) * (DIST * 2 + 1) - (DIST * 2 + 1) - 1));
+            memmove(player[nr]->cmap, player[nr]->cmap + (DIST(nr) * 2 + 1) + 1, sizeof(struct cmap) * ((DIST(nr) * 2 + 1) * (DIST(nr) * 2 + 1) - (DIST(nr) * 2 + 1) - 1));
         }
 
         if (!player[nr]) return 0;
@@ -1638,7 +1641,7 @@ static void player_map(int nr) {
     cn = player[nr]->cn;
 
     // make sure los is current
-    redo = update_los(cn, ch[cn].x, ch[cn].y, DIST);
+    redo = update_los(cn, ch[cn].x, ch[cn].y, DISTMAX);
 
     // check for scrolling
     redo |= player_check_scroll(nr, ch[cn].x, ch[cn].y);
@@ -1649,23 +1652,23 @@ static void player_map(int nr) {
         redo = 1;
     }
 
-    xoff = ch[cn].x - DIST;
-    yoff = ch[cn].y - DIST;
+    xoff = ch[cn].x - DIST(nr);
+    yoff = ch[cn].y - DIST(nr);
 
     cmap = player[nr]->cmap;
 
-    for (y = 0; y <= DIST * 2; y++) {
+    for (y = 0; y <= DIST(nr) * 2; y++) {
 
-        if (y < DIST) {
-            xs = DIST - y;
-            xe = DIST + y;
+        if (y < DIST(nr)) {
+            xs = DIST(nr) - y;
+            xe = DIST(nr) + y;
         } else {
-            xs = y - DIST;
-            xe = DIST * 3 - y;
+            xs = y - DIST(nr);
+            xe = DIST(nr) * 3 - y;
         }
 
         for (x = xs; x <= xe; x++) {
-            c = x + y * (DIST * 2 + 1);
+            c = x + y * (DIST(nr) * 2 + 1);
 
             if (!redo) {
                 skipx = skipx_sector(x + xoff, y + yoff);
@@ -1701,7 +1704,7 @@ static void player_map(int nr) {
             } else flags = 0;
 
             if (light < 1) {
-                if (abs(x - DIST) < 2 && abs(y - DIST) < 2) light = 1;
+                if (abs(x - DIST(nr)) < 2 && abs(y - DIST(nr)) < 2) light = 1;
                 else {
                     flags = 0;
                     goto skip;

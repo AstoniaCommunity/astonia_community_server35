@@ -83,7 +83,7 @@ int char_see_char(int cn, int co) {
 
     if (ch[co].flags & CF_INVISIBLE) return 0;
 
-    if (!los_can_see(cn, ch[cn].x, ch[cn].y, ch[co].x, ch[co].y, DIST)) return 0;
+    if (!los_can_see(cn, ch[cn].x, ch[cn].y, ch[co].x, ch[co].y, DISTMAX)) return 0;
 
     return char_see_char_nolos(cn, co);
 }
@@ -95,11 +95,11 @@ int char_see_item(int cn, int in) {
 
     if (it[in].carried) return 0;
 
-    if (!los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x, it[in].y, DIST)) return 0;
+    if (!los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x, it[in].y, DISTMAX)) return 0;
 
     if ((it[in].flags & IF_FRONTWALL) &&
-        ((map[it[in].x + 1 + it[in].y * MAXMAP].flags & (MF_SIGHTBLOCK | MF_TSIGHTBLOCK)) || !los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x + 1, it[in].y, DIST)) &&
-        ((map[it[in].x + it[in].y * MAXMAP + MAXMAP].flags & (MF_SIGHTBLOCK | MF_TSIGHTBLOCK)) || !los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x, it[in].y + 1, DIST)))
+        ((map[it[in].x + 1 + it[in].y * MAXMAP].flags & (MF_SIGHTBLOCK | MF_TSIGHTBLOCK)) || !los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x + 1, it[in].y, DISTMAX)) &&
+        ((map[it[in].x + it[in].y * MAXMAP + MAXMAP].flags & (MF_SIGHTBLOCK | MF_TSIGHTBLOCK)) || !los_can_see(cn, ch[cn].x, ch[cn].y, it[in].x, it[in].y + 1, DISTMAX)))
         return 0;
 
     if (!(it[in].flags & IF_TAKE)) return 1;

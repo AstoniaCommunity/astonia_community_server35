@@ -1411,7 +1411,7 @@ int look_map(int cn, int x, int y) {
     dir = offset2dx(ch[cn].x, ch[cn].y, x, y);
     if (dir) turn(cn, dir);
 
-    if (!los_can_see(cn, ch[cn].x, ch[cn].y, x, y, DIST)) {
+    if (!los_can_see(cn, ch[cn].x, ch[cn].y, x, y, DISTMAX)) {
         log_char(cn, LOG_SYSTEM, 0, "Too far away or hidden.");
         return 0;
     }

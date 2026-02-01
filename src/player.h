@@ -48,6 +48,7 @@ struct player {
     int sock;
     unsigned int addr;
     unsigned int client_version;
+    int dist;
 
     // idle ticker
     int lastcmd;
@@ -77,7 +78,7 @@ struct player {
     struct z_stream_s zs;
 
     // cache of client data
-    struct cmap cmap[(DIST * 2 + 1) * (DIST * 2 + 1)]; // map
+    struct cmap cmap[(DISTMAX * 2 + 1) * (DISTMAX * 2 + 1)]; // map
     int x, y; // last position on map
 
     short value[2][V_MAX]; // character values

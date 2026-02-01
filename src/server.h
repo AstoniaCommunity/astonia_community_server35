@@ -34,7 +34,9 @@
 
 // define DIST if client.h wasn't loaded already
 #ifndef DIST
-#define DIST 25
+#define DIST(nr) (player[nr]->dist)
+#define DISTMAX 40
+#define SAYDIST 25
 #endif
 
 // *********** Server Status Variables *******

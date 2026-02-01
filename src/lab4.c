@@ -353,28 +353,28 @@ void lab3_prisoner_driver(int cn, int ret, int lastact) {
             switch (ppd->prisoner_talkstep) {
             case 0: // INTRO
                 say(cn, "Blub.");
-                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, DIST * 2, "The Prisoner looks glad to see thee, %s.", ch[co].name);
+                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, SAYDIST * 2, "The Prisoner looks glad to see thee, %s.", ch[co].name);
                 didsay = 1;
                 ppd->prisoner_talkstep++;
                 dat->next_talk = ticker + 3 * TICKS;
                 break;
 
             case 1:
-                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, DIST * 2, "The Prisoner points to thee, %s, and moves his Hands like unlocking a door.", ch[co].name);
+                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, SAYDIST * 2, "The Prisoner points to thee, %s, and moves his Hands like unlocking a door.", ch[co].name);
                 didsay = 1;
                 ppd->prisoner_talkstep++;
                 dat->next_talk = ticker + 3 * TICKS;
                 break;
 
             case 2:
-                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, DIST * 2, "He points to the imaginary key, then he points to himself.");
+                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, SAYDIST * 2, "He points to the imaginary key, then he points to himself.");
                 didsay = 1;
                 ppd->prisoner_talkstep++;
                 dat->next_talk = ticker + 3 * TICKS;
                 break;
 
             case 3: // say(cn,"I wrote it down, so i won't forget it. Wait a moment and I'll give it to thee, %s.",ch[co].name);
-                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, DIST * 2, "Now he makes signs like giving something to thee.");
+                log_area(ch[cn].x, ch[cn].y, LOG_SYSTEM, 0, SAYDIST * 2, "Now he makes signs like giving something to thee.");
                 didsay = 1;
                 ppd->prisoner_talkstep = 255;
                 dat->next_talk = ticker + 3 * TICKS;

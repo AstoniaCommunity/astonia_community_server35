@@ -3,7 +3,8 @@
  */
 
 #ifndef DIST
-#define DIST 25
+#define DIST(nr) (player[nr]->dist)
+#define DISTMAX 40
 #endif
 
 #define CMF_LIGHT (1 + 2 + 4 + 8)
