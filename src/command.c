@@ -2436,6 +2436,11 @@ int command(int cn, char *ptr) // 1=ok, 0=repeat
         return 1;
     }
 
+    if ((len = cmdcmp(ptr, "tabunga", 7)) && (ch[cn].flags & CF_GOD)) {
+        tabunga(cn, cn, ptr);
+        return 1;
+    }
+
     if ((len = cmdcmp(ptr, "itemmod", 7)) && (ch[cn].flags & (CF_GOD))) {
         int pos, nr, in, val;
         char *tmp;

@@ -1842,10 +1842,13 @@ void tabunga(int cn, int co, char *ptr) {
         say(cn, "Defensive Value: %d, AV: %.2f", ch[cn].value[0][V_DEFENSE], ch[cn].value[0][V_ARMOR] / 20.0);
         say(cn, "Speed          : %d", ch[cn].value[0][V_SPEED]);
         say(cn, "Light          : %d", ch[cn].value[0][V_LIGHT]);
-        for (n = 0; n < INVENTORYSIZE; n++) {
-            int in;
-            if ((in = ch[cn].item[n])) {
-                say(cn, "carrying in slot %d: %s", n, it[in].name);
+
+        if (strcasestr(ptr, "items")) {
+            for (n = 0; n < INVENTORYSIZE; n++) {
+                int in;
+                if ((in = ch[cn].item[n])) {
+                    say(cn, "carrying in slot %d: %s", n, it[in].name);
+                }
             }
         }
     }

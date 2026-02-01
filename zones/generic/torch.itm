@@ -23,7 +23,7 @@ flag=IF_TAKE
 flag=IF_WNLHAND
 flag=IF_USE
 driver=12
-arg="000008E0"
+arg="00007830"
 ;
 
 green_torch:
@@ -52,4 +52,47 @@ flag=IF_WNLHAND
 flag=IF_USE
 driver=12
 arg="00007878"
+;
+
+largetorch:
+name="Large Torch"
+description="A large torch."
+value=40
+sprite=50023
+mod_index=V_LIGHT
+mod_value=1
+flag=IF_TAKE
+flag=IF_WNLHAND
+flag=IF_USE
+driver=12
+arg="0000F091"
+;
+
+bigtorch:
+name="Big Torch"
+description="A big torch."
+value=40
+sprite=50023
+mod_index=V_LIGHT
+mod_value=1
+flag=IF_TAKE
+flag=IF_WNLHAND
+flag=IF_USE
+driver=12
+arg="0000F0AA"
+;
+
+
+hugetorch:
+name="Huge Torch"
+description="A huge torch."
+value=40
+sprite=50023
+mod_index=V_LIGHT
+mod_value=1
+flag=IF_TAKE
+flag=IF_WNLHAND
+flag=IF_USE
+driver=12
+arg="0000F0E2"
 ;

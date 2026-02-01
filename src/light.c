@@ -55,7 +55,8 @@ static void add_light(int xc, int yc, int stren, int cn) {
         stren = -stren;
     } else flag = 0;
 
-    if (stren > 100) stren = 100;
+    // was: 100, max distance therefore 9 tiles. Changed to 257, giving a max distance of 16. 81 vs 256 tiles to calculate. ouch.
+    if (stren > 257) stren = 257;
 
     dist = sqrt(stren - 1) + 1;
 
