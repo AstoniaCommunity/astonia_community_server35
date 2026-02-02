@@ -32,7 +32,7 @@
 #define MAXEF 64
 
 #ifdef NEED_PLAYER_STRUCT
-#define OBUFSIZE 16384
+#define OBUFSIZE (16384 * 2) // 32K should be fine for everything. protocol 3 can handle up to 64K if needed.
 
 #define MAXSCROLLBACK 8192
 

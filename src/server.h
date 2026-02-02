@@ -36,6 +36,7 @@
 #ifndef DIST
 #define DIST(nr) (player[nr]->dist)
 #define DISTMAX 40
+#define DISTOLD 25
 #define SAYDIST 25
 #endif
 

@@ -318,6 +318,7 @@ static void read_login(int nr) {
     player[nr]->cn = cn;
     player[nr]->login_time = realtime;
     player[nr]->ticker = ticker;
+    player[nr]->client_version = 0;
 
     // we use the old vendor field to transmit the client version
     if ((magic & 0xffffff00) == 0x8fd46100) player[nr]->client_version = magic & 0xff;
@@ -357,8 +358,8 @@ static void read_login(int nr) {
         psend(nr, buf, 2);
     }
 
-    if (player[nr]->client_version >= 3) player[nr]->dist = 40;
-    else player[nr]->dist = 25;
+    if (player[nr]->client_version >= 3) player[nr]->dist = DISTMAX;
+    else player[nr]->dist = DISTOLD;
 
     player_areainfo(nr, AIC_SETID, 0, 0);
 

@@ -271,69 +271,43 @@ void psend(int nr, char *buf, int len) {
 
 // careful here, any csend might clear player[n]!
 void pflush(void) {
-    int n, ilen, olen, csize, ret, olow, ohigh;
-    unsigned char obuf[OBUFSIZE];
-    unsigned long long prof;
+    int n, len, low, high;
 
     for (n = 1; n < MAXPLAYER; n++) {
         if (!player[n]) continue;
 
-        ilen = player[n]->tptr;
+        len = player[n]->tptr;
 
-        if (ilen > 16) {
-            player[n]->zs.next_in = player[n]->tbuf;
-            player[n]->zs.avail_in = ilen;
+        if (len > 63) {
+            if (len > 16382) {
+                static unsigned char ff[] = {0xff, 0xff};
 
-            player[n]->zs.next_out = obuf;
-            player[n]->zs.avail_out = OBUFSIZE;
+                // this shouldn't happen, but if it does, we at least handle it gracefully.
+                if (player[n]->client_version < 3) {
+                    int cn;
 
-            prof = prof_start(12);
-            ret = deflate(&player[n]->zs, Z_SYNC_FLUSH);
-            prof_stop(12, prof);
-            if (ret != Z_OK) {
-                elog("compression failure #1, kicking player %d", n);
-                kick_player(n, NULL);
-                continue;
+                    if ((cn = player[n]->cn) && cn >= 1 && cn < MAXCHARS) exit_char(cn);
+
+                    player[n]->tptr = 0;
+                    player_client_exit(n, "bigtick");
+                    elog("large tick: %d, reduced to %d, kicking player.", len, player[n]->tptr);
+                    len = player[n]->tptr;
+                }
+                csend(n, ff, 2);
+                xlog("big tick: %d", len);
             }
 
-            if (player[n]->zs.avail_in) {
-                elog("compression failure #2, kicking player %d", n);
-                kick_player(n, NULL);
-                continue;
-            }
+            high = len >> 8;
+            low = len & 255;
 
-            csize = OBUFSIZE - player[n]->zs.avail_out;
-
-            olen = (csize);
-
-            if (olen > 63) {
-                ohigh = (olen >> 8) | 0x80;
-                olow = olen & 255;
-
-                csend(n, (void *)(&ohigh), 1);
-                csend(n, (void *)(&olow), 1);
-            } else {
-                ohigh = olen | (0x40 | 0x80);
-                csend(n, (void *)(&ohigh), 1);
-            }
-            csend(n, obuf, csize);
+            csend(n, (void *)(&high), 1);
+            csend(n, (void *)(&low), 1);
         } else {
-            csize = player[n]->tptr;
-
-            olen = (csize);
-
-            if (olen > 63) {
-                ohigh = olen >> 8;
-                olow = olen & 255;
-
-                csend(n, (void *)(&ohigh), 1);
-                csend(n, (void *)(&olow), 1);
-            } else {
-                ohigh = olen | 0x40;
-                csend(n, (void *)(&ohigh), 1);
-            }
-            if (ilen && player[n]) csend(n, player[n]->tbuf, ilen);
+            high = len | 0x40;
+            csend(n, (void *)(&high), 1);
         }
+
+        if (len && player[n]) csend(n, player[n]->tbuf, len);
 
         if (player[n]) player[n]->tptr = 0;
     }

@@ -5,6 +5,7 @@
 #ifndef DIST
 #define DIST(nr) (player[nr]->dist)
 #define DISTMAX 40
+#define DISTOLD 25
 #endif
 
 #define CMF_LIGHT (1 + 2 + 4 + 8)
