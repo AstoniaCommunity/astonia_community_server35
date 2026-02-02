@@ -354,7 +354,7 @@ static void read_login(int nr) {
     // clients v1 and better understand SV_PROTOCOL, so we tell them the server version
     if (player[nr]->client_version > 0) {
         buf[0] = SV_PROTOCOL;
-        buf[1] = SERVER_PROTOCOL_VERSION;
+        buf[1] = min(player[nr]->client_version, SERVER_PROTOCOL_VERSION);
         psend(nr, buf, 2);
     }
 
@@ -2851,6 +2851,15 @@ int get_char_version(int cn) {
     if (!player) return 0;
 
     if ((nr = ch[cn].player) && player[nr]) return player[nr]->client_version;
+    else return 0;
+}
+
+int get_char_viewdist(int cn) {
+    int nr;
+
+    if (!player) return 0;
+
+    if ((nr = ch[cn].player) && player[nr]) return player[nr]->dist;
     else return 0;
 }
 

@@ -159,6 +159,7 @@ unsigned int get_player_addr(int nr);
 void sendquestlog(int cn, int nr);
 int get_player_version(int nr);
 int get_char_version(int cn);
+int get_char_viewdist(int cn);
 
 #define AIC_SETID 0
 #define AIC_CLEAR 1
