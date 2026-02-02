@@ -108,7 +108,7 @@ static pthread_mutex_t data_mutex;
 static pthread_mutex_t server_mutex;
 
 volatile static int db_thread_quit = 0;
-volatile int global_online, max_online;
+volatile int global_online;
 
 unsigned int query_cnt = 0, query_long = 0, query_long_max = 0;
 unsigned long long query_time = 0, query_long_time = 0;
@@ -2214,17 +2214,6 @@ static void update_arealist(void) {
         return;
     }
     if ((row = mysql_fetch_row(result)) && row[0]) global_online = atoi(row[0]);
-    mysql_free_result_cnt(result);
-
-    if (mysql_query_con(&mysql, "select val from vars where name='max_on'")) {
-        elog("update_arealist: Could not read cur_on: Error: %s (%d)", mysql_error(&mysql), mysql_errno(&mysql));
-        return;
-    }
-    if (!(result = mysql_store_result_cnt(&mysql))) {
-        elog("update_arealist: Failed to store result(2): Error: %s (%d)", mysql_error(&mysql), mysql_errno(&mysql));
-        return;
-    }
-    if ((row = mysql_fetch_row(result)) && row[0]) max_online = atoi(row[0]);
     mysql_free_result_cnt(result);
 }
 

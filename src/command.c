@@ -2258,9 +2258,9 @@ int command(int cn, char *ptr) // 1=ok, 0=repeat
     }
 
     if ((len = cmdcmp(ptr, "version", 4))) {
-        extern volatile int global_online, max_online;
+        extern volatile int global_online;
         log_char(cn, LOG_SYSTEM, 0, "Server Version %d.%d.%d (compiled %s %s)", VERSION >> 24, (VERSION >> 16) & 255, VERSION & 65535, VER_TIME, VER_DATE);
-        log_char(cn, LOG_SYSTEM, 0, "Area %d, Mirror %d, %d online (global: %d of %d)", areaID, areaM, online, global_online, max_online);
+        log_char(cn, LOG_SYSTEM, 0, "Area %d, Mirror %d, %d online (global: %d)", areaID, areaM, online, global_online);
         return 1;
     }
 
