@@ -231,7 +231,7 @@ static void read_login(int nr) {
         return;
     }
 
-    remove_input(nr, 20);
+    remove_input(nr, sizeof(ch[0].name) + MAXPASSWORD + 4 + 12);
 
     if (ret == -1) {
         player_client_exit(nr, "Internal error. Please try again. If several retries fail email game@astonia.com.");
@@ -1043,6 +1043,7 @@ static void read_input(int nr) {
         break;
 
     default:
+        elog("Got illegal command %d from player %d. Trashing %d bytes.", player[nr]->inbuf[0], nr, player[nr]->in_len);
         player[nr]->in_len = 0; // got illegal command. trash all input and bail out
         return;
     }
