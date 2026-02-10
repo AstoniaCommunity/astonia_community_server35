@@ -109,8 +109,8 @@ static void build_los(int cn, int xc, int yc, int maxdist) {
 
     bzero(los[cn].tab, sizeof(los[cn].tab));
 
-    los[cn].xoff = MAXDIST - xc;
-    los[cn].yoff = MAXDIST - yc;
+    los[cn].xoff = DISTMAX - xc;
+    los[cn].yoff = DISTMAX - yc;
     los[cn].maxdist = maxdist;
 
     add_los(cn, xc, yc, 1);
@@ -158,8 +158,8 @@ void reset_los(int xc, int yc) {
 
     prof = prof_start(14);
 
-    for (y = max(0, yc - MAXDIST); y <= min(MAXMAP - 1, yc + MAXDIST); y++) {
-        for (x = max(0, xc - MAXDIST); x <= min(MAXMAP - 1, xc + MAXDIST); x++) {
+    for (y = max(0, yc - DISTMAX); y <= min(MAXMAP - 1, yc + DISTMAX); y++) {
+        for (x = max(0, xc - DISTMAX); x <= min(MAXMAP - 1, xc + DISTMAX); x++) {
             if ((cn = map[x + y * MAXMAP].ch) != 0) {
                 los[cn].x = los[cn].y = 0;
             }
@@ -175,7 +175,7 @@ void reset_los(int xc, int yc) {
 // updates the LOS cache for character cn
 // returns true if los had to be rebuild, false otherwise
 int update_los(int cn, int xc, int yc, int maxdist) {
-    if (maxdist > MAXDIST) maxdist = MAXDIST;
+    if (maxdist > DISTMAX) maxdist = DISTMAX;
 
     if (xc != los[cn].x || yc != los[cn].y || maxdist > los[cn].maxdist) {
         build_los(cn, xc, yc, maxdist);
@@ -197,7 +197,7 @@ int los_can_see(int cn, int xc, int yc, int tx, int ty, int maxdist) {
         return 0;
     }
 
-    if (maxdist > MAXDIST) maxdist = MAXDIST;
+    if (maxdist > DISTMAX) maxdist = DISTMAX;
 
     if (xc != los[cn].x || yc != los[cn].y || maxdist > los[cn].maxdist) {
         build_los(cn, xc, yc, maxdist);

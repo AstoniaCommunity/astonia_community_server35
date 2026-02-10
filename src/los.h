@@ -2,8 +2,7 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#define MAXDIST 25
-#define SIZE (MAXDIST * 2 + 1)
+#define SIZE (DISTMAX * 2 + 1)
 
 struct los {
     int x, y;

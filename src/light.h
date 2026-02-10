@@ -2,7 +2,7 @@
  * Part of Astonia Server 3.5 (c) Daniel Brockhaus. Please read license.txt.
  */
 
-#define LIGHTDIST 10
+#define LIGHTDIST 16
 
 void add_effect_light(int x, int y, int light);
 void remove_effect_light(int x, int y, int light);
