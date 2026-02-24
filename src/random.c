@@ -2357,7 +2357,7 @@ void gastrap(int in, int cn) {
     else if (map[n + MAXMAP].fsprite >= 15291 && map[n + MAXMAP].fsprite <= 15326) m = n + MAXMAP;
     else if (map[n - MAXMAP].fsprite >= 15291 && map[n - MAXMAP].fsprite <= 15326) m = n - MAXMAP;
     else {
-        elog("gastrap at %d,%d could not find fsprite", it[in].x, it[n].y);
+        elog("gastrap at %d,%d could not find fsprite", it[in].x, it[in].y);
         return;
     }
 
