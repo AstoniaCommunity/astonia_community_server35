@@ -106,7 +106,7 @@ void lookup_add_cache(unsigned int ID, char *name) {
     if (multi) pthread_mutex_lock(&mutex);
     for (n = 0; n < MAXLOOK; n++) {
         if (ID != -1 && lookup[n].ID == ID) break;
-        if (name && lookup[n].name && !strcasecmp(lookup[n].name, name)) break;
+        if (name && !strcasecmp(lookup[n].name, name)) break;
     }
     if (n == MAXLOOK) n = pos = (pos + 1) % MAXLOOK;
 

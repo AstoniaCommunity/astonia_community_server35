@@ -107,6 +107,7 @@ void create_worker(int follow_cn, struct saltmine_ppd *ppd) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
+#pragma GCC diagnostic ignored "-Wrestrict"
     snprintf(ch[cn].name, sizeof(ch[cn].name) - 1, "%s's Monk", ch[follow_cn].name);
     ch[cn].name[sizeof(ch[cn].name) - 1] = 0;
 #pragma GCC diagnostic pop
