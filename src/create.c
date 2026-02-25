@@ -417,7 +417,9 @@ static char *CF_tab[] = {
     "CF_SMALLUPDATE", //43
     "CF_NOWHO", //44
     "CF_WON", //45
-    "CF_NOMOVE" //46
+    "CF_NOMOVE", //46
+    "CF_TUTOR", //47
+    "CF_NOFLASK" //48
 };
 
 static int lookup_CF(char *name) {

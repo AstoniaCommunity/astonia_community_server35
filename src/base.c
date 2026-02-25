@@ -443,7 +443,7 @@ void potion_driver(int in, int cn) {
                  it[in].drdata[3] * POWERSCALE,
                  it[in].drdata[2] * POWERSCALE);
 
-    if (empty) replace_item_char(in, in2);
+    if (empty && (!(ch[cn].flags & CF_NOFLASK))) replace_item_char(in, in2);
     else remove_item_char(in);
 
     free_item(in);

@@ -263,6 +263,7 @@ extern struct item *it;
 #define CF_WON (1ull << 45) // character won the game (ie killed islena)
 #define CF_NOMOVE (1ull << 46) // fightback doesn't move the player
 #define CF_TUTOR (1ull << 47) // member of the tutor group
+#define CF_NOFLASK (1ull << 48) // stops empty potions replacing used potions
 
 // VALUES
 #define V_HP 0
