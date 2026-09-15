@@ -938,14 +938,17 @@ static void cmd_help(int cn) {
     log_char(cn, LOG_SYSTEM, 0, "/emote <text> - express yourself (also /me, /wave, /bow, /eg)");
     log_char(cn, LOG_SYSTEM, 0, "/gold <amount> - move gold to cursor");
     log_char(cn, LOG_SYSTEM, 0, "/holler <text> - like say, but with vastly increased range");
-    log_char(cn, LOG_SYSTEM, 0, "/hints <cmd> - turn the tutorial 'off', 'on' or 'reset' it.");
+    log_char(cn, LOG_SYSTEM, 0, "/hints <cmd> - turn the tutorial 'off', 'on' or 'reset' it");
     log_char(cn, LOG_SYSTEM, 0, "/ignore <name> - ignore a player in chat and tells");
     log_char(cn, LOG_SYSTEM, 0, "/join <nr> - joins chat channel <nr>");
+    log_char(cn, LOG_SYSTEM, 0, "/killbless - removes bless");
+    log_char(cn, LOG_SYSTEM, 0, "/killpotion - removes stat potion");
     log_char(cn, LOG_SYSTEM, 0, "/lastseen <player> - last time player logged into the game");
     log_char(cn, LOG_SYSTEM, 0, "/leave <nr> - leaves chat channel <nr>");
     log_char(cn, LOG_SYSTEM, 0, "/logout - logout when on blue square");
     log_char(cn, LOG_SYSTEM, 0, "/maxlag <seconds> - set delay for lag control");
     log_char(cn, LOG_SYSTEM, 0, "/murmur <text> - like say, but only within close range");
+    log_char(cn, LOG_SYSTEM, 0, "/noflask - prevents empty flasks when using potions");
     log_char(cn, LOG_SYSTEM, 0, "/notells - do not receive any tells (toggle)");
     log_char(cn, LOG_SYSTEM, 0, "/relation <nr> - show clan <nr>'s relations");
     log_char(cn, LOG_SYSTEM, 0, "/say <text> - makes your character say <text>");
@@ -2351,6 +2354,44 @@ int command(int cn, char *ptr) // 1=ok, 0=repeat
             ch[cn].flags ^= CF_NOMOVE;
             show_lostconppd(cn, ppd);
         }
+        return 1;
+    }
+
+    if (cmdcmp(ptr, "killbless", 5)) {
+        int n, in;
+        for (n = 12; n < 30; n++) {
+            if ((in = ch[cn].item[n]) && it[in].driver == IDR_BLESS) {
+                destroy_effect_type(cn, EF_BLESS);
+                destroy_item(in);
+                ch[cn].item[n] = 0;
+                update_char(cn);
+                log_char(cn, LOG_SYSTEM, 0, "Done.");
+                return 1;
+            }
+        }
+        log_char(cn, LOG_SYSTEM, 0, "No Bless found.");
+        return 1;
+    }
+
+    if (cmdcmp(ptr, "killpotion", 5)) {
+        int n, in;
+        for (n = 12; n < 30; n++) {
+            if ((in = ch[cn].item[n]) && it[in].driver == IDR_POTION_SP) {
+                destroy_effect_type(cn, EF_POTION);
+                destroy_item(in);
+                ch[cn].item[n] = 0;
+                update_char(cn);
+                log_char(cn, LOG_SYSTEM, 0, "Done.");
+                return 1;
+            }
+        }
+        log_char(cn, LOG_SYSTEM, 0, "No stat potion found.");
+        return 1;
+    }
+
+    if (cmdcmp(ptr, "noflask", 7)) {
+        ch[cn].flags ^= CF_NOFLASK;
+        log_char(cn, LOG_SYSTEM, 0, "NoFlask %s.", (ch[cn].flags & CF_NOFLASK) ? "enabled" : "disabled");
         return 1;
     }
 

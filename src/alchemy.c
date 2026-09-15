@@ -754,7 +754,7 @@ int mixer_use(int cn, int in) {
     }
 
     if (!(fre = may_add_spell(cn, IDR_POTION_SP))) {
-        log_char(cn, LOG_SYSTEM, 0, "Another potion is still active.");
+        log_char(cn, LOG_SYSTEM, 0, "Another potion is still active. Use /killpotion to remove it.");
         return 0;
     }
 
@@ -810,6 +810,11 @@ void flask_driver(int in, int cn) {
     if (!(in2 = ch[cn].citem)) {
         if (shaken) { // potion is ready
             if (!mixer_use(cn, in)) return;
+            if (ch[cn].flags & CF_NOFLASK) {
+                remove_item_char(in);
+                free_item(in);
+                return;
+            }
             strcpy(it[in].name, "Empty Potion");
             switch (size) {
             case 1:
